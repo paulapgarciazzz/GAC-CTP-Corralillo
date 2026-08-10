@@ -22,8 +22,12 @@ Homestead.yaml
 # FRONTEND (React + Vite + TypeScript)
 # ========================================
 /frontend/node_modules
+/frontend/GAC-Frontend/node_modules
+/frontend/GAC-Frontend/.pnpm-store
 /frontend/dist
+/frontend/GAC-Frontend/dist
 /frontend/.env
+/frontend/GAC-Frontend/.env
 /frontend/.env.local
 /frontend/.env.production
 /frontend/coverage
@@ -52,3 +56,5 @@ Desktop.ini
 # ========================================
 /.phpunit.cache
 /coverage
+/.env
+docker_data/

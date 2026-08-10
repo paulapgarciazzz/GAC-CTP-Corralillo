@@ -1,0 +1,13 @@
+{
+	"devDependencies": {
+		"@tailwindcss/vite": "^4.3.3",
+		"autoprefixer": "^10.5.4",
+		"postcss": "^8.5.26",
+		"tailwindcss": "^4.3.3"
+	},
+	"dependencies": {
+		"@tanstack/react-form": "^1.33.4",
+		"@tanstack/react-router": "^1.170.23",
+		"@tanstack/react-table": "^9.1.1"
+	}
+}
