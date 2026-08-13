@@ -1,4 +1,3 @@
-import logo from '../../../assets/logo.png'
 import escudo from '../../../assets/escudo.png'
 
 const Navbar = () => {

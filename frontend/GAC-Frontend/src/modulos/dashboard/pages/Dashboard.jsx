@@ -4,35 +4,31 @@ import { useState } from 'react'
 import { useEffect } from 'react';
 
 const Dashboard =()=>{
-    const [isDark,setIsdark]= useState (true);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth < 1024);
+    const [isDark,setIsDark]= useState (()=>{
+        const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+        return savedTheme === 'dark';
+    }
+    return window.matchMedia('(prefers-color-scheme:dark)').matches;
+    });
+    const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
     useEffect(() => {
         const handleResize = () =>{
-            const mobile = window.innerWidth >= 1024;
-            setIsMobile(window.innerWidth < 1024);
-            if(mobile){
-                setIsSidebarOpen(false);
-            }else{
-                setIsSidebarOpen(true);
-            }
-        };
+            const mobile = window.innerWidth < 1024;
+            setIsMobile(mobile);
+            
+            setIsSidebarOpen(prev => {
+                const newState = !mobile;
+            return prev !== newState ? newState : prev;
+        });
+    };
         window.addEventListener('resize', handleResize);
         
         return () => window.removeEventListener('resize', handleResize);
     },[]);
 
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-sheme:dark)').matches;
-        if(savedTheme){
-            setIsdark(savedTheme === 'dark');
-        }else if(systemPrefersDark){
-            setIsdark(true);
-        }
-        
-    },[]);
 
     useEffect(() => {
         const html = document.documentElement;
@@ -45,7 +41,7 @@ const Dashboard =()=>{
         }
     },[isDark]);
     const toggleTheme = () => {
-        setIsdark(!isDark);
+        setIsDark(!isDark);
     };
     const toggleDrawer = () =>{
         if (isMobile){
