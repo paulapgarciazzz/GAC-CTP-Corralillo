@@ -1,4 +1,5 @@
 import logo from '../../../assets/logo.png'
+import escudo from '../../../assets/escudo.png'
 
 const Navbar = () => {
     return (
@@ -7,7 +8,7 @@ const Navbar = () => {
             <div className="container px-4 mx-auto relative text-sm">
                 <div className="flex justify-center items-center">
                     <div className= "flex items-center shrink-0">
-                        <img className="h-24 w-24 mr-2" src={logo} alt="Logo"/>
+                        <img className="h-16 w-16 mr-2" src={escudo} alt="Escudo"/>
                         <span className="text-xl tracking-tight">CTP de Corralillo</span>
                     </div>
                     <ul className="hidden lg:flex ml-14 space-x-12">
@@ -21,6 +22,7 @@ const Navbar = () => {
                             onClick={() => alert("Funcionalidad de inicio de sesión")}>
                             Iniciar sesión
                         </button>
+                        
                     </div>
                      <div className="lg:hidden ml-14 space-x-4">
                         <button className="text-gray-700 focus:outline-none">
