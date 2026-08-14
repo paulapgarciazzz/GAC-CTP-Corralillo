@@ -1,6 +1,16 @@
 import escudo from '../../../assets/escudo.png'
+import { useNavigate, Link } from '@tanstack/react-router'
 
 const Navbar = () => {
+    const navigate = useNavigate();
+    const handleGoToDashboard = () => {
+        navigate({ to: '/dashboard' })
+    }
+    const handleGoToLogin = () => {
+        // Puedes redirigir a una página de login o mostrar un modal
+        // Por ahora usaremos un alert
+        alert("Funcionalidad de inicio de sesión")
+    }
     return (
         <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg border-b
         border-neutral-700/80">
@@ -11,15 +21,20 @@ const Navbar = () => {
                         <span className="text-xl tracking-tight">CTP de Corralillo</span>
                     </div>
                     <ul className="hidden lg:flex ml-14 space-x-12">
-                        <li><a href="#" className="hover:text-blue-500">Inicio</a></li>
+                        <li><Link to="/" className="hover:text-blue-500">Inicio</Link></li>
                         <li><a href="#" className="hover:text-blue-500">Calendario</a></li>
                         <li><a href="#" className="hover:text-blue-500">Conocenos</a></li>
                         <li><a href="#" className="hover:text-blue-500">Contacto</a></li>
                     </ul>
                     <div className="hidden lg:flex justify-center ml-14 space-x-4 items-center">
                         <button className="px-6 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-medium shadow-md hover:shadow-lg" 
-                            onClick={() => alert("Funcionalidad de inicio de sesión")}>
+                            onClick={handleGoToLogin}>
                             Iniciar sesión
+                        </button>
+                        
+                        <button className="px-6 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-medium shadow-md hover:shadow-lg" 
+                            onClick={handleGoToDashboard}>
+                            Panel de Gestion
                         </button>
                         
                     </div>

@@ -1,15 +1,15 @@
-import Landingpage from './modulos/landing/pages/Landingpage'
-import Dashboard from './modulos/dashboard/pages/Dashboard'
+import { RouterProvider } from '@tanstack/react-router'
+import { router } from './routes/router'
 import './App.css'
 
 
 function App() {
   
   return (
-    <>
+   
       
-      <Dashboard/>
-    </>
+    <RouterProvider router={router} /> 
+    
   )
 }
 

@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { Menu, Search, Sun, Moon, UserCircle, Settings, LogOut} from 'lucide-react'
 import user from '../../../assets/user.jpg'
-
-
-
+import { useNavigate, Link } from '@tanstack/react-router'
 
 const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const navigate = useNavigate();
+    const handleGoToHome = () => {
+        navigate({ to: '/' })
+    }
+    
     return(
         <nav className="sticky top-0 z-20 bg-white/80 dark:bg-background/80 backdrop-blur-lg">
             <div className= "px-4 sm:px-6 py-3">
@@ -56,8 +59,9 @@ const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
                                             <Settings className='w-4 h-4'/>
                                             Ajustes
                                         </button>
-                                        <button className='flex items-center gap-3 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-red-500/10 rounded-lg transition-colors'>
-                                            <LogOut className='w-4 h-4'/>
+                                        <button className='flex items-center gap-3 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-red-500/10 rounded-lg transition-colors'  onClick={handleGoToHome}>
+                                            
+                                            <LogOut  className='w-4 h-4'/>
                                             Cerrar Sesión 
                                         </button>
                                     </div>
