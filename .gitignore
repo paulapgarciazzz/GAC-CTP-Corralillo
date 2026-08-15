@@ -58,3 +58,4 @@ Desktop.ini
 /coverage
 /.env
 docker_data/
+.env

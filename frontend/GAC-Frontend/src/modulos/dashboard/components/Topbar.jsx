@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Menu, Search, Sun, Moon, UserCircle, Settings, LogOut} from 'lucide-react'
 import user from '../../../assets/user.jpg'
-import { useNavigate, Link } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 
 const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
