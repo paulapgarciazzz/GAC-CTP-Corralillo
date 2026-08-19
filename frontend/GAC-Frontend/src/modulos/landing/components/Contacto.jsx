@@ -1,7 +1,7 @@
 
 const Contacto = () => {
   return (
-    <section id="contacto" className="py-16 bg-white">
+    <section id="contacto" className="scroll-mt-24 py-16 bg-white">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-12">Información de Contacto</h2>
         <div className="max-w-3xl mx-auto bg-gray-50 p-8 rounded-xl shadow-md">

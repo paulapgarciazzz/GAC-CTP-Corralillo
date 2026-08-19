@@ -1,4 +1,4 @@
-import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding } from "lucide-react";
+import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, UsersRound, Boxes, UserRoundArrowLeft, BookUser, SquareLibrary, CirclePile } from "lucide-react";
 import { useState } from "react"
 import logo from '../../../assets/logo.png'
 import { ChevronDown } from "lucide-react";
@@ -11,10 +11,16 @@ const Sidebar = ({ onCloseDrawer }) =>{
         {name: "Inicio", icon: LayoutDashboard, active:false},
         {name: "Solicitudes", icon: FileUser, active:false,
             children: [
+                {name: "Gestion de Solicitudes", icon: BookUser},
                 {name: "Gestion de Agrupaciones", icon: PersonStanding},
             ]
         },
-        {name: "Inventario", icon: ShelvingUnit, active:false},
+        {name: "Inventario", icon: ShelvingUnit, active:false,
+            children: [
+                {name: "Gestion de Inventario", icon: SquareLibrary},
+                {name: "Agregar a inventario", icon: CirclePile},
+            ]
+        },
         {name: "Calendario", icon: CalendarDays, active:false},
         {name: "Gestion de Usuarios", icon: UserCog, active:false,
             children: [
@@ -23,7 +29,15 @@ const Sidebar = ({ onCloseDrawer }) =>{
                 {name: "Roles y Permisos", icon: Shield},
             ]
         },
-        {name: "Reportes", icon: ClipboardMinus, active:false},
+        {name: "Reportes", icon: ClipboardMinus, active:false,
+            children: [
+                {name: "Reportes de Agrupaciones", icon: FileUser},
+                {name: "Reportes de Actividades", icon: Boxes},
+                {name: "Reportes de Asistencia", icon: UserRoundArrowLeft},
+                {name: "Reportes de Inventario", icon: UsersRound},
+
+            ]
+        },
         
     ]);
     const handleClick = (index) => {

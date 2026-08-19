@@ -1,16 +1,15 @@
-import escudo from '../../../assets/escudo.png'
-import { useNavigate, Link } from '@tanstack/react-router'
+import escudo from '../../../assets/escudo.png';
+import { useAuth } from '../../../auth/hooks/useAuth';
+import { useNavigate, Link } from '@tanstack/react-router';
 
 const Navbar = () => {
+    const {isAuthenticated, logout} = useAuth();
     const navigate = useNavigate();
-    const handleGoToDashboard = () => {
-        navigate({ to: '/dashboard' })
+    const handleLogout = async () => {
+       await logout();
+       navigate({ to: '/'});
     }
-    const handleGoToLogin = () => {
-        // Puedes redirigir a una página de login o mostrar un modal
-        // Por ahora usaremos un alert
-        alert("Funcionalidad de inicio de sesión")
-    }
+   
     return (
         <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg border-b
         border-neutral-700/80">
@@ -23,19 +22,39 @@ const Navbar = () => {
                     <ul className="hidden lg:flex ml-14 space-x-12">
                         <li><Link to="/" className="hover:text-blue-500">Inicio</Link></li>
                         <li><a href="#" className="hover:text-blue-500">Calendario</a></li>
-                        <li><a href="#" className="hover:text-blue-500">Conocenos</a></li>
-                        <li><a href="#" className="hover:text-blue-500">Contacto</a></li>
+                        <li><a href="#conocenos" className="hover:text-blue-500">Conocenos</a></li>
+                        <li><a href="#contacto" className="hover:text-blue-500">Contacto</a></li>
                     </ul>
                     <div className="hidden lg:flex justify-center ml-14 space-x-4 items-center">
-                        <button className="px-6 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-medium shadow-md hover:shadow-lg" 
-                            onClick={handleGoToLogin}>
-                            Iniciar sesión
-                        </button>
-                        
-                        <button className="px-6 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-medium shadow-md hover:shadow-lg" 
-                            onClick={handleGoToDashboard}>
-                            Panel de Gestion
-                        </button>
+                        {!isAuthenticated ? (
+                            <>
+                                <Link to="/login">
+                                    <button className="px-6 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-medium shadow-md hover:shadow-lg" >
+                                        Iniciar sesión
+                                    </button>
+                                </Link>
+                                 <Link to="/dashboard">
+                                    <button className="px-6 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-medium shadow-md hover:shadow-lg">
+                                        Panel de Gestión
+                                    </button>
+                                </Link>
+                            </>
+                        ) : (
+                            // Usuario autenticado
+                            <>
+                                <Link to="/dashboard">
+                                    <button className="px-6 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-medium shadow-md hover:shadow-lg">
+                                        Panel de Gestión
+                                    </button>
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300 font-medium shadow-md hover:shadow-lg"
+                                >
+                                    Cerrar sesión
+                                </button>
+                            </>  
+                        )}
                         
                     </div>
                      <div className="lg:hidden ml-14 space-x-4">
