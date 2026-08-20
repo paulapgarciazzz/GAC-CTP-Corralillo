@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.11",
     "@tanstack/react-router": "^1.170.27",
     "axios": "^1.19.0",
     "lucide-react": "^1.31.0",

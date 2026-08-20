@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @custom-variant dark (&:where([data-theme=dark],[data-theme=dark] *));
-
+@plugin "@tailwindcss";
 @theme{
   --font-display: 'Inter', sans-serif;
   --color-primary: #4635b1;

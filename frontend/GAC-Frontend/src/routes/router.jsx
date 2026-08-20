@@ -12,6 +12,7 @@ import {
 } from '@tanstack/react-router';
 import LoginPage from '../modulos/login/pages/LoginPage';
 
+
 const rootRoute = createRootRoute({
     component:()=> 
      <Authprovider>
@@ -37,11 +38,14 @@ const dashboardRoute = createRoute({
 })
 
 
+
+
 export const router = createRouter({
     routeTree: rootRoute.addChildren([
         landingRoute,
         loginRoute,
         dashboardRoute,
+       
 
     ])
 })
