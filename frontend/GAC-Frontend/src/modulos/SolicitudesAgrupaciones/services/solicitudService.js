@@ -1,4 +1,5 @@
 import api from '../../../services/axios';
+import { mockSolicitudes } from '../data/mockSolicitudes';
 
 export const crearSolicitud = async (payload) => {
     try {
@@ -10,4 +11,25 @@ export const crearSolicitud = async (payload) => {
             || 'No se pudo enviar la solicitud. Intenta de nuevo.';
         return { success: false, error: mensaje };
     }
+};
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// TODO: reemplazar por `api.get('/solicitudes-agrupacion')` cuando el backend exista.
+export const obtenerSolicitudes = async () => {
+    await delay(300);
+    return { success: true, data: [...mockSolicitudes] };
+};
+
+// TODO: reemplazar por `api.patch('/solicitudes-agrupacion/:id')` cuando el backend exista.
+export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
+    await delay(300);
+    const solicitud = mockSolicitudes.find((s) => s.id === id);
+
+    if (!solicitud) {
+        return { success: false, error: 'Solicitud no encontrada' };
+    }
+
+    solicitud.estado = nuevoEstado;
+    return { success: true, data: { ...solicitud } };
 };

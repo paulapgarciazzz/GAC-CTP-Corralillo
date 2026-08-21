@@ -4,7 +4,7 @@ import logo from '../../../assets/logo.png'
 import { ChevronDown } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 
-const Sidebar = ({ onCloseDrawer }) =>{
+const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
 
     const [links,setLinks] = useState([
 
@@ -51,6 +51,10 @@ const Sidebar = ({ onCloseDrawer }) =>{
             return link.children ? {...link, active:false} : {...link,active:false};
         }));
     };
+    const handleChildClick = (childName) => {
+        onSelectView?.(childName);
+        if(onCloseDrawer && window.innerWidth < 789) onCloseDrawer();
+    };
     return (
         <aside className="fixed left-4 top-4 h-[calc(100%-2rem)] bg-gray-700 overflow-hidden rounded-xl shadow-2xl w-56 z-20 lg:mt-0 mt-14 flex flex-col">
             <div className="h-16 flex items-center justify-center px-4 border-b border-white/10">
@@ -87,10 +91,11 @@ const Sidebar = ({ onCloseDrawer }) =>{
                                 <ul className="ml-2 mt-1 space-y-1 border-1-2 border-white/10 pl-3">
                                     {link.children.map((child,childIndex)=> (
                                         <li key={childIndex}>
-                                            <button onClick={()=>{
-                                                handleClick(index);
-                                                if(onCloseDrawer && window.innerWidth < 789) onCloseDrawer();
-                                            }} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-white/10 transition-colors">
+                                            <button onClick={()=> handleChildClick(child.name)} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                                                child.name === selectedView
+                                                    ? 'bg-[#adec83]/20 text-[#adec83]'
+                                                    : 'text-gray-300 hover:bg-white/10'
+                                                }`}>
                                                 <child.icon className="w-4 h-4 text-[#adec83]"/>
                                                 <span>{child.name}</span>
                                             </button>

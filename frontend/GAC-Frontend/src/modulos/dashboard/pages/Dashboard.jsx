@@ -2,6 +2,7 @@ import Topbar from '../components/Topbar';
 import Sidebar from '../components/Sidebar';
 import { useState } from 'react'
 import { useEffect } from 'react';
+import GestionSolicitudes from '../../SolicitudesAgrupaciones/pages/GestionSolicitudes';
 
 const Dashboard =()=>{
     const [isDark,setIsDark]= useState (()=>{
@@ -13,6 +14,7 @@ const Dashboard =()=>{
     });
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+    const [selectedView, setSelectedView] = useState(null);
 
     useEffect(() => {
         const handleResize = () =>{
@@ -58,22 +60,25 @@ const Dashboard =()=>{
             <div className="font-display min-h-screen bg-base-200 dark:bg-background">
             {(isSidebarOpen || !isMobile) && (
                 <>
-                    <Sidebar onCloseDrawer={closeSidebar} isMobile={isMobile}/>
+                    <Sidebar onCloseDrawer={closeSidebar} isMobile={isMobile} selectedView={selectedView} onSelectView={setSelectedView}/>
                     {isMobile && isSidebarOpen && (
                         <div className="fixed inset-0 bg-black/50 z-10" onClick={() => setIsSidebarOpen(false)}/>
                        
                     )}
                 </>
             )}
-            <div className={!isMobile ? 'lg:ml-80' : ''}>
+            <div className={!isMobile ? 'lg:ml-60' : ''}>
                 <Topbar
                     isDark={isDark}
                     onToggleDrawer={toggleDrawer}
                     onToggleTheme={toggleTheme}
                     isMobile={isMobile}
                 />
+                <main className="p-4 sm:p-6">
+                    {selectedView === 'Gestion de Solicitudes' && <GestionSolicitudes />}
+                </main>
             </div>
-                
+
             </div>
         </>
     )
