@@ -39,6 +39,7 @@ class UpdateAgrupacionRequest extends FormRequest
                 'sometimes',
                 'nullable',
                 'string',
+                'max:5000',
             ],
         ];
     }

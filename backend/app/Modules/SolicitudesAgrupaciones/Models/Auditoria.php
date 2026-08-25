@@ -9,11 +9,7 @@ class Auditoria extends Model
 {
     protected $table = 'auditoria';
 
-    protected $fillable = [
-        'id_solicitud',
-        'accion',
-        'fecha_accion',
-    ];
+    protected $guarded = ['*'];
 
     protected $casts = [
         'fecha_accion' => 'datetime',

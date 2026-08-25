@@ -14,12 +14,6 @@ class StoreParticipacionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_agrupacion' => [
-                'required',
-                'integer',
-                'exists:agrupacion,id',
-            ],
-
             'lugar' => [
                 'required',
                 'string',

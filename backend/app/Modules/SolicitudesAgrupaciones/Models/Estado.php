@@ -9,9 +9,7 @@ class Estado extends Model
 {
     protected $table = 'estado';
 
-    protected $fillable = [
-        'nom_estado',
-    ];
+    protected $guarded = ['*'];
 
     public function solicitudes(): HasMany
     {

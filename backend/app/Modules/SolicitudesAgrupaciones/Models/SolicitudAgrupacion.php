@@ -20,7 +20,7 @@ class SolicitudAgrupacion extends Model
     ];
 
     protected $casts = [
-        'fecha_solicitud' => 'date',
+        'fecha_solicitud' => 'datetime',
         'fecha_asignada' => 'date',
     ];
 

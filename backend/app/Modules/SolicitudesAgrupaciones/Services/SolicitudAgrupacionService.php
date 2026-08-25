@@ -6,7 +6,9 @@ use App\Modules\SolicitudesAgrupaciones\Models\Estado;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use RuntimeException;
+use Illuminate\Support\Facades\Mail;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Mail\NotificacionSistema;
 
 class SolicitudAgrupacionService
 {
@@ -55,12 +57,14 @@ class SolicitudAgrupacionService
         int $id,
         array $datos
     ): SolicitudAgrupacion {
-        return DB::transaction(function () use ($id, $datos) {
+        $solicitud = DB::transaction(function () use ($id, $datos) {
             $solicitud = SolicitudAgrupacion::with('estado')
+            ->lockForUpdate()
                 ->findOrFail($id);
 
             if ($solicitud->estado->nom_estado !== 'pendiente') {
-                throw new RuntimeException(
+                throw new HttpException(
+                    422,
                     'Solo se pueden aprobar solicitudes pendientes.'
                 );
             }
@@ -82,16 +86,22 @@ class SolicitudAgrupacionService
                 'auditorias',
             ]);
         });
+
+        $this->notificarResultado($solicitud, 'aprobada');
+
+        return $solicitud;
     }
 
     public function rechazar(int $id): SolicitudAgrupacion
     {
-        return DB::transaction(function () use ($id) {
+        $solicitud = DB::transaction(function () use ($id) {
             $solicitud = SolicitudAgrupacion::with('estado')
+            ->lockForUpdate()
                 ->findOrFail($id);
 
             if ($solicitud->estado->nom_estado !== 'pendiente') {
-                throw new RuntimeException(
+                throw new HttpException(
+                    422,
                     'Solo se pueden rechazar solicitudes pendientes.'
                 );
             }
@@ -107,13 +117,31 @@ class SolicitudAgrupacionService
                 'hora_asignada' => null,
             ]);
 
-            // Más adelante aquí enviaremos el correo al encargado.
-
             return $solicitud->fresh([
                 'agrupacion.encargado',
                 'estado',
                 'auditorias',
             ]);
         });
+
+        $this->notificarResultado($solicitud, 'rechazada');
+
+        return $solicitud;
+    }
+
+    private function notificarResultado(
+        SolicitudAgrupacion $solicitud,
+        string $resultado
+    ): void {
+        $encargado = $solicitud->agrupacion->encargado;
+
+        Mail::to($encargado->email)->send(new NotificacionSistema(
+            'Resultado de solicitud de agrupación',
+            sprintf(
+                'La solicitud #%d fue %s.',
+                $solicitud->id,
+                $resultado
+            )
+        ));
     }
 }

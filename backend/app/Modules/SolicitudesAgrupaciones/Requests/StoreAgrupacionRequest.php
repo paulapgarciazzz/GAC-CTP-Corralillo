@@ -42,6 +42,7 @@ class StoreAgrupacionRequest extends FormRequest
             'resena' => [
                 'nullable',
                 'string',
+                'max:5000',
             ],
         ];
     }

@@ -28,6 +28,27 @@ class StoreSolicitudAgrupacionRequest extends FormRequest
             'comentarios' => [
                 'nullable',
                 'string',
+                'max:5000',
+            ],
+
+            'id_estado' => [
+                'prohibited',
+            ],
+
+            'estado' => [
+                'prohibited',
+            ],
+
+            'nom_estado' => [
+                'prohibited',
+            ],
+
+            'fecha_asignada' => [
+                'prohibited',
+            ],
+
+            'hora_asignada' => [
+                'prohibited',
             ],
         ];
     }
