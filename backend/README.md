@@ -21,6 +21,21 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## API Error Responses
+
+For production, keep `APP_DEBUG=false`. Laravel then returns API exceptions as
+clean JSON responses and does not expose stack traces, source paths, SQL, or
+server details. After changing the environment in a deployment with cached
+configuration, run:
+
+```bash
+php artisan config:clear
+php artisan config:cache
+```
+
+Known business-rule errors from the `SolicitudesAgrupaciones` API continue to
+return HTTP 422 with their public message.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
