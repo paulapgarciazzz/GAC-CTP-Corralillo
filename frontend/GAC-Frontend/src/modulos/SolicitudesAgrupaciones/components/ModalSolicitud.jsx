@@ -24,17 +24,17 @@ export default function ModalSolicitud({ open, onClose }) {
                 aria-modal="true"
                 aria-labelledby="titulo-modal-solicitud"
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl p-8 relative"
+                className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface rounded-2xl shadow-2xl p-8 relative"
             >
                 <button
                     type="button"
                     onClick={onClose}
                     aria-label="Cerrar"
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
+                    className="absolute top-4 right-4 text-foreground-faint hover:text-foreground transition-colors cursor-pointer"
                 >
                     <X size={22} />
                 </button>
-                <h3 id="titulo-modal-solicitud" className="text-2xl text-center font-bold text-blue-950 mb-6">
+                <h3 id="titulo-modal-solicitud" className="text-2xl text-center font-bold text-primary mb-6">
                     Solicitud de participación de agrupación
                 </h3>
                 <FormularioSolicitud onSuccess={onClose} />

@@ -56,11 +56,11 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         if(onCloseDrawer && window.innerWidth < 789) onCloseDrawer();
     };
     return (
-        <aside className="fixed left-4 top-4 h-[calc(100%-2rem)] bg-gray-700 overflow-hidden rounded-xl shadow-2xl w-56 z-20 lg:mt-0 mt-14 flex flex-col">
-            <div className="h-16 flex items-center justify-center px-4 border-b border-white/10">
+        <aside className="fixed left-0 top-0 h-screen bg-white dark:bg-rail overflow-hidden shadow-lg w-56 z-20 lg:mt-0 mt-14 flex flex-col">
+            <div className="h-16 flex items-center justify-center px-4 border-b border-border dark:border-white/10">
                 <div className="flex items-center gap-2">
                     <img src={logo} alt="Logo" className="w-10 h-10 object-cover rounded-md shrink-0 "/>
-                        <h1 className="text-3xl font-bold text-white leading-none tracking-tight">
+                        <h1 className="text-3xl font-bold text-foreground dark:text-white leading-none tracking-tight">
                         SGAC
                         </h1>
                 </div>
@@ -72,31 +72,31 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
                         <li key={index}>
                             <button onClick={()=> handleClick(index)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${
                                 link.active
-                                    ? `bg-[#adec83]/20 text-[#adec83] border-l-2 border-[#adec83]`
-                                    : `text-gray-300 hover:bg-white/10`
+                                    ? `bg-primary/15 text-primary border-l-2 border-primary`
+                                    : `text-foreground-soft dark:text-white/70 hover:bg-primary/10 dark:hover:bg-white/10`
                                 }`}>
                                 <span className="flex-1 text-left text-sm font-medium"> {link.name}</span>
                                 {link.badge && (
-                                    <span className="bg-[#adec83] text-gray-900 text-xs px-2 py-0.5 rounded-full font-semibold">
+                                    <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full font-semibold">
                                         {link.badge}
                                     </span>
                                 )}
                                 {link.children && (
-                                    <span className="text-[#adec83]">
+                                    <span className="text-primary">
                                         {link.open ? <ChevronDown className="w-4 h-4"/> : <ChevronRight className="w-4 h-4"/>}
                                     </span>
                                 )}
                             </button>
                             {link.children && link.open && (
-                                <ul className="ml-2 mt-1 space-y-1 border-1-2 border-white/10 pl-3">
+                                <ul className="ml-2 mt-1 space-y-1 border-l border-border dark:border-white/10 pl-3">
                                     {link.children.map((child,childIndex)=> (
                                         <li key={childIndex}>
                                             <button onClick={()=> handleChildClick(child.name)} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                                                 child.name === selectedView
-                                                    ? 'bg-[#adec83]/20 text-[#adec83]'
-                                                    : 'text-gray-300 hover:bg-white/10'
+                                                    ? 'bg-primary/15 text-primary'
+                                                    : 'text-foreground-soft dark:text-white/70 hover:bg-primary/10 dark:hover:bg-white/10'
                                                 }`}>
-                                                <child.icon className="w-4 h-4 text-[#adec83]"/>
+                                                <child.icon className="w-4 h-4 text-primary"/>
                                                 <span>{child.name}</span>
                                             </button>
                                         </li>

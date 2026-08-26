@@ -4,8 +4,8 @@ import EstadoBadge from './EstadoBadge';
 function Campo({ etiqueta, valor }) {
     return (
         <div className="space-y-1">
-            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">{etiqueta}</p>
-            <p className="text-sm text-gray-100 whitespace-pre-wrap">{valor || '—'}</p>
+            <p className="text-xs font-medium text-foreground-faint uppercase tracking-wider">{etiqueta}</p>
+            <p className="text-sm text-foreground whitespace-pre-wrap">{valor || '—'}</p>
         </div>
     );
 }
@@ -14,7 +14,7 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
     if (!solicitud) {
         return (
             <div className="h-full flex items-center justify-center p-6">
-                <p className="text-sm text-gray-400 text-center">Selecciona una solicitud para ver los detalles.</p>
+                <p className="text-sm text-foreground-faint text-center">Selecciona una solicitud para ver los detalles.</p>
             </div>
         );
     }
@@ -26,19 +26,19 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
             <button
                 type="button"
                 onClick={onBack}
-                className="lg:hidden flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors cursor-pointer"
+                className="lg:hidden flex items-center gap-2 text-sm text-foreground-soft hover:text-foreground transition-colors cursor-pointer"
             >
                 <ArrowLeft size={16} />
                 Volver a la lista
             </button>
 
             <div className="flex items-center justify-between gap-4">
-                <h2 className="text-xl font-bold text-white">{agrupacion.nombre}</h2>
+                <h2 className="text-xl font-bold text-foreground">{agrupacion.nombre}</h2>
                 <EstadoBadge estado={solicitud.estado} />
             </div>
 
             <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-[#adec83] uppercase tracking-wider">Datos del encargado</h3>
+                <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Datos del encargado</h3>
                 <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
                     <Campo etiqueta="Cédula" valor={encargado.cedula} />
                     <Campo etiqueta="Nombre completo" valor={`${encargado.primer_nombre} ${encargado.apellido}`} />
@@ -48,7 +48,7 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
             </div>
 
             <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-[#adec83] uppercase tracking-wider">Datos de la agrupación</h3>
+                <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Datos de la agrupación</h3>
                 <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
                     <Campo etiqueta="Nombre de la agrupación" valor={agrupacion.nombre} />
                     <Campo etiqueta="Lugar de procedencia" valor={agrupacion.lugar_procedencia} />
@@ -60,7 +60,7 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
             </div>
 
             <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-[#adec83] uppercase tracking-wider">Datos de la solicitud</h3>
+                <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Datos de la solicitud</h3>
                 <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
                     <Campo etiqueta="Fecha de solicitud" valor={solicitud.fecha_solicitud} />
                     <Campo etiqueta="Fecha asignada" valor={solicitud.fecha_asignada || 'Sin asignar'} />

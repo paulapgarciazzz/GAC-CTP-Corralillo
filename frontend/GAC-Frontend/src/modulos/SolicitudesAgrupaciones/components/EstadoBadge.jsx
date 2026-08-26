@@ -1,7 +1,7 @@
 const ESTILOS = {
-    aprobada: 'bg-[#adec83]/20 text-[#adec83]',
-    rechazada: 'bg-red-500/20 text-red-400',
-    pendiente: 'bg-gray-500/20 text-gray-300',
+    aprobada: 'bg-success-soft text-success',
+    rechazada: 'bg-danger-soft text-danger',
+    pendiente: 'bg-warning-soft text-warning',
 };
 
 const ETIQUETAS = {

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 const Carousel = () => {
     const images = [
-    "https://scontent.fsyq6-1.fna.fbcdn.net/v/t39.30808-6/710059187_1628590942603660_5414905977431291317_n.jpg?stp=dst-jpg_tt6&cstp=mx2048x1365&ctp=s2048x1365&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=127cfc&_nc_ohc=oNIHGfE-8RQQ7kNvwHJ8mfs&_nc_oc=Adpuci9NXT2Uz_gppp7erSXy0jSP1ScweMq5gflRRJXGyPsCTphmt-H_9E--4l8r2S4&_nc_zt=23&_nc_ht=scontent.fsyq6-1.fna&_nc_gid=r2mwE2w97YFKDkJf0eI3BQ&_nc_ss=7b2a8&oh=00_AQGKorrTPenrdzQ_BwJSM24zYovOhHhovDMfCZeaDU7a-g&oe=6A803F3E",
+    "https://nicoya.go.cr/img/news/detail/293_1_vistadelaembajadoradesuizaalctpdecorralillo.jpg",
     "https://vozdeguanacaste.com/wp-content/uploads/2018/01/dsc_0061-1024x683.jpg",
     "https://cloudfront-us-east-1.images.arcpublishing.com/gruponacion/JK64NJLWHVCZPCYVYPJVGOHQ34.jpg",
   ];

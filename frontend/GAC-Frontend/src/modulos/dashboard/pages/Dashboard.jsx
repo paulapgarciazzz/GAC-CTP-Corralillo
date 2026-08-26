@@ -3,15 +3,10 @@ import Sidebar from '../components/Sidebar';
 import { useState } from 'react'
 import { useEffect } from 'react';
 import GestionSolicitudes from '../../SolicitudesAgrupaciones/pages/GestionSolicitudes';
+import { useTheme } from '../../../hooks/useTheme';
 
 const Dashboard =()=>{
-    const [isDark,setIsDark]= useState (()=>{
-        const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-        return savedTheme === 'dark';
-    }
-    return window.matchMedia('(prefers-color-scheme:dark)').matches;
-    });
+    const { isDark, toggleTheme } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
     const [selectedView, setSelectedView] = useState(null);
@@ -20,31 +15,17 @@ const Dashboard =()=>{
         const handleResize = () =>{
             const mobile = window.innerWidth < 1024;
             setIsMobile(mobile);
-            
+
             setIsSidebarOpen(prev => {
                 const newState = !mobile;
             return prev !== newState ? newState : prev;
         });
     };
         window.addEventListener('resize', handleResize);
-        
+
         return () => window.removeEventListener('resize', handleResize);
     },[]);
 
-
-    useEffect(() => {
-        const html = document.documentElement;
-        if(isDark){
-            html.setAttribute('data-theme','dark');
-            localStorage.setItem('theme','dark');
-        }else{
-            html.setAttribute('data-theme','light');
-            localStorage.setItem('theme','light');
-        }
-    },[isDark]);
-    const toggleTheme = () => {
-        setIsDark(!isDark);
-    };
     const toggleDrawer = () =>{
         if (isMobile){
             setIsSidebarOpen(!isSidebarOpen);
@@ -57,7 +38,7 @@ const Dashboard =()=>{
     };
     return (
         <>
-            <div className="font-display min-h-screen bg-base-200 dark:bg-background">
+            <div className="font-display min-h-screen bg-background">
             {(isSidebarOpen || !isMobile) && (
                 <>
                     <Sidebar onCloseDrawer={closeSidebar} isMobile={isMobile} selectedView={selectedView} onSelectView={setSelectedView}/>
@@ -67,7 +48,7 @@ const Dashboard =()=>{
                     )}
                 </>
             )}
-            <div className={!isMobile ? 'lg:ml-60' : ''}>
+            <div className={!isMobile ? 'lg:ml-56' : ''}>
                 <Topbar
                     isDark={isDark}
                     onToggleDrawer={toggleDrawer}

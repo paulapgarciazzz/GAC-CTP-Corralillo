@@ -24,7 +24,7 @@ const Login = () => {
         }
     };
     return (
-        <div className="min-h-screen flex items-center justify-center bg-linear-to-r from-slate-900 via-gray-900 to-slate-800 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-rail to-[#05070f] p-4">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/10 space-y-6">
  
         {/* Encabezado */}
@@ -54,11 +54,11 @@ const Login = () => {
               placeholder="tu@ejemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7ecdda] focus:border-transparent transition-all duration-200"
               required
             />
           </div>
- 
+
           {/* Campo Contraseña */}
           <div className="space-y-1">
             <label
@@ -76,7 +76,7 @@ const Login = () => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 pr-11 bg-white/5 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 pr-11 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7ecdda] focus:border-transparent transition-all duration-200"
                 required
               />
               <button
@@ -94,7 +94,7 @@ const Login = () => {
           <div className="flex justify-end">
             <button
               type="button"
-              className="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
+              className="text-xs font-medium text-[#7ecdda] hover:text-[#a8e2ea] transition-colors cursor-pointer"
             >
               ¿Olvidaste tu contraseña?
             </button>
@@ -104,7 +104,7 @@ const Login = () => {
           {error && (
             <div
               role="alert"
-              className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center font-medium"
+              className="p-3 bg-[#e75c50]/10 border border-[#e75c50]/30 rounded-xl text-[#e75c50] text-sm text-center font-medium"
             >
               {error}
             </div>
@@ -114,7 +114,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-linear-to-r from-green-600 to-orange-500 hover:from-green-500 hover:to-green-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 bg-[#45ac75] hover:bg-[#6bc596] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
           >
             {loading && <Loader2 size={18} className="animate-spin" />}
             {loading ? "Ingresando..." : "Ingresar"}

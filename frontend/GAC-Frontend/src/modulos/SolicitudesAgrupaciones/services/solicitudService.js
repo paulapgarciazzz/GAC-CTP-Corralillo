@@ -33,3 +33,16 @@ export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
     solicitud.estado = nuevoEstado;
     return { success: true, data: { ...solicitud } };
 };
+
+// TODO: reemplazar por `api.delete('/solicitudes-agrupacion/:id')` cuando el backend exista.
+export const eliminarSolicitud = async (id) => {
+    await delay(300);
+    const index = mockSolicitudes.findIndex((s) => s.id === id);
+
+    if (index === -1) {
+        return { success: false, error: 'Solicitud no encontrada' };
+    }
+
+    mockSolicitudes.splice(index, 1);
+    return { success: true };
+};
