@@ -11,7 +11,7 @@ const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
     }
     
     return(
-        <nav className="sticky top-0 z-20 bg-surface/80 backdrop-blur-lg border-b border-border">
+        <nav className="print:hidden sticky top-0 z-20 bg-surface/80 backdrop-blur-lg border-b border-border">
             <div className="h-16 flex items-center px-4 sm:px-6">
                 <div className='flex items-center justify-between w-full'>
                     <div className="flex items-center gap-3">

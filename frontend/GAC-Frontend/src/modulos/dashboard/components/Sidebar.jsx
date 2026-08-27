@@ -56,7 +56,7 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         if(onCloseDrawer && window.innerWidth < 789) onCloseDrawer();
     };
     return (
-        <aside className="fixed left-0 top-0 h-screen bg-white dark:bg-rail overflow-hidden shadow-lg w-56 z-20 lg:mt-0 mt-14 flex flex-col">
+        <aside className="print:hidden fixed left-0 top-0 h-screen bg-white dark:bg-rail overflow-hidden shadow-lg w-56 z-20 lg:mt-0 mt-14 flex flex-col">
             <div className="h-16 flex items-center justify-center px-4 border-b border-border dark:border-white/10">
                 <div className="flex items-center gap-2">
                     <img src={logo} alt="Logo" className="w-10 h-10 object-cover rounded-md shrink-0 "/>
