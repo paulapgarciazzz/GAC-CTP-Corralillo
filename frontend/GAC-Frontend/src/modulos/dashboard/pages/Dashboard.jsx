@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import { useState } from 'react'
 import { useEffect } from 'react';
 import GestionSolicitudes from '../../SolicitudesAgrupaciones/pages/GestionSolicitudes';
+import GestionAgrupaciones from '../../Agrupaciones/pages/GestionAgrupaciones';
 import { useTheme } from '../../../hooks/useTheme';
 
 const Dashboard =()=>{
@@ -57,6 +58,7 @@ const Dashboard =()=>{
                 />
                 <main className="p-4 sm:p-6">
                     {selectedView === 'Gestion de Solicitudes' && <GestionSolicitudes />}
+                    {selectedView === 'Gestion de Agrupaciones' && <GestionAgrupaciones />}
                 </main>
             </div>
 
