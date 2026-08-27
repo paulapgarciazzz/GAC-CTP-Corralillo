@@ -16,6 +16,7 @@ const valoresIniciales = {
     resena: '',
     // Solicitud
     fecha_asignada: '',
+    hora_asignada: '',
     comentarios: '',
 };
 
@@ -72,6 +73,7 @@ export default function FormularioSolicitud({ onSuccess }) {
             solicitud: {
                 fecha_solicitud: new Date().toISOString().split('T')[0],
                 fecha_asignada: valores.fecha_asignada,
+                hora_asignada: valores.hora_asignada,
                 comentarios: valores.comentarios,
             },
         };
@@ -165,6 +167,11 @@ export default function FormularioSolicitud({ onSuccess }) {
                     <div className="space-y-1">
                         <label htmlFor="fecha_asignada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label>
                         <input id="fecha_asignada" name="fecha_asignada" type="date" min={hoy} value={valores.fecha_asignada} onChange={handleChange} required
+                            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div className="space-y-1">
+                        <label htmlFor="hora_asignada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Hora deseada de participación</label>
+                        <input id="hora_asignada" name="hora_asignada" type="time" value={valores.hora_asignada} onChange={handleChange} required
                             className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                     <div className="space-y-1 sm:col-span-2">

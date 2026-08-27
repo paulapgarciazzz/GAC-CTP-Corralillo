@@ -1,17 +1,24 @@
 import { useState } from 'react';
-import { MoreVertical, Trash2 } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
 
-export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, onAceptar, onRechazar, onEliminar }) {
+export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, onAceptar, onRechazar, onEditar, onEliminar, hayBusqueda }) {
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
 
     if (solicitudes.length === 0) {
         return (
             <div className="h-full flex items-center justify-center p-6">
-                <p className="text-sm text-foreground-faint text-center">No hay solicitudes por el momento.</p>
+                <p className="text-sm text-foreground-faint text-center">
+                    {hayBusqueda ? 'Ninguna agrupación coincide con la búsqueda.' : 'No hay solicitudes por el momento.'}
+                </p>
             </div>
         );
     }
+
+    const handleEditar = (solicitud) => {
+        setMenuAbiertoId(null);
+        onEditar(solicitud);
+    };
 
     const handleEliminar = (solicitud) => {
         setMenuAbiertoId(null);
@@ -78,6 +85,14 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                                 onClick={(e) => e.stopPropagation()}
                                                 className="absolute right-0 mt-1 w-40 bg-surface rounded-lg shadow-lg border border-border z-20 p-1"
                                             >
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleEditar(solicitud)}
+                                                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
+                                                >
+                                                    <Pencil size={14} />
+                                                    Editar
+                                                </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => handleEliminar(solicitud)}

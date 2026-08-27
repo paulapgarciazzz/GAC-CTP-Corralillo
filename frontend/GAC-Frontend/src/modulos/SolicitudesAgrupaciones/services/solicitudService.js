@@ -34,6 +34,24 @@ export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
     return { success: true, data: { ...solicitud } };
 };
 
+// TODO: reemplazar por `api.put('/solicitudes-agrupacion/:id')` cuando el backend exista.
+export const actualizarSolicitud = async (id, payload) => {
+    await delay(300);
+    const solicitud = mockSolicitudes.find((s) => s.id === id);
+
+    if (!solicitud) {
+        return { success: false, error: 'Solicitud no encontrada' };
+    }
+
+    solicitud.encargado = { ...solicitud.encargado, ...payload.encargado };
+    solicitud.agrupacion = { ...solicitud.agrupacion, ...payload.agrupacion };
+    solicitud.fecha_asignada = payload.solicitud.fecha_asignada;
+    solicitud.hora_asignada = payload.solicitud.hora_asignada;
+    solicitud.comentarios = payload.solicitud.comentarios;
+
+    return { success: true, data: { ...solicitud } };
+};
+
 // TODO: reemplazar por `api.delete('/solicitudes-agrupacion/:id')` cuando el backend exista.
 export const eliminarSolicitud = async (id) => {
     await delay(300);
