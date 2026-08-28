@@ -4,10 +4,12 @@ namespace App\Modules\SolicitudesAgrupaciones\Controllers;
 
 use App\Modules\SolicitudesAgrupaciones\Requests\GestionarSolicitudRequest;
 use App\Modules\SolicitudesAgrupaciones\Requests\StoreSolicitudAgrupacionRequest;
+use App\Modules\SolicitudesAgrupaciones\Requests\UpdateSolicitudAgrupacionRequest;
 use App\Modules\SolicitudesAgrupaciones\Resources\SolicitudAgrupacionResource;
 use App\Modules\SolicitudesAgrupaciones\Services\SolicitudAgrupacionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class SolicitudAgrupacionController
 {
@@ -43,5 +45,21 @@ class SolicitudAgrupacionController
     public function rechazar(int $id): SolicitudAgrupacionResource
     {
         return new SolicitudAgrupacionResource($this->service->rechazar($id));
+    }
+
+    public function update(
+        UpdateSolicitudAgrupacionRequest $request,
+        int $id
+    ): SolicitudAgrupacionResource {
+        return new SolicitudAgrupacionResource(
+            $this->service->actualizar($id, $request->validated())
+        );
+    }
+
+    public function destroy(int $id): Response
+    {
+        $this->service->eliminar($id);
+
+        return response()->noContent();
     }
 }

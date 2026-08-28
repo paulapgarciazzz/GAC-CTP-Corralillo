@@ -20,8 +20,8 @@ class SolicitudesAgrupacionesSecurityTest extends TestCase
         $this->assertArrayHasKey('id_agrupacion', $rules);
         $this->assertArrayHasKey('fecha_solicitud', $rules);
         $this->assertContains('prohibited', $rules['id_estado']);
-        $this->assertContains('prohibited', $rules['fecha_asignada']);
-        $this->assertContains('prohibited', $rules['hora_asignada']);
+        $this->assertContains('nullable', $rules['fecha_asignada']);
+        $this->assertContains('nullable', $rules['hora_asignada']);
     }
 
     public function test_participation_request_does_not_accept_parent_id(): void
