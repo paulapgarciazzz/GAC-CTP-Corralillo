@@ -5,6 +5,7 @@ namespace App\Modules\SolicitudesAgrupaciones\Services;
 use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\Participacion;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class AgrupacionService
 {
@@ -25,11 +26,35 @@ class AgrupacionService
             ->get();
     }
 
+    public function listarAprobadas(): Collection
+    {
+        return Agrupacion::whereHas('solicitudes', function ($query) {
+            $query->whereHas('estado', function ($query) {
+                $query->where('nom_estado', 'aprobada');
+            });
+        })
+            ->with(['encargado', 'participaciones'])
+            ->get();
+    }
+
     public function actualizar(Agrupacion $agrupacion, array $datos): Agrupacion
     {
         $agrupacion->update($datos);
 
         return $agrupacion->fresh();
+    }
+
+    public function eliminar(Agrupacion $agrupacion): void
+    {
+        DB::transaction(function () use ($agrupacion) {
+            foreach ($agrupacion->solicitudes as $solicitud) {
+                $solicitud->auditorias()->delete();
+            }
+
+            $agrupacion->solicitudes()->delete();
+            $agrupacion->participaciones()->delete();
+            $agrupacion->delete();
+        });
     }
 
     public function agregarParticipacion(

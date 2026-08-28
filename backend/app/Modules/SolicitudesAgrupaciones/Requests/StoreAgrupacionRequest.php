@@ -44,6 +44,11 @@ class StoreAgrupacionRequest extends FormRequest
                 'string',
                 'max:5000',
             ],
+
+            'foto_url' => [
+                'nullable',
+                'string',
+            ],
         ];
     }
 }

@@ -15,4 +15,11 @@ class EncargadoService
     {
         return Encargado::create($datos);
     }
+
+    public function actualizar(Encargado $encargado, array $datos): Encargado
+    {
+        $encargado->update($datos);
+
+        return $encargado->fresh();
+    }
 }

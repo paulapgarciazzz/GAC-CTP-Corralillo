@@ -16,6 +16,7 @@ class Agrupacion extends Model
         'lugar_procedencia',
         'cantidad_integrantes',
         'resena',
+        'foto_url',
     ];
 
     public function encargado(): BelongsTo
