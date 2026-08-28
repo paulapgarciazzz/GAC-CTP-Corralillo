@@ -1,1 +1,59 @@
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme=dark],[data-theme=dark] *));
+
+@theme{
+  --font-display: 'Inter', sans-serif;
+
+  /* Verde Accesible — marca */
+  --color-primary: #277a48;
+  --color-primary-hover: #1e5c37;
+  --color-accent: #2c8a9c;
+
+  /* Riel de navegación (footer/login) — siempre oscuro, no cambia con el tema */
+  --color-rail: #1a1e3c;
+
+  /* Superficies y texto (valores por defecto = tema claro) */
+  --color-background: #f4f8f6;
+  --color-surface: #ffffff;
+  --color-border: #d3e0d9;
+  --color-foreground: #14151f;
+  --color-foreground-soft: #4f546c;
+  --color-foreground-faint: #8b91a8;
+
+  /* Estados semánticos (tablas, badges) */
+  --color-success: #1e5c37;
+  --color-success-soft: #cdedda;
+  --color-warning: #8a5a12;
+  --color-warning-soft: #fbe8c8;
+  --color-danger: #971911;
+  --color-danger-soft: #fadcda;
+  --color-info: #1c5c69;
+  --color-info-soft: #d3eef2;
+}
+
+:root[data-theme="dark"]{
+  --color-primary: #45ac75;
+  --color-primary-hover: #6bc596;
+  --color-accent: #7ecdda;
+
+  --color-background: #0a0c1a;
+  --color-surface: #12152b;
+  --color-border: #1c3327;
+  --color-foreground: #f4f5f8;
+  --color-foreground-soft: #a7abc4;
+  --color-foreground-faint: #6a708a;
+
+  --color-success: #6bc596;
+  --color-success-soft: #143d25;
+  --color-warning: #f3c476;
+  --color-warning-soft: #3a2a0f;
+  --color-danger: #e75c50;
+  --color-danger-soft: #440c08;
+  --color-info: #7ecdda;
+  --color-info-soft: #132a2e;
+}
+
+body{
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
