@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Inbox, CheckCircle, XCircle, Clock, Users, Printer } from 'lucide-react';
-import { obtenerReporteAgrupaciones } from '../services/reporteService';
-import TarjetaEstadistica from '../components/TarjetaEstadistica';
+import { Loader2, Inbox, CheckCircle, XCircle, Clock, Printer } from 'lucide-react';
+import { obtenerReporteAgrupaciones } from '../../services/reporteService';
+import TarjetaEstadistica from '../../components/Reportes_agrupaciones/TarjetaEstadistica';
+import GraficoSolicitudesPorMes from '../../components/Reportes_agrupaciones/GraficoSolicitudesPorMes';
+import GraficoTopMeses from '../../components/Reportes_agrupaciones/GraficoTopMeses';
 
 export default function ReportesAgrupaciones() {
     const [reporte, setReporte] = useState(null);
@@ -47,12 +49,18 @@ export default function ReportesAgrupaciones() {
                     <Loader2 className="animate-spin text-primary" size={28} />
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     <TarjetaEstadistica icon={Inbox} label="Solicitudes recibidas" value={reporte.recibidas} variant="primary" />
                     <TarjetaEstadistica icon={CheckCircle} label="Aceptadas" value={reporte.aceptadas} variant="success" />
                     <TarjetaEstadistica icon={XCircle} label="Rechazadas" value={reporte.rechazadas} variant="danger" />
                     <TarjetaEstadistica icon={Clock} label="Pendientes" value={reporte.pendientes} variant="warning" />
-                    <TarjetaEstadistica icon={Users} label="Agrupaciones almacenadas" value={reporte.agrupacionesAlmacenadas} variant="info" />
+                </div>
+            )}
+
+            {!loading && !error && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <GraficoSolicitudesPorMes datos={reporte.porMes} />
+                    <GraficoTopMeses datos={reporte.porMes} />
                 </div>
             )}
         </div>

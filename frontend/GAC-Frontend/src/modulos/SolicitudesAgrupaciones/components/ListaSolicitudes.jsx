@@ -85,14 +85,16 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                                 onClick={(e) => e.stopPropagation()}
                                                 className="absolute right-0 mt-1 w-40 bg-surface rounded-lg shadow-lg border border-border z-20 p-1"
                                             >
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleEditar(solicitud)}
-                                                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
-                                                >
-                                                    <Pencil size={14} />
-                                                    Editar
-                                                </button>
+                                                {solicitud.estado !== 'rechazada' && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleEditar(solicitud)}
+                                                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
+                                                    >
+                                                        <Pencil size={14} />
+                                                        Editar
+                                                    </button>
+                                                )}
                                                 <button
                                                     type="button"
                                                     onClick={() => handleEliminar(solicitud)}
