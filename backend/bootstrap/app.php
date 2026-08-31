@@ -14,6 +14,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
+        $middleware->validateCsrfTokens(except: [
+            'api/encargados',
+            'api/encargados/*',
+            'api/agrupaciones',
+            'api/agrupaciones/*',
+            'api/solicitudes-agrupaciones',
+            'api/solicitudes-agrupaciones/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->shouldRenderJsonWhen(

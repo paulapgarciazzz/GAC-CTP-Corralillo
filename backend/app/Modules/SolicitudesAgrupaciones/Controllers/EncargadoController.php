@@ -3,6 +3,7 @@
 namespace App\Modules\SolicitudesAgrupaciones\Controllers;
 
 use App\Modules\SolicitudesAgrupaciones\Requests\StoreEncargadoRequest;
+use App\Modules\SolicitudesAgrupaciones\Requests\UpdateEncargadoRequest;
 use App\Modules\SolicitudesAgrupaciones\Resources\EncargadoResource;
 use App\Modules\SolicitudesAgrupaciones\Services\EncargadoService;
 use Illuminate\Http\JsonResponse;
@@ -25,5 +26,16 @@ class EncargadoController
         return (new EncargadoResource(
             $this->service->crear($request->validated())
         ))->response()->setStatusCode(201);
+    }
+
+    public function update(UpdateEncargadoRequest $request, string $cedula): EncargadoResource
+    {
+        $encargado = $this->service->buscarPorCedula($cedula);
+
+        abort_if($encargado === null, 404, 'Encargado no encontrado.');
+
+        return new EncargadoResource(
+            $this->service->actualizar($encargado, $request->validated())
+        );
     }
 }

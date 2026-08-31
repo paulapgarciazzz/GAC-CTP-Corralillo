@@ -15,12 +15,12 @@ class GestionarSolicitudRequest extends FormRequest
     {
         return [
             'fecha_asignada' => [
-                'required',
+                'nullable',
                 'date',
             ],
 
             'hora_asignada' => [
-                'required',
+                'nullable',
                 'date_format:H:i',
             ],
         ];

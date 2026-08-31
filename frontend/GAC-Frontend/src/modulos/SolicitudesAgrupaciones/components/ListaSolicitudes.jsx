@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, MailPlus } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
 
 export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, onAceptar, onRechazar, onEditar, onEliminar, hayBusqueda }) {
@@ -18,6 +18,12 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
     const handleEditar = (solicitud) => {
         setMenuAbiertoId(null);
         onEditar(solicitud);
+    };
+
+    const handleEnviarDetalles = (solicitud) => {
+        setMenuAbiertoId(null);
+        // TODO: implementar envío de detalles al encargado
+        console.log('Enviar detalles de la solicitud', solicitud.id);
     };
 
     const handleEliminar = (solicitud) => {
@@ -85,14 +91,26 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                                 onClick={(e) => e.stopPropagation()}
                                                 className="absolute right-0 mt-1 w-40 bg-surface rounded-lg shadow-lg border border-border z-20 p-1"
                                             >
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleEditar(solicitud)}
-                                                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
-                                                >
-                                                    <Pencil size={14} />
-                                                    Editar
-                                                </button>
+                                                {solicitud.estado !== 'rechazada' && (
+                                                    <>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleEditar(solicitud)}
+                                                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
+                                                        >
+                                                            <Pencil size={14} />
+                                                            Editar
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleEnviarDetalles(solicitud)}
+                                                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
+                                                        >
+                                                            <MailPlus size={14} />
+                                                            Enviar detalles
+                                                        </button>
+                                                    </>
+                                                )}
                                                 <button
                                                     type="button"
                                                     onClick={() => handleEliminar(solicitud)}

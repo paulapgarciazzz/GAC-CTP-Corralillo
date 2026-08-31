@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useEffect } from 'react';
 import GestionSolicitudes from '../../SolicitudesAgrupaciones/pages/GestionSolicitudes';
 import GestionAgrupaciones from '../../Agrupaciones/pages/GestionAgrupaciones';
-import ReportesAgrupaciones from '../../Reportes/pages/ReportesAgrupaciones';
+import ReportesAgrupaciones from '../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones';
 import { useTheme } from '../../../hooks/useTheme';
 
 const Dashboard =()=>{

@@ -11,6 +11,7 @@ use App\Modules\SolicitudesAgrupaciones\Resources\ParticipacionResource;
 use App\Modules\SolicitudesAgrupaciones\Services\AgrupacionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class AgrupacionController
 {
@@ -20,6 +21,13 @@ class AgrupacionController
     {
         return AgrupacionResource::collection(
             $this->service->obtenerPorEncargado($cedula)
+        );
+    }
+
+    public function listar(): AnonymousResourceCollection
+    {
+        return AgrupacionResource::collection(
+            $this->service->listarAprobadas()
         );
     }
 
@@ -57,5 +65,12 @@ class AgrupacionController
                 $request->validated()
             )
         ))->response()->setStatusCode(201);
+    }
+
+    public function destroy(Agrupacion $agrupacion): Response
+    {
+        $this->service->eliminar($agrupacion);
+
+        return response()->noContent();
     }
 }

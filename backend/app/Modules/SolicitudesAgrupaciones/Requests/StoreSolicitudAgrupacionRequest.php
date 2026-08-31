@@ -44,11 +44,13 @@ class StoreSolicitudAgrupacionRequest extends FormRequest
             ],
 
             'fecha_asignada' => [
-                'prohibited',
+                'nullable',
+                'date',
             ],
 
             'hora_asignada' => [
-                'prohibited',
+                'nullable',
+                'date_format:H:i',
             ],
         ];
     }

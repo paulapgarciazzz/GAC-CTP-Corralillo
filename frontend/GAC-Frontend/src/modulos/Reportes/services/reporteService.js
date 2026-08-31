@@ -1,9 +1,11 @@
-import { mockReporteAgrupaciones } from '../data/mockReporteAgrupaciones';
+import api from '../../../services/axios';
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// TODO: reemplazar por `api.get('/reportes/agrupaciones')` cuando el backend exista.
 export const obtenerReporteAgrupaciones = async () => {
-    await delay(300);
-    return { success: true, data: { ...mockReporteAgrupaciones } };
+    try {
+        const response = await api.get('/reportes/agrupaciones');
+        return { success: true, data: response.data.data };
+    } catch (error) {
+        const mensaje = error.response?.data?.message || 'No se pudo cargar el reporte.';
+        return { success: false, error: mensaje };
+    }
 };

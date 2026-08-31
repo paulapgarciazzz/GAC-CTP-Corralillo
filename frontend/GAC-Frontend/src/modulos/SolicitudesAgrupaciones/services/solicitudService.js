@@ -1,66 +1,96 @@
 import api from '../../../services/axios';
-import { mockSolicitudes } from '../data/mockSolicitudes';
+
+const extraerMensajeError = (error, fallback) =>
+    error.response?.data?.message
+    || Object.values(error.response?.data?.errors || {})[0]?.[0]
+    || fallback;
+
+const normalizarSolicitud = (data) => ({
+    ...data,
+    encargado: data.agrupacion?.encargado,
+    fecha_solicitud: data.fecha_solicitud?.split('T')[0] ?? data.fecha_solicitud,
+    hora_asignada: data.hora_asignada?.slice(0, 5) ?? data.hora_asignada,
+});
 
 export const crearSolicitud = async (payload) => {
     try {
-        const response = await api.post('/solicitudes-agrupacion', payload);
+        const { cedula, ...datosEncargado } = payload.encargado;
+
+        let encargadoExiste = true;
+        try {
+            await api.get(`/encargados/${cedula}`);
+        } catch (error) {
+            if (error.response?.status === 404) {
+                encargadoExiste = false;
+            } else {
+                throw error;
+            }
+        }
+
+        if (!encargadoExiste) {
+            await api.post('/encargados', { cedula, ...datosEncargado });
+        }
+
+        const agrupacionResponse = await api.post('/agrupaciones', {
+            ced_encargado: cedula,
+            nombre: payload.agrupacion.nombre,
+            lugar_procedencia: payload.agrupacion.lugar_procedencia,
+            cantidad_integrantes: payload.agrupacion.cantidad_integrantes,
+            resena: payload.agrupacion.resena,
+        });
+
+        const response = await api.post('/solicitudes-agrupaciones', {
+            id_agrupacion: agrupacionResponse.data.data.id,
+            fecha_solicitud: payload.solicitud.fecha_solicitud,
+            comentarios: payload.solicitud.comentarios,
+            fecha_asignada: payload.solicitud.fecha_asignada || null,
+            hora_asignada: payload.solicitud.hora_asignada || null,
+        });
+
         return { success: true, data: response.data };
     } catch (error) {
-        const mensaje = error.response?.data?.message
-            || Object.values(error.response?.data?.errors || {})[0]?.[0]
-            || 'No se pudo enviar la solicitud. Intenta de nuevo.';
+        const mensaje = extraerMensajeError(error, 'No se pudo enviar la solicitud. Intenta de nuevo.');
         return { success: false, error: mensaje };
     }
 };
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// TODO: reemplazar por `api.get('/solicitudes-agrupacion')` cuando el backend exista.
 export const obtenerSolicitudes = async () => {
-    await delay(300);
-    return { success: true, data: [...mockSolicitudes] };
+    try {
+        const response = await api.get('/solicitudes-agrupaciones');
+        return { success: true, data: response.data.data.map(normalizarSolicitud) };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudieron cargar las solicitudes.');
+        return { success: false, error: mensaje };
+    }
 };
 
-// TODO: reemplazar por `api.patch('/solicitudes-agrupacion/:id')` cuando el backend exista.
 export const actualizarEstadoSolicitud = async (id, nuevoEstado) => {
-    await delay(300);
-    const solicitud = mockSolicitudes.find((s) => s.id === id);
-
-    if (!solicitud) {
-        return { success: false, error: 'Solicitud no encontrada' };
+    try {
+        const accion = nuevoEstado === 'aprobada' ? 'aprobar' : 'rechazar';
+        const response = await api.patch(`/solicitudes-agrupaciones/${id}/${accion}`);
+        return { success: true, data: normalizarSolicitud(response.data.data) };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudo actualizar el estado de la solicitud.');
+        return { success: false, error: mensaje };
     }
-
-    solicitud.estado = nuevoEstado;
-    return { success: true, data: { ...solicitud } };
 };
 
-// TODO: reemplazar por `api.put('/solicitudes-agrupacion/:id')` cuando el backend exista.
 export const actualizarSolicitud = async (id, payload) => {
-    await delay(300);
-    const solicitud = mockSolicitudes.find((s) => s.id === id);
-
-    if (!solicitud) {
-        return { success: false, error: 'Solicitud no encontrada' };
+    try {
+        const response = await api.put(`/solicitudes-agrupaciones/${id}`, payload);
+        return { success: true, data: normalizarSolicitud(response.data.data) };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudo actualizar la solicitud.');
+        return { success: false, error: mensaje };
     }
-
-    solicitud.encargado = { ...solicitud.encargado, ...payload.encargado };
-    solicitud.agrupacion = { ...solicitud.agrupacion, ...payload.agrupacion };
-    solicitud.fecha_asignada = payload.solicitud.fecha_asignada;
-    solicitud.hora_asignada = payload.solicitud.hora_asignada;
-    solicitud.comentarios = payload.solicitud.comentarios;
-
-    return { success: true, data: { ...solicitud } };
 };
 
-// TODO: reemplazar por `api.delete('/solicitudes-agrupacion/:id')` cuando el backend exista.
 export const eliminarSolicitud = async (id) => {
-    await delay(300);
-    const index = mockSolicitudes.findIndex((s) => s.id === id);
-
-    if (index === -1) {
-        return { success: false, error: 'Solicitud no encontrada' };
+    try {
+        await api.delete(`/solicitudes-agrupaciones/${id}`);
+        return { success: true };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudo eliminar la solicitud.');
+        return { success: false, error: mensaje };
     }
-
-    mockSolicitudes.splice(index, 1);
-    return { success: true };
 };

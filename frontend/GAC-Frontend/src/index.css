@@ -29,6 +29,11 @@
   --color-danger-soft: #fadcda;
   --color-info: #1c5c69;
   --color-info-soft: #d3eef2;
+
+  /* Paleta categórica para gráficos (validada CVD, máx. 3 usos simultáneos) */
+  --color-chart-1: #2a78d6;
+  --color-chart-2: #eb6834;
+  --color-chart-3: #1baf7a;
 }
 
 :root[data-theme="dark"]{
@@ -51,6 +56,10 @@
   --color-danger-soft: #440c08;
   --color-info: #7ecdda;
   --color-info-soft: #132a2e;
+
+  --color-chart-1: #3987e5;
+  --color-chart-2: #d95926;
+  --color-chart-3: #199e70;
 }
 
 body{

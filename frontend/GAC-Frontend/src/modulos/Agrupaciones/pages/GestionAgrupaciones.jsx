@@ -3,14 +3,12 @@ import { Loader2, Search } from 'lucide-react';
 import { obtenerAgrupaciones, eliminarAgrupacion } from '../services/agrupacionService';
 import TarjetaAgrupacion from '../components/TarjetaAgrupacion';
 import ModalEditarAgrupacion from '../components/ModalEditarAgrupacion';
-import ModalCrearAgrupacion from '../components/ModalCrearAgrupacion';
 
 export default function GestionAgrupaciones() {
     const [agrupaciones, setAgrupaciones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [agrupacionEditar, setAgrupacionEditar] = useState(null);
-    const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
     const [busqueda, setBusqueda] = useState('');
 
     useEffect(() => {
@@ -27,10 +25,6 @@ export default function GestionAgrupaciones() {
 
     const handleActualizado = (agrupacionActualizada) => {
         setAgrupaciones((prev) => prev.map((a) => (a.id === agrupacionActualizada.id ? agrupacionActualizada : a)));
-    };
-
-    const handleCreada = (agrupacionCreada) => {
-        setAgrupaciones((prev) => [...prev, agrupacionCreada]);
     };
 
     const handleEliminar = async (agrupacion) => {
@@ -56,26 +50,16 @@ export default function GestionAgrupaciones() {
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-                <div className="relative w-full sm:max-w-xs">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-faint" />
-                    <input
-                        type="text"
-                        value={busqueda}
-                        onChange={(e) => setBusqueda(e.target.value)}
-                        placeholder="Buscar por nombre o cédula del encargado"
-                        aria-label="Buscar agrupación"
-                        className="w-full pl-9 pr-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                </div>
-
-                <button
-                    type="button"
-                    onClick={() => setModalCrearAbierto(true)}
-                    className="px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-white hover:bg-primary-hover transition-colors cursor-pointer shrink-0"
-                >
-                    + Crear agrupación
-                </button>
+            <div className="relative w-full sm:max-w-xs">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-faint" />
+                <input
+                    type="text"
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                    placeholder="Buscar por nombre o cédula del encargado"
+                    aria-label="Buscar agrupación"
+                    className="w-full pl-9 pr-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
             </div>
 
             {error && (
@@ -114,12 +98,6 @@ export default function GestionAgrupaciones() {
                 agrupacion={agrupacionEditar}
                 onClose={() => setAgrupacionEditar(null)}
                 onActualizado={handleActualizado}
-            />
-
-            <ModalCrearAgrupacion
-                open={modalCrearAbierto}
-                onClose={() => setModalCrearAbierto(false)}
-                onCreada={handleCreada}
             />
         </div>
     );

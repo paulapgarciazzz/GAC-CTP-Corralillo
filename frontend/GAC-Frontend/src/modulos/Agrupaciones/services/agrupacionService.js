@@ -1,49 +1,41 @@
-import { mockAgrupaciones } from '../data/mockAgrupaciones';
+import api from '../../../services/axios';
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const extraerMensajeError = (error, fallback) =>
+    error.response?.data?.message
+    || Object.values(error.response?.data?.errors || {})[0]?.[0]
+    || fallback;
 
-// TODO: reemplazar por `api.get('/agrupaciones')` cuando el backend exista.
 export const obtenerAgrupaciones = async () => {
-    await delay(300);
-    return { success: true, data: [...mockAgrupaciones] };
+    try {
+        const response = await api.get('/agrupaciones');
+        return { success: true, data: response.data.data };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudieron cargar las agrupaciones.');
+        return { success: false, error: mensaje };
+    }
 };
 
-// TODO: reemplazar por `api.post('/agrupaciones')` cuando el backend exista.
-export const crearAgrupacion = async ({ encargado, agrupacion }) => {
-    await delay(300);
-    const nuevaAgrupacion = {
-        id: Math.max(0, ...mockAgrupaciones.map((a) => a.id)) + 1,
-        foto_url: null,
-        ...agrupacion,
-        encargado,
-    };
-
-    mockAgrupaciones.push(nuevaAgrupacion);
-    return { success: true, data: { ...nuevaAgrupacion } };
-};
-
-// TODO: reemplazar por `api.put('/agrupaciones/:id')` cuando el backend exista.
 export const actualizarAgrupacion = async (id, payload) => {
-    await delay(300);
-    const agrupacion = mockAgrupaciones.find((a) => a.id === id);
+    try {
+        const { encargado, ...datosAgrupacion } = payload;
+        const { cedula, ...datosEncargado } = encargado;
 
-    if (!agrupacion) {
-        return { success: false, error: 'Agrupación no encontrada' };
+        await api.patch(`/encargados/${cedula}`, datosEncargado);
+        const response = await api.put(`/agrupaciones/${id}`, datosAgrupacion);
+
+        return { success: true, data: response.data.data };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudo actualizar la agrupación.');
+        return { success: false, error: mensaje };
     }
-
-    Object.assign(agrupacion, payload);
-    return { success: true, data: { ...agrupacion } };
 };
 
-// TODO: reemplazar por `api.delete('/agrupaciones/:id')` cuando el backend exista.
 export const eliminarAgrupacion = async (id) => {
-    await delay(300);
-    const index = mockAgrupaciones.findIndex((a) => a.id === id);
-
-    if (index === -1) {
-        return { success: false, error: 'Agrupación no encontrada' };
+    try {
+        await api.delete(`/agrupaciones/${id}`);
+        return { success: true };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudo eliminar la agrupación.');
+        return { success: false, error: mensaje };
     }
-
-    mockAgrupaciones.splice(index, 1);
-    return { success: true };
 };

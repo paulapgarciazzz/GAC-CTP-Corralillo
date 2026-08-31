@@ -44,6 +44,8 @@ class SolicitudAgrupacionService
                 'fecha_solicitud' => $datos['fecha_solicitud'],
                 'id_estado' => $estadoPendiente->id,
                 'comentarios' => $datos['comentarios'] ?? null,
+                'fecha_asignada' => $datos['fecha_asignada'] ?? null,
+                'hora_asignada' => $datos['hora_asignada'] ?? null,
             ]);
 
             return $solicitud->load([
@@ -76,8 +78,8 @@ class SolicitudAgrupacionService
 
             $solicitud->update([
                 'id_estado' => $estadoAprobado->id,
-                'fecha_asignada' => $datos['fecha_asignada'],
-                'hora_asignada' => $datos['hora_asignada'],
+                'fecha_asignada' => $datos['fecha_asignada'] ?? $solicitud->fecha_asignada,
+                'hora_asignada' => $datos['hora_asignada'] ?? $solicitud->hora_asignada,
             ]);
 
             return $solicitud->fresh([
@@ -127,6 +129,42 @@ class SolicitudAgrupacionService
         $this->notificarResultado($solicitud, 'rechazada');
 
         return $solicitud;
+    }
+
+    public function actualizar(int $id, array $datos): SolicitudAgrupacion
+    {
+        return DB::transaction(function () use ($id, $datos) {
+            $solicitud = SolicitudAgrupacion::with('agrupacion.encargado')
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            if (!empty($datos['encargado'])) {
+                $solicitud->agrupacion->encargado->update($datos['encargado']);
+            }
+
+            if (!empty($datos['agrupacion'])) {
+                $solicitud->agrupacion->update($datos['agrupacion']);
+            }
+
+            if (!empty($datos['solicitud'])) {
+                $solicitud->update($datos['solicitud']);
+            }
+
+            return $solicitud->fresh([
+                'agrupacion.encargado',
+                'estado',
+                'auditorias',
+            ]);
+        });
+    }
+
+    public function eliminar(int $id): void
+    {
+        DB::transaction(function () use ($id) {
+            $solicitud = SolicitudAgrupacion::findOrFail($id);
+            $solicitud->auditorias()->delete();
+            $solicitud->delete();
+        });
     }
 
     private function notificarResultado(

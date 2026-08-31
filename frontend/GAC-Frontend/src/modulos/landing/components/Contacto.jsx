@@ -8,8 +8,8 @@ const Contacto = () => {
   return (
     <section id="contacto" className="scroll-mt-24 py-16 bg-background">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-foreground">Información de Contacto</h2>
-        <p className="text-xl font-bold text-center mb-12 text-foreground">Quieres formar parte de las actividades culturales?</p>
+        <h2 className="text-3xl font-bold text-center mb-12 text-[#1f4d3a] dark:text-white">Información de Contacto</h2>
+        <p className="text-xl font-bold text-center mb-12 text-[#1f4d3a] dark:text-white">Quieres formar parte de las actividades culturales?</p>
         <button
           type="button"
           onClick={() => setModalAbierto(true)}
@@ -21,13 +21,13 @@ const Contacto = () => {
         <div className="max-w-3xl mx-auto bg-surface p-8 rounded-xl shadow-md border border-border">
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
-              <h4 className="text-lg font-semibold text-center text-accent mb-2">📧 Correo</h4>
+              <h4 className="text-lg font-bold text-center text-[#1f4d3a] dark:text-white">📧 Correo</h4>
               <ul className="space-y-1 text-center text-foreground-soft">
                 <li>ctp.decorralillo@mep.go.cr</li>
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-center text-accent mb-2">📞 Teléfonos</h4>
+              <h4 className="text-lg font-bold text-center text-[#1f4d3a] dark:text-white">📞 Teléfonos</h4>
               <ul className="space-y-1 text-center text-foreground-soft">
                 <li>+506 8888-9999 (WhatsApp)</li>
                 <li>+506 2687 8014</li>
@@ -35,7 +35,7 @@ const Contacto = () => {
               </ul>
             </div>
             <div className="sm:col-span-2 ">
-              <h4 className="text-lg font-semibold text-center text-accent mb-2">🌐 Redes Sociales</h4>
+              <h4 className="text-lg font-bold text-center text-[#1f4d3a] dark:text-white">🌐 Redes Sociales</h4>
               <div className="flex flex-wrap justify-center gap-4 text-foreground-soft">
                 <a href="https://www.facebook.com/CTPDeCorralillo/?locale=es_LA" className="hover:text-accent transition">Facebook</a>
                 <a href="https://www.instagram.com/ctpdecorralillo/" className=" hover:text-accent transition">Instagram</a>

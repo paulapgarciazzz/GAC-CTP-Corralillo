@@ -3,8 +3,9 @@
 namespace App\Modules\SolicitudesAgrupaciones\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class UpdateAgrupacionRequest extends FormRequest
+class UpdateEncargadoRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,38 +15,33 @@ class UpdateAgrupacionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre' => [
+            'primer_nombre' => [
                 'sometimes',
                 'required',
                 'string',
+                'max:100',
+            ],
+
+            'apellido' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'email' => [
+                'sometimes',
+                'required',
+                'email',
                 'max:150',
+                Rule::unique('encargado', 'email')->ignore($this->route('cedula'), 'cedula'),
             ],
 
-            'lugar_procedencia' => [
+            'numero_tel' => [
                 'sometimes',
                 'required',
                 'string',
-                'max:150',
-            ],
-
-            'cantidad_integrantes' => [
-                'sometimes',
-                'required',
-                'integer',
-                'min:1',
-            ],
-
-            'resena' => [
-                'sometimes',
-                'nullable',
-                'string',
-                'max:5000',
-            ],
-
-            'foto_url' => [
-                'sometimes',
-                'nullable',
-                'string',
+                'max:20',
             ],
         ];
     }
