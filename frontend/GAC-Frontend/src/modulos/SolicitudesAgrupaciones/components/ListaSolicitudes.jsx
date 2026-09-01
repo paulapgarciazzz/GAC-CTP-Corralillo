@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { MoreVertical, Pencil, Trash2, MailPlus } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, MailPlus, Loader2 } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
 
-export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, onAceptar, onRechazar, onEditar, onEliminar, hayBusqueda }) {
+export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, onAceptar, onRechazar, onEditar, onEnviarDetalles, onEliminar, hayBusqueda }) {
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
+    const [enviandoId, setEnviandoId] = useState(null);
 
     if (solicitudes.length === 0) {
         return (
@@ -20,10 +21,11 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
         onEditar(solicitud);
     };
 
-    const handleEnviarDetalles = (solicitud) => {
+    const handleEnviarDetalles = async (solicitud) => {
         setMenuAbiertoId(null);
-        // TODO: implementar envío de detalles al encargado
-        console.log('Enviar detalles de la solicitud', solicitud.id);
+        setEnviandoId(solicitud.id);
+        await onEnviarDetalles(solicitud.id);
+        setEnviandoId(null);
     };
 
     const handleEliminar = (solicitud) => {
@@ -104,9 +106,14 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                                         <button
                                                             type="button"
                                                             onClick={() => handleEnviarDetalles(solicitud)}
-                                                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
+                                                            disabled={enviandoId === solicitud.id}
+                                                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                                         >
-                                                            <MailPlus size={14} />
+                                                            {enviandoId === solicitud.id ? (
+                                                                <Loader2 size={14} className="animate-spin" />
+                                                            ) : (
+                                                                <MailPlus size={14} />
+                                                            )}
                                                             Enviar detalles
                                                         </button>
                                                     </>

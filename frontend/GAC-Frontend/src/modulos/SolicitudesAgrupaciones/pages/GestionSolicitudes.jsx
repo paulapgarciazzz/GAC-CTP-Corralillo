@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Loader2, Search } from 'lucide-react';
-import { obtenerSolicitudes, actualizarEstadoSolicitud, eliminarSolicitud } from '../services/solicitudService';
+import { obtenerSolicitudes, actualizarEstadoSolicitud, eliminarSolicitud, enviarDetallesSolicitud } from '../services/solicitudService';
 import ListaSolicitudes from '../components/ListaSolicitudes';
 import DetalleSolicitud from '../components/DetalleSolicitud';
 import ModalEditarSolicitud from '../components/ModalEditarSolicitud';
@@ -11,6 +11,7 @@ export default function GestionSolicitudes() {
     const [solicitudEditando, setSolicitudEditando] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [mensajeExito, setMensajeExito] = useState('');
     const [busqueda, setBusqueda] = useState('');
 
     useEffect(() => {
@@ -29,6 +30,16 @@ export default function GestionSolicitudes() {
         const result = await actualizarEstadoSolicitud(id, nuevoEstado);
         if (result.success) {
             setSolicitudes((prev) => prev.map((s) => (s.id === id ? { ...s, estado: nuevoEstado } : s)));
+        } else {
+            setError(result.error);
+        }
+    };
+
+    const handleEnviarDetalles = async (id) => {
+        const result = await enviarDetallesSolicitud(id);
+        if (result.success) {
+            setMensajeExito('Los detalles de la solicitud fueron enviados al encargado.');
+            setTimeout(() => setMensajeExito(''), 4000);
         } else {
             setError(result.error);
         }
@@ -69,6 +80,12 @@ export default function GestionSolicitudes() {
                 </div>
             )}
 
+            {mensajeExito && (
+                <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">
+                    {mensajeExito}
+                </div>
+            )}
+
             {loading ? (
                 <div className="flex items-center justify-center py-16">
                     <Loader2 className="animate-spin text-primary" size={28} />
@@ -83,6 +100,7 @@ export default function GestionSolicitudes() {
                             onAceptar={(id) => cambiarEstado(id, 'aprobada')}
                             onRechazar={(id) => cambiarEstado(id, 'rechazada')}
                             onEditar={setSolicitudEditando}
+                            onEnviarDetalles={handleEnviarDetalles}
                             onEliminar={handleEliminar}
                             hayBusqueda={busqueda.trim().length > 0}
                         />
