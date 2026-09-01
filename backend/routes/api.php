@@ -40,6 +40,7 @@ Route::prefix('solicitudes-agrupaciones')->group(function () {
     Route::get('/{id}', [SolicitudAgrupacionController::class, 'show']);
     Route::patch('/{id}/aprobar', [SolicitudAgrupacionController::class, 'aprobar']);
     Route::patch('/{id}/rechazar', [SolicitudAgrupacionController::class, 'rechazar']);
+    Route::post('/{id}/enviar-detalles', [SolicitudAgrupacionController::class, 'enviarDetalles']);
     Route::put('/{id}', [SolicitudAgrupacionController::class, 'update']);
     Route::delete('/{id}', [SolicitudAgrupacionController::class, 'destroy']);
 });

@@ -85,6 +85,16 @@ export const actualizarSolicitud = async (id, payload) => {
     }
 };
 
+export const enviarDetallesSolicitud = async (id) => {
+    try {
+        await api.post(`/solicitudes-agrupaciones/${id}/enviar-detalles`);
+        return { success: true };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudo enviar el correo con los detalles.');
+        return { success: false, error: mensaje };
+    }
+};
+
 export const eliminarSolicitud = async (id) => {
     try {
         await api.delete(`/solicitudes-agrupaciones/${id}`);
