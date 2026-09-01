@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use App\Mail\NotificacionSistema;
+use App\Mail\SolicitudAprobadaNotification;
+use App\Mail\SolicitudRechazadaNotification;
+use Illuminate\Support\Facades\Log;
 
 class SolicitudAgrupacionService
 {
@@ -171,15 +173,27 @@ class SolicitudAgrupacionService
         SolicitudAgrupacion $solicitud,
         string $resultado
     ): void {
-        $encargado = $solicitud->agrupacion->encargado;
+        try {
+            $encargado = $solicitud->agrupacion->encargado;
 
-        Mail::to($encargado->email)->send(new NotificacionSistema(
-            'Resultado de solicitud de agrupación',
-            sprintf(
-                'La solicitud #%d fue %s.',
-                $solicitud->id,
-                $resultado
-            )
-        ));
+            if ($resultado === 'aprobada') {
+                Mail::to($encargado->email)->send(
+                    new SolicitudAprobadaNotification($solicitud)
+                );
+            } elseif ($resultado === 'rechazada') {
+                Mail::to($encargado->email)->send(
+                    new SolicitudRechazadaNotification($solicitud)
+                );
+            }
+        } catch (\Exception $e) {
+            // Log the error but don't fail the transaction
+            // The solicitud state has already been persisted
+            Log::error('Error al enviar notificación de solicitud', [
+                'solicitud_id' => $solicitud->id,
+                'resultado' => $resultado,
+                'encargado_email' => $solicitud->agrupacion->encargado->email ?? 'unknown',
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
