@@ -14,6 +14,8 @@ class UpdateEncargadoRequest extends FormRequest
 
     public function rules(): array
     {
+        // 'cedula' y 'tipo_identificacion' no se incluyen a propósito: son inmutables
+        // una vez creado el encargado (cedula es la primary key de la tabla).
         return [
             'primer_nombre' => [
                 'sometimes',

@@ -33,6 +33,10 @@ Route::post(
     'agrupaciones/{agrupacion}/participaciones',
     [AgrupacionController::class, 'participaciones']
 );
+Route::get(
+    'agrupaciones/{agrupacion}/archivo-adjunto',
+    [AgrupacionController::class, 'archivoAdjunto']
+);
 
 Route::prefix('solicitudes-agrupaciones')->group(function () {
     Route::get('/', [SolicitudAgrupacionController::class, 'index']);

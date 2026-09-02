@@ -2,6 +2,7 @@
 
 namespace App\Modules\SolicitudesAgrupaciones\Requests;
 
+use App\Modules\SolicitudesAgrupaciones\Rules\ArchivoAdjuntoValido;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateAgrupacionRequest extends FormRequest
@@ -40,6 +41,13 @@ class UpdateAgrupacionRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:5000',
+            ],
+
+            'archivo_adjunto' => [
+                'sometimes',
+                'nullable',
+                'string',
+                new ArchivoAdjuntoValido(),
             ],
 
             'foto_url' => [

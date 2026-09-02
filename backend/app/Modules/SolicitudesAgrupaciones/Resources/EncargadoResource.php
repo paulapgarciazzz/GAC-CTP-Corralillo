@@ -11,6 +11,7 @@ class EncargadoResource extends JsonResource
     {
         return [
             'cedula' => $this->cedula,
+            'tipo_identificacion' => $this->tipo_identificacion,
             'primer_nombre' => $this->primer_nombre,
             'apellido' => $this->apellido,
             'email' => $this->email,

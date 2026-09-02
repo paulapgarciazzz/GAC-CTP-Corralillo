@@ -4,8 +4,10 @@ namespace App\Modules\SolicitudesAgrupaciones\Services;
 
 use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\Participacion;
+use App\Modules\SolicitudesAgrupaciones\Support\DataUri;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AgrupacionService
 {
@@ -55,6 +57,20 @@ class AgrupacionService
             $agrupacion->participaciones()->delete();
             $agrupacion->delete();
         });
+    }
+
+    /**
+     * @return array{mime: string, binario: string}
+     */
+    public function obtenerArchivoAdjunto(Agrupacion $agrupacion): array
+    {
+        $datos = DataUri::parse($agrupacion->archivo_adjunto);
+
+        if ($datos === null) {
+            throw new HttpException(404, 'Esta agrupación no tiene un archivo adjunto.');
+        }
+
+        return $datos;
     }
 
     public function agregarParticipacion(
