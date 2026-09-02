@@ -36,7 +36,7 @@ export const crearSolicitud = async (payload) => {
             nombre: payload.agrupacion.nombre,
             lugar_procedencia: payload.agrupacion.lugar_procedencia,
             cantidad_integrantes: payload.agrupacion.cantidad_integrantes,
-            resena: payload.agrupacion.resena,
+            archivo_adjunto: payload.agrupacion.archivo_adjunto,
         });
 
         const response = await api.post('/solicitudes-agrupaciones', {
