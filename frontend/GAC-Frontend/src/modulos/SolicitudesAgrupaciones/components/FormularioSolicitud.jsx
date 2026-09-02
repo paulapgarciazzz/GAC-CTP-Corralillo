@@ -1,19 +1,25 @@
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { crearSolicitud } from '../services/solicitudService';
+import { TIPOS_IDENTIFICACION, obtenerConfigIdentificacion, formatearValorIdentificacion } from '../../../utils/identificacion';
+import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono } from '../../../utils/telefono';
 
 const valoresIniciales = {
     // Encargado
+    tipo_identificacion: 'cedula',
     cedula: '',
     primer_nombre: '',
     apellido: '',
     email: '',
+    codigo_pais_tel: CODIGO_PAIS_POR_DEFECTO,
+    prefijo_custom_tel: '',
     numero_tel: '',
     // Agrupacion
     nombre: '',
     lugar_procedencia: '',
     cantidad_integrantes: '',
-    resena: '',
+    archivo_adjunto: null,
+    archivo_adjunto_nombre: '',
     // Solicitud
     fecha_asignada: '',
     hora_asignada: '',
@@ -22,10 +28,11 @@ const valoresIniciales = {
 
 const hoy = new Date().toISOString().split('T')[0];
 
-const CAMPOS_SOLO_NUMEROS = { cedula: 9, numero_tel: 8 };
 const CAMPOS_SOLO_LETRAS = ['primer_nombre', 'apellido', 'nombre', 'lugar_procedencia'];
-const REGEX_NO_NUMERO = /\D/;
 const REGEX_NO_LETRA = /[^A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]/;
+
+const TIPOS_ARCHIVO_ADJUNTO_ACEPTADOS = ['image/png', 'image/jpeg', 'application/pdf'];
+const TAMANO_MAXIMO_ARCHIVO_ADJUNTO = 4 * 1024 * 1024;
 
 export default function FormularioSolicitud({ onSuccess }) {
     const [valores, setValores] = useState(valoresIniciales);
@@ -33,14 +40,19 @@ export default function FormularioSolicitud({ onSuccess }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const configIdentificacion = obtenerConfigIdentificacion(valores.tipo_identificacion);
+
+    const configTelefono = obtenerConfigTelefono(valores.codigo_pais_tel);
+
     const handleChange = (e) => {
         const { name } = e.target;
         let { value } = e.target;
         let mensaje = '';
 
-        if (name in CAMPOS_SOLO_NUMEROS) {
-            if (REGEX_NO_NUMERO.test(value)) mensaje = 'Solo se permiten números';
-            value = value.replace(/\D/g, '').slice(0, CAMPOS_SOLO_NUMEROS[name]);
+        if (name === 'cedula') {
+            const regexInvalido = configIdentificacion.soloNumeros ? /\D/ : /[^A-Za-z0-9]/;
+            if (regexInvalido.test(value)) mensaje = configIdentificacion.mensajeError;
+            value = formatearValorIdentificacion(valores.tipo_identificacion, value);
         } else if (CAMPOS_SOLO_LETRAS.includes(name)) {
             if (REGEX_NO_LETRA.test(value)) mensaje = 'Solo se permiten letras y espacios';
             value = value.replace(/[^A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]/g, '');
@@ -50,25 +62,78 @@ export default function FormularioSolicitud({ onSuccess }) {
         setValores((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleTipoIdentificacionChange = (e) => {
+        const tipo_identificacion = e.target.value;
+        setValores((prev) => ({ ...prev, tipo_identificacion, cedula: '' }));
+        setErrores((prev) => ({ ...prev, cedula: '' }));
+    };
+
+    const handleCodigoPaisChange = (e) => {
+        const codigo_pais_tel = e.target.value;
+        setValores((prev) => ({ ...prev, codigo_pais_tel, numero_tel: '', prefijo_custom_tel: '' }));
+    };
+
+    const handlePrefijoCustomChange = (e) => {
+        const prefijo_custom_tel = e.target.value.replace(/\D/g, '').slice(0, MAX_DIGITOS_PREFIJO_CUSTOM);
+        setValores((prev) => ({ ...prev, prefijo_custom_tel }));
+    };
+
+    const handleNumeroTelChange = (e) => {
+        const numero_tel = e.target.value.replace(/\D/g, '').slice(0, configTelefono.maxLength);
+        setValores((prev) => ({ ...prev, numero_tel }));
+    };
+
+    const handleArchivoAdjuntoChange = (e) => {
+        const archivo = e.target.files?.[0];
+        if (!archivo) return;
+
+        if (!TIPOS_ARCHIVO_ADJUNTO_ACEPTADOS.includes(archivo.type)) {
+            setErrores((prev) => ({ ...prev, archivo_adjunto: 'Debe ser una imagen PNG/JPG o un PDF.' }));
+            return;
+        }
+        if (archivo.size > TAMANO_MAXIMO_ARCHIVO_ADJUNTO) {
+            setErrores((prev) => ({ ...prev, archivo_adjunto: 'El archivo no debe superar 4MB.' }));
+            return;
+        }
+
+        setErrores((prev) => ({ ...prev, archivo_adjunto: '' }));
+        const reader = new FileReader();
+        reader.onload = () => {
+            setValores((prev) => ({ ...prev, archivo_adjunto: reader.result, archivo_adjunto_nombre: archivo.name }));
+        };
+        reader.readAsDataURL(archivo);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (!valores.archivo_adjunto) {
+            setError('Debe adjuntar un archivo (PNG, JPG o PDF).');
+            return;
+        }
+
         setLoading(true);
 
         const payload = {
             encargado: {
                 cedula: valores.cedula,
+                tipo_identificacion: valores.tipo_identificacion,
                 primer_nombre: valores.primer_nombre,
                 apellido: valores.apellido,
                 email: valores.email,
-                numero_tel: valores.numero_tel,
+                numero_tel: combinarNumeroTelefono({
+                    codigoPais: valores.codigo_pais_tel,
+                    prefijoCustom: valores.prefijo_custom_tel,
+                    numero: valores.numero_tel,
+                }),
             },
             agrupacion: {
                 ced_encargado: valores.cedula,
                 nombre: valores.nombre,
                 lugar_procedencia: valores.lugar_procedencia,
                 cantidad_integrantes: valores.cantidad_integrantes,
-                resena: valores.resena,
+                archivo_adjunto: valores.archivo_adjunto,
             },
             solicitud: {
                 fecha_solicitud: new Date().toISOString().split('T')[0],
@@ -95,9 +160,18 @@ export default function FormularioSolicitud({ onSuccess }) {
                 <legend className="text-lg font-semibold text-primary">Datos del encargado</legend>
                 <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label htmlFor="cedula" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Cédula</label>
-                        <input id="cedula" name="cedula" type="text" inputMode="numeric" value={valores.cedula} onChange={handleChange} required
-                            pattern="\d{9}" title="Debe contener exactamente 9 dígitos"
+                        <label htmlFor="tipo_identificacion" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Tipo de identificación</label>
+                        <select id="tipo_identificacion" name="tipo_identificacion" value={valores.tipo_identificacion} onChange={handleTipoIdentificacionChange} required
+                            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            {TIPOS_IDENTIFICACION.map((tipo) => (
+                                <option key={tipo.value} value={tipo.value}>{tipo.etiqueta}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="space-y-1">
+                        <label htmlFor="cedula" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">{configIdentificacion.etiquetaCorta}</label>
+                        <input id="cedula" name="cedula" type="text" inputMode={configIdentificacion.inputMode} value={valores.cedula} onChange={handleChange} required
+                            pattern={configIdentificacion.pattern} title={configIdentificacion.title} placeholder={configIdentificacion.placeholder}
                             className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                         {errores.cedula && <p className="text-xs text-danger">{errores.cedula}</p>}
                     </div>
@@ -116,16 +190,32 @@ export default function FormularioSolicitud({ onSuccess }) {
                         {errores.apellido && <p className="text-xs text-danger">{errores.apellido}</p>}
                     </div>
                     <div className="space-y-1">
+                        <label htmlFor="codigo_pais_tel" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">País</label>
+                        <select id="codigo_pais_tel" name="codigo_pais_tel" value={valores.codigo_pais_tel} onChange={handleCodigoPaisChange} required
+                            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            {PAISES_TELEFONO.map((p) => (
+                                <option key={p.value} value={p.value}>{p.pais}{p.prefijo ? ` (+${p.prefijo})` : ''}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="space-y-1">
+                        <label htmlFor="numero_tel" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Número de teléfono</label>
+                        <div className="flex gap-2">
+                            {valores.codigo_pais_tel === 'OTRO' && (
+                                <input id="prefijo_custom_tel" name="prefijo_custom_tel" type="text" inputMode="numeric" value={valores.prefijo_custom_tel} onChange={handlePrefijoCustomChange} required
+                                    placeholder="Prefijo" maxLength={MAX_DIGITOS_PREFIJO_CUSTOM}
+                                    className="w-20 px-2 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                            )}
+                            <input id="numero_tel" name="numero_tel" type="tel" inputMode="numeric" value={valores.numero_tel} onChange={handleNumeroTelChange} required
+                                pattern={configTelefono.pattern} title={configTelefono.title} maxLength={configTelefono.maxLength}
+                                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                        </div>
+                        {errores.numero_tel && <p className="text-xs text-danger">{errores.numero_tel}</p>}
+                    </div>
+                    <div className="space-y-1">
                         <label htmlFor="email" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Correo electrónico</label>
                         <input id="email" name="email" type="email" value={valores.email} onChange={handleChange} required
                             className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
-                    </div>
-                    <div className="space-y-1 sm:col-span-2">
-                        <label htmlFor="numero_tel" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Número de teléfono</label>
-                        <input id="numero_tel" name="numero_tel" type="tel" inputMode="numeric" value={valores.numero_tel} onChange={handleChange} required
-                            pattern="\d{8}" title="Debe contener exactamente 8 dígitos"
-                            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
-                        {errores.numero_tel && <p className="text-xs text-danger">{errores.numero_tel}</p>}
                     </div>
                 </div>
             </fieldset>
@@ -153,10 +243,12 @@ export default function FormularioSolicitud({ onSuccess }) {
                             className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                     <div className="space-y-1 sm:col-span-2">
-                        <label htmlFor="resena" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Reseña (Presentaciones previas y que los caracteriza)</label>
-                        <textarea id="resena" name="resena" rows={3} value={valores.resena} onChange={handleChange} required
-                            minLength={10} maxLength={1000}
-                            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <label htmlFor="archivo_adjunto" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Adjuntar archivo (presentaciones previas, portafolio, etc.)</label>
+                        <input id="archivo_adjunto" name="archivo_adjunto" type="file" accept="image/png,image/jpeg,application/pdf" onChange={handleArchivoAdjuntoChange} required
+                            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-primary file:text-white file:cursor-pointer cursor-pointer" />
+                        <p className="text-xs text-foreground-faint">Formatos permitidos: PNG, JPG o PDF. Tamaño máximo 4MB.</p>
+                        {valores.archivo_adjunto_nombre && <p className="text-xs text-foreground-soft">Archivo seleccionado: {valores.archivo_adjunto_nombre}</p>}
+                        {errores.archivo_adjunto && <p className="text-xs text-danger">{errores.archivo_adjunto}</p>}
                     </div>
                 </div>
             </fieldset>

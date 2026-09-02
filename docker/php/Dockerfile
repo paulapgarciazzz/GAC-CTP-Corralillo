@@ -16,6 +16,11 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
+RUN { \
+    echo 'post_max_size=10M'; \
+    echo 'upload_max_filesize=10M'; \
+} > /usr/local/etc/php/conf.d/99-uploads.ini
+
 EXPOSE 9000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
