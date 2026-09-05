@@ -2,7 +2,10 @@ export function formatearFecha(fecha) {
     if (!fecha) return null;
     const date = new Date(fecha);
     if (Number.isNaN(date.getTime())) return null;
-    return date.toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' });
+    const dia = String(date.getDate()).padStart(2, '0');
+    const mes = String(date.getMonth() + 1).padStart(2, '0');
+    const anio = date.getFullYear();
+    return `${dia}/${mes}/${anio}`;
 }
 
 export function obtenerFechaLocalISO() {
