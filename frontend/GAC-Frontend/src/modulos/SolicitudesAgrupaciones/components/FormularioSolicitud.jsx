@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react';
 import { crearSolicitud } from '../services/solicitudService';
 import { TIPOS_IDENTIFICACION, obtenerConfigIdentificacion, formatearValorIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono } from '../../../utils/telefono';
+import { obtenerFechaLocalISO } from '../../../utils/fecha';
 
 const valoresIniciales = {
     // Encargado
@@ -26,7 +27,7 @@ const valoresIniciales = {
     comentarios: '',
 };
 
-const hoy = new Date().toISOString().split('T')[0];
+const hoy = obtenerFechaLocalISO();
 
 const CAMPOS_SOLO_LETRAS = ['primer_nombre', 'apellido', 'nombre', 'lugar_procedencia'];
 const REGEX_NO_LETRA = /[^A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]/;
@@ -136,7 +137,7 @@ export default function FormularioSolicitud({ onSuccess }) {
                 archivo_adjunto: valores.archivo_adjunto,
             },
             solicitud: {
-                fecha_solicitud: new Date().toISOString().split('T')[0],
+                fecha_solicitud: obtenerFechaLocalISO(),
                 fecha_asignada: valores.fecha_asignada,
                 hora_asignada: valores.hora_asignada,
                 comentarios: valores.comentarios,

@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
 import { obtenerConfigIdentificacion } from '../../../utils/identificacion';
+import { formatearFecha } from '../../../utils/fecha';
 import CampoArchivoAdjunto from '../../../components/CampoArchivoAdjunto';
 
 function Campo({ etiqueta, valor }) {
@@ -64,7 +65,7 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
             <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Datos de la solicitud</h3>
                 <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
-                    <Campo etiqueta="Fecha de solicitud" valor={solicitud.fecha_solicitud} />
+                    <Campo etiqueta="Fecha de solicitud" valor={formatearFecha(solicitud.fecha_solicitud)} />
                     <Campo etiqueta="Fecha asignada" valor={solicitud.fecha_asignada || 'Sin asignar'} />
                     <Campo etiqueta="Hora asignada" valor={solicitud.hora_asignada || '—'} />
                     <div className="col-span-full">
