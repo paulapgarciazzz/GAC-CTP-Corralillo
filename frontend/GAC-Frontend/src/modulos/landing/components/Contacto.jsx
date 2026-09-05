@@ -1,9 +1,11 @@
 
 import { useState } from 'react';
 import ModalSolicitud from '../../SolicitudesAgrupaciones/components/ModalSolicitud';
+import ModalSolicitudExistente from '../../SolicitudesAgrupaciones/components/ModalSolicitudExistente';
+import ModalPreguntaParticipacion from '../../SolicitudesAgrupaciones/components/ModalPreguntaParticipacion';
 
 const Contacto = () => {
-  const [modalAbierto, setModalAbierto] = useState(false);
+  const [pasoModal, setPasoModal] = useState(null);
 
   return (
     <section id="contacto" className="scroll-mt-24 py-8 bg-background">
@@ -12,12 +14,18 @@ const Contacto = () => {
         <p className="text-xl font-bold text-center mb-6 text-[#1f4d3a] dark:text-white">Quieres formar parte de las actividades culturales?</p>
         <button
           type="button"
-          onClick={() => setModalAbierto(true)}
+          onClick={() => setPasoModal('pregunta')}
           className="block mx-auto -mt-2 mb-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition duration-300 font-medium shadow-md hover:shadow-lg"
         >
           Inscribete
         </button>
-        <ModalSolicitud open={modalAbierto} onClose={() => setModalAbierto(false)} />
+        <ModalPreguntaParticipacion
+          open={pasoModal === 'pregunta'}
+          onClose={() => setPasoModal(null)}
+          onRespuesta={(yaParticipo) => setPasoModal(yaParticipo ? 'existente' : 'nuevo')}
+        />
+        <ModalSolicitud open={pasoModal === 'nuevo'} onClose={() => setPasoModal(null)} />
+        <ModalSolicitudExistente open={pasoModal === 'existente'} onClose={() => setPasoModal(null)} />
         <div className="max-w-3xl mx-auto bg-surface p-8 rounded-xl shadow-md border border-border">
           <div className="grid sm:grid-cols-2 gap-6">
             <div>

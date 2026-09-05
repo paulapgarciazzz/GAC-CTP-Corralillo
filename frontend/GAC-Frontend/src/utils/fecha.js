@@ -2,9 +2,9 @@ export function formatearFecha(fecha) {
     if (!fecha) return null;
     const date = new Date(fecha);
     if (Number.isNaN(date.getTime())) return null;
-    const dia = String(date.getDate()).padStart(2, '0');
-    const mes = String(date.getMonth() + 1).padStart(2, '0');
-    const anio = date.getFullYear();
+    const dia = String(date.getUTCDate()).padStart(2, '0');
+    const mes = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const anio = date.getUTCFullYear();
     return `${dia}/${mes}/${anio}`;
 }
 

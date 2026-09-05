@@ -108,12 +108,6 @@ export default function FormularioSolicitud({ onSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-
-        if (!valores.archivo_adjunto) {
-            setError('Debe adjuntar un archivo (PNG, JPG o PDF).');
-            return;
-        }
-
         setLoading(true);
 
         const payload = {
@@ -245,7 +239,7 @@ export default function FormularioSolicitud({ onSuccess }) {
                     </div>
                     <div className="space-y-1 sm:col-span-2">
                         <label htmlFor="archivo_adjunto" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Adjuntar archivo (presentaciones previas, portafolio, etc.)</label>
-                        <input id="archivo_adjunto" name="archivo_adjunto" type="file" accept="image/png,image/jpeg,application/pdf" onChange={handleArchivoAdjuntoChange} required
+                        <input id="archivo_adjunto" name="archivo_adjunto" type="file" accept="image/png,image/jpeg,application/pdf" onChange={handleArchivoAdjuntoChange}
                             className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-primary file:text-white file:cursor-pointer cursor-pointer" />
                         <p className="text-xs text-foreground-faint">Formatos permitidos: PNG, JPG o PDF. Tamaño máximo 4MB.</p>
                         {valores.archivo_adjunto_nombre && <p className="text-xs text-foreground-soft">Archivo seleccionado: {valores.archivo_adjunto_nombre}</p>}
