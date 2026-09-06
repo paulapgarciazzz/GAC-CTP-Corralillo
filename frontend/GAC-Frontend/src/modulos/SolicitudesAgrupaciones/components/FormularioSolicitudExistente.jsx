@@ -17,12 +17,14 @@ const valoresListoIniciales = {
     cantidad_integrantes: '',
     archivo_adjunto: null,
     archivo_adjunto_nombre: '',
+    resena: '',
     fecha_asignada: '',
     hora_asignada: '',
     comentarios: '',
 };
 
 const hoy = obtenerFechaLocalISO();
+const MENSAJE_ERROR_SUBMIT = 'Información incompleta, por favor verifique nuevamente.';
 
 const CAMPOS_SOLO_LETRAS = ['nombre', 'lugar_procedencia'];
 const REGEX_NO_LETRA = /[^A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]/;
@@ -184,7 +186,8 @@ export default function FormularioSolicitudExistente({ onSuccess }) {
             const resultadoActualizacion = await actualizarEncargado(encargadoOriginal.cedula, datosEncargadoModificados);
             if (!resultadoActualizacion.success) {
                 setLoading(false);
-                setError(resultadoActualizacion.error);
+                console.error(resultadoActualizacion.error);
+                setError(MENSAJE_ERROR_SUBMIT);
                 return;
             }
         }
@@ -198,6 +201,7 @@ export default function FormularioSolicitudExistente({ onSuccess }) {
                 lugar_procedencia: valores.lugar_procedencia,
                 cantidad_integrantes: valores.cantidad_integrantes,
                 archivo_adjunto: valores.archivo_adjunto,
+                resena: valores.resena,
             },
             solicitud: {
                 fecha_solicitud: obtenerFechaLocalISO(),
@@ -212,7 +216,8 @@ export default function FormularioSolicitudExistente({ onSuccess }) {
         if (result.success) {
             onSuccess?.();
         } else {
-            setError(result.error);
+            console.error(result.error);
+            setError(MENSAJE_ERROR_SUBMIT);
         }
     };
 
@@ -373,6 +378,12 @@ export default function FormularioSolicitudExistente({ onSuccess }) {
                             <p className="text-xs text-foreground-faint">Formatos permitidos: PNG, JPG o PDF. Tamaño máximo 4MB.</p>
                             {valores.archivo_adjunto_nombre && <p className="text-xs text-foreground-soft">Archivo seleccionado: {valores.archivo_adjunto_nombre}</p>}
                             {errores.archivo_adjunto && <p className="text-xs text-danger">{errores.archivo_adjunto}</p>}
+                        </div>
+                        <div className="space-y-1 sm:col-span-2">
+                            <label htmlFor="resena" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Reseña</label>
+                            <textarea id="resena" name="resena" placeholder="Cuéntanos sobre la agrupación..." rows={4} value={valores.resena} onChange={handleChange}
+                                maxLength={5000}
+                                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                         </div>
                     </div>
                 )}

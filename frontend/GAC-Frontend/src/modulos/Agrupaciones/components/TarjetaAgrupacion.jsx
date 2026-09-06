@@ -1,8 +1,11 @@
 import { Pencil, Trash2, Users } from 'lucide-react';
 
-export default function TarjetaAgrupacion({ agrupacion, onEditar, onEliminar }) {
+export default function TarjetaAgrupacion({ agrupacion, onVerDetalle, onEditar, onEliminar }) {
     return (
-        <div className="bg-surface border border-border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+        <div
+            onClick={() => onVerDetalle(agrupacion)}
+            className="bg-surface border border-border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+        >
             <div className="aspect-square bg-primary/10 flex items-center justify-center overflow-hidden">
                 {agrupacion.foto_url ? (
                     <img src={agrupacion.foto_url} alt={agrupacion.nombre} className="w-full h-full object-cover" />
@@ -24,7 +27,7 @@ export default function TarjetaAgrupacion({ agrupacion, onEditar, onEliminar }) 
                     <div className="flex items-center gap-1 shrink-0">
                         <button
                             type="button"
-                            onClick={() => onEditar(agrupacion)}
+                            onClick={(e) => { e.stopPropagation(); onEditar(agrupacion); }}
                             aria-label={`Editar ${agrupacion.nombre}`}
                             className="p-1 rounded-md border border-primary text-primary hover:bg-primary/10 transition-colors cursor-pointer"
                         >
@@ -32,7 +35,7 @@ export default function TarjetaAgrupacion({ agrupacion, onEditar, onEliminar }) 
                         </button>
                         <button
                             type="button"
-                            onClick={() => onEliminar(agrupacion)}
+                            onClick={(e) => { e.stopPropagation(); onEliminar(agrupacion); }}
                             aria-label={`Eliminar ${agrupacion.nombre}`}
                             className="p-1 rounded-md border border-danger text-danger hover:bg-danger-soft transition-colors cursor-pointer"
                         >

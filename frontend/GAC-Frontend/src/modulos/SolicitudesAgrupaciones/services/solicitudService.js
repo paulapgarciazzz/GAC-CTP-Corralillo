@@ -37,6 +37,7 @@ export const crearSolicitud = async (payload) => {
             lugar_procedencia: payload.agrupacion.lugar_procedencia,
             cantidad_integrantes: payload.agrupacion.cantidad_integrantes,
             archivo_adjunto: payload.agrupacion.archivo_adjunto,
+            resena: payload.agrupacion.resena,
         });
 
         const response = await api.post('/solicitudes-agrupaciones', {
@@ -65,6 +66,7 @@ export const crearSolicitudParaEncargadoExistente = async (payload) => {
                 lugar_procedencia: payload.agrupacion.lugar_procedencia,
                 cantidad_integrantes: payload.agrupacion.cantidad_integrantes,
                 archivo_adjunto: payload.agrupacion.archivo_adjunto,
+                resena: payload.agrupacion.resena,
             });
             idAgrupacion = agrupacionResponse.data.data.id;
         }
