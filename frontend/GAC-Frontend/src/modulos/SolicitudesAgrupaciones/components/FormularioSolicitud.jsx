@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react';
 import { crearSolicitud } from '../services/solicitudService';
 import { TIPOS_IDENTIFICACION, obtenerConfigIdentificacion, formatearValorIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono } from '../../../utils/telefono';
+import { obtenerFechaLocalISO } from '../../../utils/fecha';
 
 const valoresIniciales = {
     // Encargado
@@ -20,13 +21,14 @@ const valoresIniciales = {
     cantidad_integrantes: '',
     archivo_adjunto: null,
     archivo_adjunto_nombre: '',
+    resena: '',
     // Solicitud
     fecha_asignada: '',
     hora_asignada: '',
     comentarios: '',
 };
 
-const hoy = new Date().toISOString().split('T')[0];
+const hoy = obtenerFechaLocalISO();
 
 const CAMPOS_SOLO_LETRAS = ['primer_nombre', 'apellido', 'nombre', 'lugar_procedencia'];
 const REGEX_NO_LETRA = /[^A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]/;
@@ -107,12 +109,6 @@ export default function FormularioSolicitud({ onSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-
-        if (!valores.archivo_adjunto) {
-            setError('Debe adjuntar un archivo (PNG, JPG o PDF).');
-            return;
-        }
-
         setLoading(true);
 
         const payload = {
@@ -134,9 +130,10 @@ export default function FormularioSolicitud({ onSuccess }) {
                 lugar_procedencia: valores.lugar_procedencia,
                 cantidad_integrantes: valores.cantidad_integrantes,
                 archivo_adjunto: valores.archivo_adjunto,
+                resena: valores.resena,
             },
             solicitud: {
-                fecha_solicitud: new Date().toISOString().split('T')[0],
+                fecha_solicitud: obtenerFechaLocalISO(),
                 fecha_asignada: valores.fecha_asignada,
                 hora_asignada: valores.hora_asignada,
                 comentarios: valores.comentarios,
@@ -244,11 +241,17 @@ export default function FormularioSolicitud({ onSuccess }) {
                     </div>
                     <div className="space-y-1 sm:col-span-2">
                         <label htmlFor="archivo_adjunto" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Adjuntar archivo (presentaciones previas, portafolio, etc.)</label>
-                        <input id="archivo_adjunto" name="archivo_adjunto" type="file" accept="image/png,image/jpeg,application/pdf" onChange={handleArchivoAdjuntoChange} required
+                        <input id="archivo_adjunto" name="archivo_adjunto" type="file" accept="image/png,image/jpeg,application/pdf" onChange={handleArchivoAdjuntoChange}
                             className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-primary file:text-white file:cursor-pointer cursor-pointer" />
                         <p className="text-xs text-foreground-faint">Formatos permitidos: PNG, JPG o PDF. Tamaño máximo 4MB.</p>
                         {valores.archivo_adjunto_nombre && <p className="text-xs text-foreground-soft">Archivo seleccionado: {valores.archivo_adjunto_nombre}</p>}
                         {errores.archivo_adjunto && <p className="text-xs text-danger">{errores.archivo_adjunto}</p>}
+                    </div>
+                    <div className="space-y-1 sm:col-span-2">
+                        <label htmlFor="resena" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Reseña</label>
+                        <textarea id="resena" name="resena" placeholder="Cuéntanos sobre la agrupación..." rows={4} value={valores.resena} onChange={handleChange}
+                            maxLength={5000}
+                            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                 </div>
             </fieldset>

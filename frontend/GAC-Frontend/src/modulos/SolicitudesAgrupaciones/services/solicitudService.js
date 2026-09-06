@@ -37,10 +37,42 @@ export const crearSolicitud = async (payload) => {
             lugar_procedencia: payload.agrupacion.lugar_procedencia,
             cantidad_integrantes: payload.agrupacion.cantidad_integrantes,
             archivo_adjunto: payload.agrupacion.archivo_adjunto,
+            resena: payload.agrupacion.resena,
         });
 
         const response = await api.post('/solicitudes-agrupaciones', {
             id_agrupacion: agrupacionResponse.data.data.id,
+            fecha_solicitud: payload.solicitud.fecha_solicitud,
+            comentarios: payload.solicitud.comentarios,
+            fecha_asignada: payload.solicitud.fecha_asignada || null,
+            hora_asignada: payload.solicitud.hora_asignada || null,
+        });
+
+        return { success: true, data: response.data };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudo enviar la solicitud. Intenta de nuevo.');
+        return { success: false, error: mensaje };
+    }
+};
+
+export const crearSolicitudParaEncargadoExistente = async (payload) => {
+    try {
+        let idAgrupacion = payload.idAgrupacionSeleccionada;
+
+        if (payload.modoAgrupacion === 'nueva') {
+            const agrupacionResponse = await api.post('/agrupaciones', {
+                ced_encargado: payload.cedula,
+                nombre: payload.agrupacion.nombre,
+                lugar_procedencia: payload.agrupacion.lugar_procedencia,
+                cantidad_integrantes: payload.agrupacion.cantidad_integrantes,
+                archivo_adjunto: payload.agrupacion.archivo_adjunto,
+                resena: payload.agrupacion.resena,
+            });
+            idAgrupacion = agrupacionResponse.data.data.id;
+        }
+
+        const response = await api.post('/solicitudes-agrupaciones', {
+            id_agrupacion: idAgrupacion,
             fecha_solicitud: payload.solicitud.fecha_solicitud,
             comentarios: payload.solicitud.comentarios,
             fecha_asignada: payload.solicitud.fecha_asignada || null,
