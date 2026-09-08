@@ -15,13 +15,27 @@ export const obtenerAgrupaciones = async () => {
     }
 };
 
+export const crearAgrupacion = async (payload) => {
+    try {
+        const response = await api.post('/agrupaciones', payload);
+        return { success: true, data: response.data.data };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudo registrar la agrupación.');
+        return { success: false, error: mensaje };
+    }
+};
+
 export const actualizarAgrupacion = async (id, payload) => {
     try {
         const { encargado, ...datosAgrupacion } = payload;
-        const { cedula, ...datosEncargado } = encargado;
-
-        await api.patch(`/encargados/${cedula}`, datosEncargado);
-        const response = await api.put(`/agrupaciones/${id}`, datosAgrupacion);
+        delete datosAgrupacion.id;
+        delete datosAgrupacion.nombre;
+        delete datosAgrupacion.ced_encargado;
+        if (encargado?.cedula) {
+            const { cedula, ...datosEncargado } = encargado;
+            await api.patch(`/encargados/${cedula}`, datosEncargado);
+        }
+        const response = await api.patch(`/agrupaciones/${id}`, datosAgrupacion);
 
         return { success: true, data: response.data.data };
     } catch (error) {

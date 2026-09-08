@@ -15,6 +15,9 @@ class UpdateEncargadoRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'cedula' => ['prohibited'],
+            'tipo_identificacion' => ['prohibited'],
+
             'primer_nombre' => [
                 'sometimes',
                 'required',
@@ -34,7 +37,8 @@ class UpdateEncargadoRequest extends FormRequest
                 'required',
                 'email',
                 'max:150',
-                Rule::unique('encargado', 'email')->ignore($this->route('cedula'), 'cedula'),
+                Rule::unique('encargado', 'email')
+                    ->ignore($this->route('cedula'), 'cedula'),
             ],
 
             'numero_tel' => [
@@ -42,7 +46,19 @@ class UpdateEncargadoRequest extends FormRequest
                 'required',
                 'string',
                 'max:20',
+                Rule::unique('encargado', 'numero_tel')
+                    ->ignore($this->route('cedula'), 'cedula'),
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'cedula.prohibited' => 'La cédula no puede modificarse.',
+            'tipo_identificacion.prohibited' => 'El tipo de identificación no puede modificarse.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'numero_tel.unique' => 'Este número de teléfono ya está registrado.',
         ];
     }
 }

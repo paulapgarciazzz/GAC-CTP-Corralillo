@@ -44,7 +44,17 @@ class StoreEncargadoRequest extends FormRequest
                 'required',
                 'string',
                 'max:20',
+                'unique:encargado,numero_tel',
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'cedula.unique' => 'Esta cédula ya está registrada. Si ya ha participado anteriormente, seleccione la opción \'Sí, ya he participado\'.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'numero_tel.unique' => 'Este número de teléfono ya está registrado.',
         ];
     }
 }
