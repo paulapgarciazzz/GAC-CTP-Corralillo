@@ -17,6 +17,9 @@ class UpdateEncargadoRequest extends FormRequest
         // 'cedula' y 'tipo_identificacion' no se incluyen a propósito: son inmutables
         // una vez creado el encargado (cedula es la primary key de la tabla).
         return [
+            'cedula' => ['prohibited'],
+            'tipo_identificacion' => ['prohibited'],
+
             'primer_nombre' => [
                 'sometimes',
                 'required',
@@ -36,7 +39,8 @@ class UpdateEncargadoRequest extends FormRequest
                 'required',
                 'email',
                 'max:150',
-                Rule::unique('encargado', 'email')->ignore($this->route('cedula'), 'cedula'),
+                Rule::unique('encargado', 'email')
+                    ->ignore($this->route('cedula'), 'cedula'),
             ],
 
             'numero_tel' => [
@@ -44,7 +48,19 @@ class UpdateEncargadoRequest extends FormRequest
                 'required',
                 'string',
                 'max:20',
+                Rule::unique('encargado', 'numero_tel')
+                    ->ignore($this->route('cedula'), 'cedula'),
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'cedula.prohibited' => 'La cédula no puede modificarse.',
+            'tipo_identificacion.prohibited' => 'El tipo de identificación no puede modificarse.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'numero_tel.unique' => 'Este número de teléfono ya está registrado.',
         ];
     }
 }

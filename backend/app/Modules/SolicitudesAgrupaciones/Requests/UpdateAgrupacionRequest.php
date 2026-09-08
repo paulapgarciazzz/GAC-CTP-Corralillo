@@ -15,12 +15,9 @@ class UpdateAgrupacionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre' => [
-                'sometimes',
-                'required',
-                'string',
-                'max:150',
-            ],
+            'id' => ['prohibited'],
+            'ced_encargado' => ['prohibited'],
+            'nombre' => ['prohibited'],
 
             'lugar_procedencia' => [
                 'sometimes',
@@ -55,6 +52,15 @@ class UpdateAgrupacionRequest extends FormRequest
                 'nullable',
                 'string',
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'id.prohibited' => 'El identificador no puede modificarse.',
+            'ced_encargado.prohibited' => 'El encargado asociado no puede modificarse.',
+            'nombre.prohibited' => 'El nombre no puede modificarse.',
         ];
     }
 }

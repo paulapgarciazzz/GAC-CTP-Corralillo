@@ -1,4 +1,4 @@
-import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, UsersRound, Boxes, UserRoundArrowLeft, BookUser, SquareLibrary, CirclePile, ShieldAlert } from "lucide-react";
+import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, UsersRound, Boxes, UserRoundArrowLeft, BookUser, SquareLibrary, CirclePile, ShieldAlert, Settings } from "lucide-react";
 import { useState } from "react"
 import logo from '../../../assets/logo.png'
 import { ChevronDown } from "lucide-react";
@@ -37,6 +37,12 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
                 {name: "Reportes de Asistencia", icon: UserRoundArrowLeft},
                 {name: "Reportes de Inventario", icon: UsersRound},
 
+            ]
+        },
+        {name: "Ajustes", icon: Settings, active:false,
+            children: [
+                {name: "Gestión de agrupaciones", icon: PersonStanding},
+                {name: "Gestión de encargados", icon: Users},
             ]
         },
         

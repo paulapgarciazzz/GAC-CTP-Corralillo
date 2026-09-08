@@ -109,6 +109,7 @@ export default function FormularioSolicitud({ onSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setErrores({});
         setLoading(true);
 
         const payload = {
@@ -147,6 +148,14 @@ export default function FormularioSolicitud({ onSuccess }) {
             setValores(valoresIniciales);
             onSuccess?.();
         } else {
+            const erroresBackend = result.errors ?? {};
+            const erroresPorCampo = Object.fromEntries(
+                Object.entries(erroresBackend).map(([campo, mensajes]) => [
+                    campo,
+                    Array.isArray(mensajes) ? mensajes[0] : mensajes,
+                ])
+            );
+            setErrores(erroresPorCampo);
             setError(result.error);
         }
     };
@@ -213,6 +222,7 @@ export default function FormularioSolicitud({ onSuccess }) {
                         <label htmlFor="email" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Correo electrónico</label>
                         <input id="email" name="email" type="email" value={valores.email} onChange={handleChange} required
                             className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                        {errores.email && <p className="text-xs text-danger">{errores.email}</p>}
                     </div>
                 </div>
             </fieldset>

@@ -3,6 +3,7 @@
 namespace App\Modules\SolicitudesAgrupaciones\Services;
 
 use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
+use App\Modules\SolicitudesAgrupaciones\Models\Auditoria;
 use App\Modules\SolicitudesAgrupaciones\Models\Participacion;
 use App\Modules\SolicitudesAgrupaciones\Support\DataUri;
 use Illuminate\Database\Eloquent\Collection;
@@ -39,6 +40,13 @@ class AgrupacionService
             ->get();
     }
 
+    public function listarAdministrativa(): Collection
+    {
+        return Agrupacion::with(['encargado'])
+            ->withCount('solicitudes')
+            ->get();
+    }
+
     public function actualizar(Agrupacion $agrupacion, array $datos): Agrupacion
     {
         $agrupacion->update($datos);
@@ -49,11 +57,13 @@ class AgrupacionService
     public function eliminar(Agrupacion $agrupacion): void
     {
         DB::transaction(function () use ($agrupacion) {
-            foreach ($agrupacion->solicitudes as $solicitud) {
-                $solicitud->auditorias()->delete();
+            $idsSolicitudes = $agrupacion->solicitudes()->pluck('id')->all();
+
+            if (! empty($idsSolicitudes)) {
+                Auditoria::whereIn('id_solicitud', $idsSolicitudes)->delete();
+                $agrupacion->solicitudes()->delete();
             }
 
-            $agrupacion->solicitudes()->delete();
             $agrupacion->participaciones()->delete();
             $agrupacion->delete();
         });

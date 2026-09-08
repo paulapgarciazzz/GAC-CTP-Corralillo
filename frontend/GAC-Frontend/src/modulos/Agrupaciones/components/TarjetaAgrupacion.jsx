@@ -1,6 +1,6 @@
-import { Pencil, Trash2, Users } from 'lucide-react';
+import { Pencil, Users } from 'lucide-react';
 
-export default function TarjetaAgrupacion({ agrupacion, onVerDetalle, onEditar, onEliminar }) {
+export default function TarjetaAgrupacion({ agrupacion, onVerDetalle, onEditar }) {
     return (
         <div
             onClick={() => onVerDetalle(agrupacion)}
@@ -32,14 +32,6 @@ export default function TarjetaAgrupacion({ agrupacion, onVerDetalle, onEditar, 
                             className="p-1 rounded-md border border-primary text-primary hover:bg-primary/10 transition-colors cursor-pointer"
                         >
                             <Pencil size={12} />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); onEliminar(agrupacion); }}
-                            aria-label={`Eliminar ${agrupacion.nombre}`}
-                            className="p-1 rounded-md border border-danger text-danger hover:bg-danger-soft transition-colors cursor-pointer"
-                        >
-                            <Trash2 size={12} />
                         </button>
                     </div>
                 </div>

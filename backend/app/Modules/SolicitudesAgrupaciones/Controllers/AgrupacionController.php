@@ -28,7 +28,7 @@ class AgrupacionController
     public function listar(): AnonymousResourceCollection
     {
         return AgrupacionResource::collection(
-            $this->service->listarAprobadas()
+            $this->service->listarAdministrativa()
         );
     }
 

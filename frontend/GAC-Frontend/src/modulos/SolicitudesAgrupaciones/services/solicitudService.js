@@ -5,6 +5,8 @@ const extraerMensajeError = (error, fallback) =>
     || Object.values(error.response?.data?.errors || {})[0]?.[0]
     || fallback;
 
+const extraerErroresValidacion = (error) => error.response?.data?.errors ?? {};
+
 const normalizarSolicitud = (data) => ({
     ...data,
     encargado: data.agrupacion?.encargado,
@@ -15,24 +17,15 @@ const normalizarSolicitud = (data) => ({
 export const crearSolicitud = async (payload) => {
     try {
         const { cedula, ...datosEncargado } = payload.encargado;
-
-        let encargadoExiste = true;
-        try {
-            await api.get(`/encargados/${cedula}`);
-        } catch (error) {
-            if (error.response?.status === 404) {
-                encargadoExiste = false;
-            } else {
-                throw error;
-            }
+        const identificacion = String(cedula ?? '').trim();
+        if (!identificacion) {
+            return { success: false, error: 'Ingresa la cédula del encargado antes de enviar la solicitud.' };
         }
 
-        if (!encargadoExiste) {
-            await api.post('/encargados', { cedula, ...datosEncargado });
-        }
+        await api.post('/encargados', { cedula: identificacion, ...datosEncargado });
 
         const agrupacionResponse = await api.post('/agrupaciones', {
-            ced_encargado: cedula,
+            ced_encargado: identificacion,
             nombre: payload.agrupacion.nombre,
             lugar_procedencia: payload.agrupacion.lugar_procedencia,
             cantidad_integrantes: payload.agrupacion.cantidad_integrantes,
@@ -42,6 +35,41 @@ export const crearSolicitud = async (payload) => {
 
         const response = await api.post('/solicitudes-agrupaciones', {
             id_agrupacion: agrupacionResponse.data.data.id,
+            fecha_solicitud: payload.solicitud.fecha_solicitud,
+            comentarios: payload.solicitud.comentarios,
+            fecha_asignada: payload.solicitud.fecha_asignada || null,
+            hora_asignada: payload.solicitud.hora_asignada || null,
+        });
+
+        return { success: true, data: response.data };
+    } catch (error) {
+        const mensaje = extraerMensajeError(error, 'No se pudo enviar la solicitud. Intenta de nuevo.');
+        return { success: false, error: mensaje, errors: extraerErroresValidacion(error) };
+    }
+};
+
+export const crearSolicitudParaEncargadoExistente = async (payload) => {
+    try {
+        let idAgrupacion = payload.idAgrupacionSeleccionada;
+
+        if (payload.modoAgrupacion === 'nueva') {
+            const agrupacionResponse = await api.post('/agrupaciones', {
+                ced_encargado: payload.cedula,
+                nombre: payload.agrupacion.nombre,
+                lugar_procedencia: payload.agrupacion.lugar_procedencia,
+                cantidad_integrantes: payload.agrupacion.cantidad_integrantes,
+                archivo_adjunto: payload.agrupacion.archivo_adjunto,
+                resena: payload.agrupacion.resena,
+            });
+            idAgrupacion = agrupacionResponse.data.data.id;
+        }
+
+        if (!idAgrupacion) {
+            return { success: false, error: 'Selecciona o registra una agrupación antes de continuar.' };
+        }
+
+        const response = await api.post('/solicitudes-agrupaciones', {
+            id_agrupacion: idAgrupacion,
             fecha_solicitud: payload.solicitud.fecha_solicitud,
             comentarios: payload.solicitud.comentarios,
             fecha_asignada: payload.solicitud.fecha_asignada || null,

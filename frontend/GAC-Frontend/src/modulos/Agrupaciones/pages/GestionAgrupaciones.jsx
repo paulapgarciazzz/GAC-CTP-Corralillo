@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Loader2, Search } from 'lucide-react';
-import { obtenerAgrupaciones, eliminarAgrupacion } from '../services/agrupacionService';
+import { obtenerAgrupaciones } from '../services/agrupacionService';
 import TarjetaAgrupacion from '../components/TarjetaAgrupacion';
 import ModalEditarAgrupacion from '../components/ModalEditarAgrupacion';
 import ModalDetalleAgrupacion from '../components/ModalDetalleAgrupacion';
@@ -27,19 +27,6 @@ export default function GestionAgrupaciones() {
 
     const handleActualizado = (agrupacionActualizada) => {
         setAgrupaciones((prev) => prev.map((a) => (a.id === agrupacionActualizada.id ? agrupacionActualizada : a)));
-    };
-
-    const handleEliminar = async (agrupacion) => {
-        if (!window.confirm(`¿Eliminar la agrupación "${agrupacion.nombre}"? Esta acción no se puede deshacer.`)) {
-            return;
-        }
-
-        const result = await eliminarAgrupacion(agrupacion.id);
-        if (result.success) {
-            setAgrupaciones((prev) => prev.filter((a) => a.id !== agrupacion.id));
-        } else {
-            setError(result.error);
-        }
     };
 
     const terminoBusqueda = busqueda.trim().toLowerCase();
@@ -90,7 +77,6 @@ export default function GestionAgrupaciones() {
                             agrupacion={agrupacion}
                             onVerDetalle={setAgrupacionDetalle}
                             onEditar={setAgrupacionEditar}
-                            onEliminar={handleEliminar}
                         />
                     ))}
                 </div>
