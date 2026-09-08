@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Mail\SolicitudAprobadaNotification;
+use App\Mail\SolicitudDetalleNotification;
 use App\Mail\SolicitudRechazadaNotification;
 use Illuminate\Support\Facades\Log;
 
@@ -158,6 +159,30 @@ class SolicitudAgrupacionService
                 'auditorias',
             ]);
         });
+    }
+
+    public function enviarDetalles(int $id): SolicitudAgrupacion
+    {
+        $solicitud = $this->buscarPorId($id);
+
+        try {
+            Mail::to($solicitud->agrupacion->encargado->email)->send(
+                new SolicitudDetalleNotification($solicitud)
+            );
+        } catch (\Exception $e) {
+            Log::error('Error al enviar detalles de la solicitud', [
+                'solicitud_id' => $solicitud->id,
+                'encargado_email' => $solicitud->agrupacion->encargado->email ?? 'unknown',
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new HttpException(
+                500,
+                'No se pudo enviar el correo con los detalles de la solicitud.'
+            );
+        }
+
+        return $solicitud;
     }
 
     public function eliminar(int $id): void

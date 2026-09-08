@@ -3,11 +3,13 @@ import { Loader2, Search } from 'lucide-react';
 import { obtenerAgrupaciones } from '../services/agrupacionService';
 import TarjetaAgrupacion from '../components/TarjetaAgrupacion';
 import ModalEditarAgrupacion from '../components/ModalEditarAgrupacion';
+import ModalDetalleAgrupacion from '../components/ModalDetalleAgrupacion';
 
 export default function GestionAgrupaciones() {
     const [agrupaciones, setAgrupaciones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [agrupacionDetalle, setAgrupacionDetalle] = useState(null);
     const [agrupacionEditar, setAgrupacionEditar] = useState(null);
     const [busqueda, setBusqueda] = useState('');
 
@@ -73,11 +75,18 @@ export default function GestionAgrupaciones() {
                         <TarjetaAgrupacion
                             key={agrupacion.id}
                             agrupacion={agrupacion}
+                            onVerDetalle={setAgrupacionDetalle}
                             onEditar={setAgrupacionEditar}
                         />
                     ))}
                 </div>
             )}
+
+            <ModalDetalleAgrupacion
+                open={!!agrupacionDetalle}
+                agrupacion={agrupacionDetalle}
+                onClose={() => setAgrupacionDetalle(null)}
+            />
 
             <ModalEditarAgrupacion
                 open={!!agrupacionEditar}

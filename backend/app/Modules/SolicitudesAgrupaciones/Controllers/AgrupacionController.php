@@ -9,6 +9,7 @@ use App\Modules\SolicitudesAgrupaciones\Requests\UpdateAgrupacionRequest;
 use App\Modules\SolicitudesAgrupaciones\Resources\AgrupacionResource;
 use App\Modules\SolicitudesAgrupaciones\Resources\ParticipacionResource;
 use App\Modules\SolicitudesAgrupaciones\Services\AgrupacionService;
+use App\Modules\SolicitudesAgrupaciones\Support\DataUri;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -65,6 +66,18 @@ class AgrupacionController
                 $request->validated()
             )
         ))->response()->setStatusCode(201);
+    }
+
+    public function archivoAdjunto(Agrupacion $agrupacion): Response
+    {
+        $archivo = $this->service->obtenerArchivoAdjunto($agrupacion);
+        $extension = DataUri::extensionParaMime($archivo['mime']);
+
+        return response($archivo['binario'], 200, [
+            'Content-Type' => $archivo['mime'],
+            'Content-Disposition' => "inline; filename=\"agrupacion-{$agrupacion->id}.{$extension}\"",
+            'Cache-Control' => 'private, max-age=3600',
+        ]);
     }
 
     public function destroy(Agrupacion $agrupacion): Response

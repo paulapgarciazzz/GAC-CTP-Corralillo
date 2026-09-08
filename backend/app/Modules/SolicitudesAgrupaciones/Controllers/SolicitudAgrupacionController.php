@@ -47,6 +47,15 @@ class SolicitudAgrupacionController
         return new SolicitudAgrupacionResource($this->service->rechazar($id));
     }
 
+    public function enviarDetalles(int $id): JsonResponse
+    {
+        $this->service->enviarDetalles($id);
+
+        return response()->json([
+            'message' => 'Detalles enviados correctamente.',
+        ]);
+    }
+
     public function update(
         UpdateSolicitudAgrupacionRequest $request,
         int $id

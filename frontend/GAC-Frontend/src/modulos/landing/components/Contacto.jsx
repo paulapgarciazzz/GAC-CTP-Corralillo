@@ -1,23 +1,31 @@
 
 import { useState } from 'react';
 import ModalSolicitud from '../../SolicitudesAgrupaciones/components/ModalSolicitud';
+import ModalSolicitudExistente from '../../SolicitudesAgrupaciones/components/ModalSolicitudExistente';
+import ModalPreguntaParticipacion from '../../SolicitudesAgrupaciones/components/ModalPreguntaParticipacion';
 
 const Contacto = () => {
-  const [modalAbierto, setModalAbierto] = useState(false);
+  const [pasoModal, setPasoModal] = useState(null);
 
   return (
-    <section id="contacto" className="scroll-mt-24 py-16 bg-background">
+    <section id="contacto" className="scroll-mt-24 py-8 bg-background">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-[#1f4d3a] dark:text-white">Información de Contacto</h2>
-        <p className="text-xl font-bold text-center mb-12 text-[#1f4d3a] dark:text-white">Quieres formar parte de las actividades culturales?</p>
+        <h2 className="text-3xl font-bold text-center mb-6 text-[#1f4d3a] dark:text-white">Información de Contacto</h2>
+        <p className="text-xl font-bold text-center mb-6 text-[#1f4d3a] dark:text-white">Quieres formar parte de las actividades culturales?</p>
         <button
           type="button"
-          onClick={() => setModalAbierto(true)}
-          className="block mx-auto -mt-6 mb-6 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition duration-300 font-medium shadow-md hover:shadow-lg"
+          onClick={() => setPasoModal('pregunta')}
+          className="block mx-auto -mt-2 mb-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition duration-300 font-medium shadow-md hover:shadow-lg"
         >
           Inscribete
         </button>
-        <ModalSolicitud open={modalAbierto} onClose={() => setModalAbierto(false)} />
+        <ModalPreguntaParticipacion
+          open={pasoModal === 'pregunta'}
+          onClose={() => setPasoModal(null)}
+          onRespuesta={(yaParticipo) => setPasoModal(yaParticipo ? 'existente' : 'nuevo')}
+        />
+        <ModalSolicitud open={pasoModal === 'nuevo'} onClose={() => setPasoModal(null)} />
+        <ModalSolicitudExistente open={pasoModal === 'existente'} onClose={() => setPasoModal(null)} />
         <div className="max-w-3xl mx-auto bg-surface p-8 rounded-xl shadow-md border border-border">
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
@@ -29,9 +37,7 @@ const Contacto = () => {
             <div>
               <h4 className="text-lg font-bold text-center text-[#1f4d3a] dark:text-white">📞 Teléfonos</h4>
               <ul className="space-y-1 text-center text-foreground-soft">
-                <li>+506 8888-9999 (WhatsApp)</li>
-                <li>+506 2687 8014</li>
-                <li>+506 4500 1829</li>
+                <li>Numero principal: +506 4500 1829</li>
               </ul>
             </div>
             <div className="sm:col-span-2 ">

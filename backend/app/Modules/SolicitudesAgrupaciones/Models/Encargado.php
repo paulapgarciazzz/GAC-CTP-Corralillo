@@ -18,6 +18,7 @@ class Encargado extends Model
 
     protected $fillable = [
         'cedula',
+        'tipo_identificacion',
         'primer_nombre',
         'apellido',
         'email',
