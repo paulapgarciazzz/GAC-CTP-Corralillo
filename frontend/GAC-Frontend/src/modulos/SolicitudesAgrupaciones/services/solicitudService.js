@@ -83,6 +83,8 @@ export const crearSolicitudParaEncargadoExistente = async (payload) => {
     }
 };
 
+
+
 export const obtenerSolicitudes = async () => {
     try {
         const response = await api.get('/solicitudes-agrupaciones');
