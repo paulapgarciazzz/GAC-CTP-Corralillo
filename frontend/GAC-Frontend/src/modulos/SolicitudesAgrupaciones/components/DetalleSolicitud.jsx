@@ -1,5 +1,8 @@
 import { ArrowLeft } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
+import { obtenerConfigIdentificacion } from '../../../utils/identificacion';
+import { formatearFecha } from '../../../utils/fecha';
+import CampoArchivoAdjunto from '../../../components/CampoArchivoAdjunto';
 
 function Campo({ etiqueta, valor }) {
     return (
@@ -40,7 +43,7 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
             <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Datos del encargado</h3>
                 <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
-                    <Campo etiqueta="Cédula" valor={encargado.cedula} />
+                    <Campo etiqueta={obtenerConfigIdentificacion(encargado.tipo_identificacion).etiquetaCorta} valor={encargado.cedula} />
                     <Campo etiqueta="Nombre completo" valor={`${encargado.primer_nombre} ${encargado.apellido}`} />
                     <Campo etiqueta="Correo electrónico" valor={encargado.email} />
                     <Campo etiqueta="Número de teléfono" valor={encargado.numero_tel} />
@@ -54,7 +57,7 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
                     <Campo etiqueta="Lugar de procedencia" valor={agrupacion.lugar_procedencia} />
                     <Campo etiqueta="Cantidad de integrantes" valor={agrupacion.cantidad_integrantes} />
                     <div className="col-span-full">
-                        <Campo etiqueta="Reseña" valor={agrupacion.resena} />
+                        <CampoArchivoAdjunto archivoAdjuntoUrl={agrupacion.archivo_adjunto_url} resena={agrupacion.resena} />
                     </div>
                 </div>
             </div>
@@ -62,7 +65,7 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
             <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Datos de la solicitud</h3>
                 <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
-                    <Campo etiqueta="Fecha de solicitud" valor={solicitud.fecha_solicitud} />
+                    <Campo etiqueta="Fecha de solicitud" valor={formatearFecha(solicitud.fecha_solicitud)} />
                     <Campo etiqueta="Fecha asignada" valor={solicitud.fecha_asignada || 'Sin asignar'} />
                     <Campo etiqueta="Hora asignada" valor={solicitud.hora_asignada || '—'} />
                     <div className="col-span-full">

@@ -4,6 +4,7 @@ namespace App\Modules\SolicitudesAgrupaciones\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Encargado extends Model
 {
@@ -17,6 +18,7 @@ class Encargado extends Model
 
     protected $fillable = [
         'cedula',
+        'tipo_identificacion',
         'primer_nombre',
         'apellido',
         'email',
@@ -29,6 +31,18 @@ class Encargado extends Model
             Agrupacion::class,
             'ced_encargado',
             'cedula'
+        );
+    }
+
+    public function solicitudes(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            SolicitudAgrupacion::class,
+            Agrupacion::class,
+            'ced_encargado',
+            'id_agrupacion',
+            'cedula',
+            'id'
         );
     }
 }

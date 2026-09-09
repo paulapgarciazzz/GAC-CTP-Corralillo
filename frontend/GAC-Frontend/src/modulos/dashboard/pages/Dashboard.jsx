@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import GestionSolicitudes from '../../SolicitudesAgrupaciones/pages/GestionSolicitudes';
 import GestionAgrupaciones from '../../Agrupaciones/pages/GestionAgrupaciones';
 import ReportesAgrupaciones from '../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones';
+import GestionAgrupacionesAjustes from '../../Agrupaciones/pages/GestionAgrupacionesAjustes';
+import GestionEncargadosAjustes from '../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes';
 import { useTheme } from '../../../hooks/useTheme';
 
 const Dashboard =()=>{
@@ -61,6 +63,8 @@ const Dashboard =()=>{
                     {selectedView === 'Gestion de Solicitudes' && <GestionSolicitudes />}
                     {selectedView === 'Gestion de Agrupaciones' && <GestionAgrupaciones />}
                     {selectedView === 'Reportes de Agrupaciones' && <ReportesAgrupaciones />}
+                    {selectedView === 'Gestión de agrupaciones' && <GestionAgrupacionesAjustes />}
+                    {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
                 </main>
             </div>
 

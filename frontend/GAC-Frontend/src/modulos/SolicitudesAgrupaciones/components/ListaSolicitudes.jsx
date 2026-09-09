@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MoreVertical, Pencil, Trash2, MailPlus, Loader2 } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
+import { formatearFecha } from '../../../utils/fecha';
 
 export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, onAceptar, onRechazar, onEditar, onEnviarDetalles, onEliminar, hayBusqueda }) {
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
@@ -50,9 +51,14 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                     : 'hover:bg-primary/5 border-l-2 border-transparent'
                             }`}
                         >
-                            <span className={`truncate text-sm font-medium ${seleccionada ? 'text-primary' : 'text-foreground'}`}>
-                                {solicitud.agrupacion.nombre}
-                            </span>
+                            <div className="min-w-0">
+                                <span className={`block truncate text-sm font-medium ${seleccionada ? 'text-primary' : 'text-foreground'}`}>
+                                    {solicitud.agrupacion.nombre}
+                                </span>
+                                <span className="block text-xs text-foreground-faint">
+                                    {formatearFecha(solicitud.fecha_solicitud) ?? '—'}
+                                </span>
+                            </div>
 
                             <div className="flex items-center gap-2 shrink-0">
                                 {solicitud.estado === 'pendiente' ? (

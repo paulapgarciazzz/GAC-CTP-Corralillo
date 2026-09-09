@@ -19,9 +19,11 @@ Route::get('/ping', function () {
 });
 
 Route::prefix('encargados')->group(function () {
+    Route::get('/', [EncargadoController::class, 'index']);
     Route::post('/', [EncargadoController::class, 'store']);
     Route::get('/{cedula}', [EncargadoController::class, 'show']);
     Route::patch('/{cedula}', [EncargadoController::class, 'update']);
+    Route::delete('/{cedula}', [EncargadoController::class, 'destroy']);
     Route::get('/{cedula}/agrupaciones', [AgrupacionController::class, 'index']);
 });
 
@@ -32,6 +34,10 @@ Route::apiResource('agrupaciones', AgrupacionController::class)
 Route::post(
     'agrupaciones/{agrupacion}/participaciones',
     [AgrupacionController::class, 'participaciones']
+);
+Route::get(
+    'agrupaciones/{agrupacion}/archivo-adjunto',
+    [AgrupacionController::class, 'archivoAdjunto']
 );
 
 Route::prefix('solicitudes-agrupaciones')->group(function () {

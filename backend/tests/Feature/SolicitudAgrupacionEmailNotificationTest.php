@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\SolicitudAprobadaNotification;
+use App\Mail\SolicitudDetalleNotification;
 use App\Mail\SolicitudRechazadaNotification;
 use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\Encargado;
@@ -395,5 +396,58 @@ class SolicitudAgrupacionEmailNotificationTest extends TestCase
 
         $this->assertEquals($this->estadoAprobado->id, $result->id_estado);
         $this->assertEquals('aprobada', $result->estado->nom_estado);
+    }
+
+    /**
+     * Test that the "enviar detalles" email shows a link to the attached file when present.
+     */
+    public function test_correo_muestra_enlace_de_archivo_adjunto_cuando_existe(): void
+    {
+        Mail::fake();
+
+        $this->agrupacion->update([
+            'archivo_adjunto' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+        ]);
+
+        $solicitud = SolicitudAgrupacion::create([
+            'id_agrupacion' => $this->agrupacion->id,
+            'fecha_solicitud' => now(),
+            'id_estado' => $this->estadoPendiente->id,
+        ]);
+        $solicitud->load('agrupacion.encargado', 'estado');
+
+        $service = app(\App\Modules\SolicitudesAgrupaciones\Services\SolicitudAgrupacionService::class);
+        $service->enviarDetalles($solicitud->id);
+
+        Mail::assertSent(SolicitudDetalleNotification::class, function ($mail) {
+            $mailContent = $mail->render();
+            return str_contains($mailContent, '/archivo-adjunto');
+        });
+    }
+
+    /**
+     * Test that the "enviar detalles" email falls back to the legacy text reseña when there is no attachment.
+     */
+    public function test_correo_muestra_resena_de_texto_cuando_no_hay_archivo_adjunto(): void
+    {
+        Mail::fake();
+
+        $this->agrupacion->update(['resena' => 'Una reseña histórica en texto plano.']);
+
+        $solicitud = SolicitudAgrupacion::create([
+            'id_agrupacion' => $this->agrupacion->id,
+            'fecha_solicitud' => now(),
+            'id_estado' => $this->estadoPendiente->id,
+        ]);
+        $solicitud->load('agrupacion.encargado', 'estado');
+
+        $service = app(\App\Modules\SolicitudesAgrupaciones\Services\SolicitudAgrupacionService::class);
+        $service->enviarDetalles($solicitud->id);
+
+        Mail::assertSent(SolicitudDetalleNotification::class, function ($mail) {
+            $mailContent = $mail->render();
+            return str_contains($mailContent, 'Una reseña histórica en texto plano.')
+                && !str_contains($mailContent, '/archivo-adjunto');
+        });
     }
 }

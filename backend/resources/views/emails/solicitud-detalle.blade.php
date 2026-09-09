@@ -118,7 +118,18 @@
             <p class="section-title">Datos del encargado</p>
             <div class="info-section">
                 <p>
-                    <span class="info-label">Cédula</span>
+                    <span class="info-label">
+                        @switch($encargado->tipo_identificacion)
+                            @case('dimex')
+                                DIMEX
+                                @break
+                            @case('pasaporte')
+                                Número de pasaporte
+                                @break
+                            @default
+                                Cédula
+                        @endswitch
+                    </span>
                     <span class="info-value">{{ $encargado->cedula }}</span>
                 </p>
                 <p>
@@ -149,7 +160,12 @@
                     <span class="info-label">Cantidad de integrantes</span>
                     <span class="info-value">{{ $agrupacion->cantidad_integrantes }}</span>
                 </p>
-                @if($agrupacion->resena)
+                @if($agrupacion->archivo_adjunto)
+                <p>
+                    <span class="info-label">Archivo adjunto</span>
+                    <span class="info-value"><a href="{{ url('/api/agrupaciones/' . $agrupacion->id . '/archivo-adjunto') }}">Ver archivo adjunto</a></span>
+                </p>
+                @elseif($agrupacion->resena)
                 <p>
                     <span class="info-label">Reseña</span>
                     <span class="info-value">{{ $agrupacion->resena }}</span>

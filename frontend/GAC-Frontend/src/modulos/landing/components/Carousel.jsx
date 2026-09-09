@@ -41,6 +41,13 @@ const Carousel = () => {
         ))}
       </div>
 
+      {/* Título superpuesto */}
+      <div className="pointer-events-none absolute inset-0 flex items-end justify-center bg-linear-to-t from-black/60 via-black/10 to-transparent pb-8 sm:pb-10">
+        <h1 className="px-4 text-center text-3xl sm:text-5xl md:text-6xl font-extrabold uppercase tracking-wide text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
+          Festival de la Tortilla
+        </h1>
+      </div>
+
       {/* Flecha izquierda */}
       <button
         onClick={goToPrevious}
