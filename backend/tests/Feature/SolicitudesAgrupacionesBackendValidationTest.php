@@ -17,9 +17,9 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     private function crearEstadoPendiente(): void
     {
-        Estado::forceCreate(['nom_estado' => 'pendiente']);
-        Estado::forceCreate(['nom_estado' => 'aprobada']);
-        Estado::forceCreate(['nom_estado' => 'rechazada']);
+        $this->assertDatabaseHas('estado', ['nom_estado' => 'pendiente']);
+        $this->assertDatabaseHas('estado', ['nom_estado' => 'aprobada']);
+        $this->assertDatabaseHas('estado', ['nom_estado' => 'rechazada']);
     }
 
     private function baseEncargado(array $overrides = []): array
@@ -343,6 +343,8 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_si_falla_la_solicitud_se_reviertan_encargado_y_agrupacion(): void
     {
+        Estado::where('nom_estado', 'pendiente')->delete();
+
         $response = $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta());
 
         $response->assertNotFound();
@@ -353,6 +355,7 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_encargado_existente_con_agrupacion_nueva_revierte_la_agrupacion_si_falla_la_solicitud(): void
     {
+        Estado::where('nom_estado', 'pendiente')->delete();
         $encargado = Encargado::create($this->baseEncargado());
 
         $response = $this->postJson('/api/solicitudes-agrupaciones/encargado-existente', [

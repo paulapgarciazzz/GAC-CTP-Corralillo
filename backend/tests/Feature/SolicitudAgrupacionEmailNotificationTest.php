@@ -27,18 +27,9 @@ class SolicitudAgrupacionEmailNotificationTest extends TestCase
 {
     parent::setUp();
 
-    // Create states
-    $this->estadoPendiente = Estado::forceCreate([
-        'nom_estado' => 'pendiente',
-    ]);
-
-    $this->estadoAprobado = Estado::forceCreate([
-        'nom_estado' => 'aprobada',
-    ]);
-
-    $this->estadoRechazado = Estado::forceCreate([
-        'nom_estado' => 'rechazada',
-    ]);
+    $this->estadoPendiente = Estado::where('nom_estado', 'pendiente')->firstOrFail();
+    $this->estadoAprobado = Estado::where('nom_estado', 'aprobada')->firstOrFail();
+    $this->estadoRechazado = Estado::where('nom_estado', 'rechazada')->firstOrFail();
 
     // Create encargado
     $this->encargado = Encargado::create([

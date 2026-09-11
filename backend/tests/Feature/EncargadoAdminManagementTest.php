@@ -45,9 +45,6 @@ class EncargadoAdminManagementTest extends TestCase
     {
         parent::setUp();
 
-        Estado::forceCreate(['nom_estado' => 'pendiente']);
-        Estado::forceCreate(['nom_estado' => 'aprobada']);
-        Estado::forceCreate(['nom_estado' => 'rechazada']);
     }
 
     public function test_get_encargados_devuelve_listado_administrativo(): void
