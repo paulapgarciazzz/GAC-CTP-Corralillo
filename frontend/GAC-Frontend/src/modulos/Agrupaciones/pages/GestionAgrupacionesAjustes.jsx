@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, Loader2, RefreshCw, Trash2, X } from 'lucide-react';
-import { eliminarAgrupacion, obtenerAgrupaciones } from '../services/agrupacionService';
+import { eliminarAgrupacion, obtenerAgrupacionesAdministrativas } from '../services/agrupacionService';
 
 function cantidadSolicitudes(agrupacion) {
     return Number(agrupacion.solicitudes_count ?? 0);
@@ -87,7 +87,7 @@ export default function GestionAgrupacionesAjustes() {
     const cargarAgrupaciones = async () => {
         setLoading(true);
         setError('');
-        const resultado = await obtenerAgrupaciones();
+        const resultado = await obtenerAgrupacionesAdministrativas();
         if (resultado.success) {
             setAgrupaciones(Array.isArray(resultado.data) ? resultado.data : []);
         } else {

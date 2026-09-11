@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { buscarEncargadoPorCedula, obtenerAgrupacionesPorEncargado, actualizarEncargado } from '../services/encargadoService';
-import { crearAgrupacion, actualizarAgrupacion } from '../../../modulos/Agrupaciones/services/agrupacionService';
+import { actualizarAgrupacion } from '../../../modulos/Agrupaciones/services/agrupacionService';
 import { crearSolicitudParaEncargadoExistente } from '../services/solicitudService';
 import { formatearValorIdentificacion, obtenerConfigIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono, parsearNumeroTelefono } from '../../../utils/telefono';
@@ -17,7 +17,7 @@ const REGEX_NO_LETRA = /[^A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]/;
 const valoresIniciales = {
     primer_nombre: '', apellido: '', email: '', codigo_pais_tel: CODIGO_PAIS_POR_DEFECTO,
     prefijo_custom_tel: '', numero_tel: '', nombre: '', lugar_procedencia: '', cantidad_integrantes: '',
-    archivo_adjunto: null, archivo_adjunto_nombre: '', resena: '', fecha_asignada: '', hora_asignada: '', comentarios: '',
+    archivo_adjunto: null, archivo_adjunto_nombre: '', resena: '', fecha_solicitada: '', hora_solicitada: '', comentarios: '',
 };
 
 function CampoSoloLectura({ etiqueta, valor }) {
@@ -138,11 +138,7 @@ export default function FormularioSolicitudExistente({ onSuccess }) {
         setError('');
         setLoading(true);
         let agrupacion = agrupacionSeleccionada;
-        if (modoAgrupacion === 'nueva') {
-            const resultado = await crearAgrupacion({ ced_encargado: encargado.cedula, nombre: valores.nombre, lugar_procedencia: valores.lugar_procedencia, cantidad_integrantes: valores.cantidad_integrantes, archivo_adjunto: valores.archivo_adjunto, resena: valores.resena });
-            if (!resultado.success) { setLoading(false); setError(resultado.error); return; }
-            agrupacion = resultado.data;
-        } else if (agrupacion) {
+        if (modoAgrupacion === 'existente' && agrupacion) {
             const cambios = {};
             ['lugar_procedencia', 'cantidad_integrantes', 'resena'].forEach((campo) => { if (valores[campo] !== (agrupacion[campo] ?? '')) cambios[campo] = valores[campo]; });
             if (Object.keys(cambios).length > 0) {
@@ -158,10 +154,26 @@ export default function FormularioSolicitudExistente({ onSuccess }) {
 
     const crearSolicitud = async (event) => {
         event.preventDefault();
-        if (!encargado || !agrupacionSeleccionada?.id) return;
+        if (!encargado || (modoAgrupacion === 'existente' && !agrupacionSeleccionada?.id)) return;
         setError('');
         setLoading(true);
-        const resultado = await crearSolicitudParaEncargadoExistente({ cedula: encargado.cedula, modoAgrupacion: 'existente', idAgrupacionSeleccionada: agrupacionSeleccionada.id, solicitud: { fecha_solicitud: obtenerFechaLocalISO(), fecha_asignada: valores.fecha_asignada, hora_asignada: valores.hora_asignada, comentarios: valores.comentarios } });
+        const resultado = await crearSolicitudParaEncargadoExistente({
+            cedula: encargado.cedula,
+            modoAgrupacion,
+            idAgrupacionSeleccionada: agrupacionSeleccionada?.id,
+            agrupacion: modoAgrupacion === 'nueva' ? {
+                nombre: valores.nombre,
+                lugar_procedencia: valores.lugar_procedencia,
+                cantidad_integrantes: valores.cantidad_integrantes,
+                archivo_adjunto: valores.archivo_adjunto,
+                resena: valores.resena,
+            } : undefined,
+            solicitud: {
+                fecha_solicitada: valores.fecha_solicitada,
+                hora_solicitada: valores.hora_solicitada,
+                comentarios: valores.comentarios,
+            },
+        });
         setLoading(false);
         if (resultado.success) onSuccess?.();
         else setError(resultado.error);
@@ -194,7 +206,7 @@ export default function FormularioSolicitudExistente({ onSuccess }) {
 
     if (paso === 'agrupacion') return <form onSubmit={guardarAgrupacion} className="space-y-6" noValidate><fieldset className="space-y-4"><legend className="text-lg font-semibold text-primary">{modoAgrupacion === 'nueva' ? 'Registrar agrupación nueva' : 'Editar agrupación'}</legend><div className="grid sm:grid-cols-2 gap-4"><div className="space-y-1"><label htmlFor="nombre" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Nombre de la agrupación</label><input id="nombre" name="nombre" value={valores.nombre} onChange={handleChange} required readOnly={modoAgrupacion === 'existente'} className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary read-only:bg-surface-soft read-only:text-foreground-faint" /></div><div className="space-y-1"><label htmlFor="lugar_procedencia" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Lugar de procedencia</label><input id="lugar_procedencia" name="lugar_procedencia" value={valores.lugar_procedencia} onChange={handleChange} required className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" /></div><div className="space-y-1"><label htmlFor="cantidad_integrantes" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Cantidad de integrantes</label><input id="cantidad_integrantes" name="cantidad_integrantes" type="number" min="1" max="200" value={valores.cantidad_integrantes} onChange={handleChange} required className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" /></div><div className="space-y-1 sm:col-span-2"><label htmlFor="resena" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Reseña</label><textarea id="resena" name="resena" value={valores.resena} onChange={handleChange} rows={4} maxLength={5000} className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" /></div>{modoAgrupacion === 'nueva' && <div className="space-y-1 sm:col-span-2"><label htmlFor="archivo_adjunto" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Adjuntar archivo</label><input id="archivo_adjunto" type="file" accept="image/png,image/jpeg,application/pdf" onChange={handleArchivoAdjuntoChange} className="w-full px-4 py-2 border border-border rounded-lg file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-primary file:text-white cursor-pointer" />{valores.archivo_adjunto_nombre && <p className="text-xs text-foreground-soft">Archivo seleccionado: {valores.archivo_adjunto_nombre}</p>}</div>}{modoAgrupacion === 'existente' && agrupacionSeleccionada && <div className="sm:col-span-2"><CampoArchivoAdjunto archivoAdjuntoUrl={agrupacionSeleccionada.archivo_adjunto_url} resena={agrupacionSeleccionada.resena} /></div>}</div></fieldset>{error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm text-center font-medium">{error}</div>}<BotonContinuar loading={loading}>{modoAgrupacion === 'nueva' ? 'Registrar y continuar' : 'Guardar y continuar'}</BotonContinuar></form>;
 
-    if (paso === 'solicitud' && agrupacionSeleccionada?.id) return <form onSubmit={crearSolicitud} className="space-y-6" noValidate><fieldset className="space-y-4"><legend className="text-lg font-semibold text-primary">Datos de la solicitud</legend><div className="grid sm:grid-cols-2 gap-4"><div className="space-y-1"><label htmlFor="fecha_asignada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label><input id="fecha_asignada" name="fecha_asignada" type="date" min={hoy} value={valores.fecha_asignada} onChange={handleChange} required className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" /></div><div className="space-y-1"><label htmlFor="hora_asignada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Hora deseada de participación</label><input id="hora_asignada" name="hora_asignada" type="time" value={valores.hora_asignada} onChange={handleChange} required className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" /></div><div className="space-y-1 sm:col-span-2"><label htmlFor="comentarios" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Comentarios</label><textarea id="comentarios" name="comentarios" value={valores.comentarios} onChange={handleChange} rows={4} minLength={10} maxLength={1000} required className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" /></div></div></fieldset>{error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm text-center font-medium">{error}</div>}<BotonContinuar loading={loading}>Enviar solicitud</BotonContinuar></form>;
+    if (paso === 'solicitud' && (modoAgrupacion === 'nueva' || agrupacionSeleccionada?.id)) return <form onSubmit={crearSolicitud} className="space-y-6" noValidate><fieldset className="space-y-4"><legend className="text-lg font-semibold text-primary">Datos de la solicitud</legend><div className="grid sm:grid-cols-2 gap-4"><div className="space-y-1"><label htmlFor="fecha_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label><input id="fecha_solicitada" name="fecha_solicitada" type="date" min={hoy} value={valores.fecha_solicitada} onChange={handleChange} required className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" /></div><div className="space-y-1"><label htmlFor="hora_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Hora deseada de participación</label><input id="hora_solicitada" name="hora_solicitada" type="time" value={valores.hora_solicitada} onChange={handleChange} required className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" /></div><div className="space-y-1 sm:col-span-2"><label htmlFor="comentarios" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Comentarios</label><textarea id="comentarios" name="comentarios" value={valores.comentarios} onChange={handleChange} rows={4} minLength={10} maxLength={1000} required className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" /></div></div></fieldset>{error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm text-center font-medium">{error}</div>}<BotonContinuar loading={loading}>Enviar solicitud</BotonContinuar></form>;
 
     return null;
 }

@@ -12,6 +12,8 @@ class SolicitudAgrupacionResource extends JsonResource
         return [
             'id' => $this->id,
             'fecha_solicitud' => $this->fecha_solicitud?->toISOString(),
+            'fecha_solicitada' => $this->fecha_solicitada?->toDateString(),
+            'hora_solicitada' => $this->hora_solicitada,
             'fecha_asignada' => $this->fecha_asignada?->toDateString(),
             'hora_asignada' => $this->hora_asignada,
             'comentarios' => $this->comentarios,

@@ -53,6 +53,7 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
                 if(link.children){
                     return {...link, open: !link.open};
                 }
+                onSelectView?.(link.name === 'Inicio' ? null : link.name);
                 return{ ...link, active: true}
             }
             return link.children ? {...link, active:false} : {...link,active:false};

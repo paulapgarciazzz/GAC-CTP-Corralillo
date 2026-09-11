@@ -21,8 +21,19 @@ class StoreSolicitudAgrupacionRequest extends FormRequest
             ],
 
             'fecha_solicitud' => [
-                'required',
+                'nullable',
                 'date',
+            ],
+
+            'fecha_solicitada' => [
+                'required_without:fecha_solicitud',
+                'nullable',
+                'date',
+            ],
+
+            'hora_solicitada' => [
+                'nullable',
+                'date_format:H:i',
             ],
 
             'comentarios' => [

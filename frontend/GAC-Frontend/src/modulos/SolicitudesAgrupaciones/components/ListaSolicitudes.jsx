@@ -56,7 +56,7 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                     {solicitud.agrupacion.nombre}
                                 </span>
                                 <span className="block text-xs text-foreground-faint">
-                                    {formatearFecha(solicitud.fecha_solicitud) ?? '—'}
+                                    {formatearFecha(solicitud.fecha_solicitada ?? solicitud.fecha_solicitud) ?? '—'}
                                 </span>
                             </div>
 

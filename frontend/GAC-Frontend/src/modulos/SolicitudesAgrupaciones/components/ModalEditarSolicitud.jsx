@@ -35,8 +35,8 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
         lugar_procedencia: solicitud.agrupacion?.lugar_procedencia ?? '',
         cantidad_integrantes: solicitud.agrupacion?.cantidad_integrantes ?? '',
         // Solicitud
-        fecha_asignada: solicitud.fecha_asignada ?? '',
-        hora_asignada: solicitud.hora_asignada ?? '',
+        fecha_solicitada: solicitud.fecha_solicitada ?? '',
+        hora_solicitada: solicitud.hora_solicitada ?? '',
         comentarios: solicitud.comentarios ?? '',
     });
     const [loading, setLoading] = useState(false);
@@ -94,8 +94,8 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                 cantidad_integrantes: valores.cantidad_integrantes,
             },
             solicitud: {
-                fecha_asignada: valores.fecha_asignada,
-                hora_asignada: valores.hora_asignada,
+                fecha_solicitada: valores.fecha_solicitada,
+                hora_solicitada: valores.hora_solicitada,
                 comentarios: valores.comentarios,
             },
         };
@@ -216,13 +216,13 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                         <legend className="text-lg font-semibold text-primary">Datos de la solicitud</legend>
                         <div className="grid sm:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <label htmlFor="fecha_asignada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label>
-                                <input id="fecha_asignada" name="fecha_asignada" type="date" value={valores.fecha_asignada} onChange={handleChange} required
+                                <label htmlFor="fecha_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label>
+                                <input id="fecha_solicitada" name="fecha_solicitada" type="date" value={valores.fecha_solicitada} onChange={handleChange} required
                                     className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div className="space-y-1">
-                                <label htmlFor="hora_asignada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Hora deseada de participación</label>
-                                <input id="hora_asignada" name="hora_asignada" type="time" value={valores.hora_asignada} onChange={handleChange}
+                                <label htmlFor="hora_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Hora deseada de participación</label>
+                                <input id="hora_solicitada" name="hora_solicitada" type="time" value={valores.hora_solicitada} onChange={handleChange}
                                     className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div className="space-y-1 sm:col-span-2">

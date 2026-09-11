@@ -3,6 +3,8 @@
 namespace App\Modules\SolicitudesAgrupaciones\Controllers;
 
 use App\Modules\SolicitudesAgrupaciones\Requests\GestionarSolicitudRequest;
+use App\Modules\SolicitudesAgrupaciones\Requests\StoreSolicitudCompletaRequest;
+use App\Modules\SolicitudesAgrupaciones\Requests\StoreSolicitudEncargadoExistenteRequest;
 use App\Modules\SolicitudesAgrupaciones\Requests\StoreSolicitudAgrupacionRequest;
 use App\Modules\SolicitudesAgrupaciones\Requests\UpdateSolicitudAgrupacionRequest;
 use App\Modules\SolicitudesAgrupaciones\Resources\SolicitudAgrupacionResource;
@@ -30,6 +32,22 @@ class SolicitudAgrupacionController
     ): JsonResponse {
         return (new SolicitudAgrupacionResource(
             $this->service->crear($request->validated())
+        ))->response()->setStatusCode(201);
+    }
+
+    public function storeNueva(
+        StoreSolicitudCompletaRequest $request
+    ): JsonResponse {
+        return (new SolicitudAgrupacionResource(
+            $this->service->crearConEncargadoNuevo($request->validated())
+        ))->response()->setStatusCode(201);
+    }
+
+    public function storeParaEncargadoExistente(
+        StoreSolicitudEncargadoExistenteRequest $request
+    ): JsonResponse {
+        return (new SolicitudAgrupacionResource(
+            $this->service->crearParaEncargadoExistente($request->validated())
         ))->response()->setStatusCode(201);
     }
 

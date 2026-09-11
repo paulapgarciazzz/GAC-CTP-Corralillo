@@ -28,6 +28,7 @@ Route::prefix('encargados')->group(function () {
 });
 
 Route::get('agrupaciones', [AgrupacionController::class, 'listar']);
+Route::get('agrupaciones/aprobadas', [AgrupacionController::class, 'listarAprobadas']);
 Route::apiResource('agrupaciones', AgrupacionController::class)
     ->only(['store', 'show', 'update', 'destroy'])
     ->parameters(['agrupaciones' => 'agrupacion']);
@@ -42,6 +43,8 @@ Route::get(
 
 Route::prefix('solicitudes-agrupaciones')->group(function () {
     Route::get('/', [SolicitudAgrupacionController::class, 'index']);
+    Route::post('/nueva', [SolicitudAgrupacionController::class, 'storeNueva']);
+    Route::post('/encargado-existente', [SolicitudAgrupacionController::class, 'storeParaEncargadoExistente']);
     Route::post('/', [SolicitudAgrupacionController::class, 'store']);
     Route::get('/{id}', [SolicitudAgrupacionController::class, 'show']);
     Route::patch('/{id}/aprobar', [SolicitudAgrupacionController::class, 'aprobar']);

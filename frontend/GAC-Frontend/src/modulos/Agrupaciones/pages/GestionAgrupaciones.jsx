@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Loader2, Search } from 'lucide-react';
-import { obtenerAgrupaciones } from '../services/agrupacionService';
+import { obtenerAgrupacionesAprobadas } from '../services/agrupacionService';
 import TarjetaAgrupacion from '../components/TarjetaAgrupacion';
 import ModalEditarAgrupacion from '../components/ModalEditarAgrupacion';
 import ModalDetalleAgrupacion from '../components/ModalDetalleAgrupacion';
@@ -15,7 +15,7 @@ export default function GestionAgrupaciones() {
 
     useEffect(() => {
         (async () => {
-            const result = await obtenerAgrupaciones();
+            const result = await obtenerAgrupacionesAprobadas();
             if (result.success) {
                 setAgrupaciones(result.data);
             } else {
