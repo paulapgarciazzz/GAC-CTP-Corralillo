@@ -29,10 +29,6 @@ class AgrupacionAdminManagementTest extends TestCase
             'email' => 'juan.garcia@example.com',
             'numero_tel' => '88887777',
         ]);
-
-        Estado::forceCreate(['nom_estado' => 'pendiente']);
-        Estado::forceCreate(['nom_estado' => 'aprobada']);
-        Estado::forceCreate(['nom_estado' => 'rechazada']);
     }
 
     private function datosAgrupacion(string $nombre, array $overrides = []): array
