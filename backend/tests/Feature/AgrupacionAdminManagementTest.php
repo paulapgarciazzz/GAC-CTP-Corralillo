@@ -56,6 +56,8 @@ class AgrupacionAdminManagementTest extends TestCase
 
         $response->assertOk();
         $this->assertCount(2, $response->json('data'));
+        $response->assertJsonPath('data.0.encargado.cedula', $this->encargado->cedula);
+        $response->assertJsonPath('data.0.participaciones', []);
     }
 
     public function test_get_agrupaciones_incluye_solicitudes_count(): void
@@ -72,6 +74,29 @@ class AgrupacionAdminManagementTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonPath('data.0.solicitudes_count', 1);
+    }
+
+    public function test_get_agrupaciones_aprobadas_solo_devuelve_agrupaciones_con_solicitud_aprobada(): void
+    {
+        $aprobada = Agrupacion::create($this->datosAgrupacion('Agrupación aprobada'));
+        $pendiente = Agrupacion::create($this->datosAgrupacion('Agrupación pendiente'));
+
+        SolicitudAgrupacion::create([
+            'id_agrupacion' => $aprobada->id,
+            'fecha_solicitud' => now(),
+            'id_estado' => Estado::where('nom_estado', 'aprobada')->first()->id,
+        ]);
+        SolicitudAgrupacion::create([
+            'id_agrupacion' => $pendiente->id,
+            'fecha_solicitud' => now(),
+            'id_estado' => Estado::where('nom_estado', 'pendiente')->first()->id,
+        ]);
+
+        $response = $this->getJson('/api/agrupaciones/aprobadas');
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.nombre', 'Agrupación aprobada');
     }
 
     public function test_se_puede_eliminar_agrupacion_sin_solicitudes(): void

@@ -76,6 +76,16 @@ class UpdateSolicitudAgrupacionRequest extends FormRequest
                 'sometimes',
                 'array',
             ],
+            'solicitud.fecha_solicitada' => [
+                'sometimes',
+                'required',
+                'date',
+            ],
+            'solicitud.hora_solicitada' => [
+                'sometimes',
+                'required',
+                'date_format:H:i',
+            ],
             'solicitud.fecha_asignada' => [
                 'sometimes',
                 'nullable',

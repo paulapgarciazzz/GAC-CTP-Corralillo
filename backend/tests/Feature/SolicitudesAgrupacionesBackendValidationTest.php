@@ -46,6 +46,19 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
         ], $overrides);
     }
 
+    private function baseSolicitudCompleta(array $overrides = []): array
+    {
+        return array_replace_recursive([
+            'encargado' => $this->baseEncargado(),
+            'agrupacion' => $this->baseAgrupacion('123456789'),
+            'solicitud' => [
+                'fecha_solicitada' => '2026-09-20',
+                'hora_solicitada' => '10:30',
+                'comentarios' => 'Solicitud de participación.',
+            ],
+        ], $overrides);
+    }
+
     public function test_no_se_pueden_crear_dos_encargados_con_la_misma_cedula(): void
     {
         $this->postJson('/api/encargados', $this->baseEncargado());
@@ -316,5 +329,98 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
         $response->assertOk();
         $this->assertCount(2, $response->json('data'));
+    }
+
+    public function test_si_falla_la_validacion_de_la_agrupacion_no_se_guarda_el_encargado(): void
+    {
+        $response = $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta([
+            'agrupacion' => ['cantidad_integrantes' => 0],
+        ]));
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('encargado', ['cedula' => '123456789']);
+    }
+
+    public function test_si_falla_la_solicitud_se_reviertan_encargado_y_agrupacion(): void
+    {
+        $response = $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta());
+
+        $response->assertNotFound();
+        $this->assertDatabaseMissing('encargado', ['cedula' => '123456789']);
+        $this->assertDatabaseCount('agrupacion', 0);
+        $this->assertDatabaseCount('solicitud_agrupacion', 0);
+    }
+
+    public function test_encargado_existente_con_agrupacion_nueva_revierte_la_agrupacion_si_falla_la_solicitud(): void
+    {
+        $encargado = Encargado::create($this->baseEncargado());
+
+        $response = $this->postJson('/api/solicitudes-agrupaciones/encargado-existente', [
+            'cedula' => $encargado->cedula,
+            'agrupacion' => $this->baseAgrupacion($encargado->cedula),
+            'solicitud' => [
+                'fecha_solicitada' => '2026-09-20',
+                'hora_solicitada' => '10:30',
+            ],
+        ]);
+
+        $response->assertNotFound();
+        $this->assertDatabaseHas('encargado', ['cedula' => $encargado->cedula]);
+        $this->assertDatabaseCount('agrupacion', 0);
+        $this->assertDatabaseCount('solicitud_agrupacion', 0);
+    }
+
+    public function test_una_solicitud_nueva_guarda_fecha_y_hora_solicitadas(): void
+    {
+        $this->crearEstadoPendiente();
+
+        $response = $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta());
+
+        $response->assertCreated();
+        $this->assertDatabaseHas('solicitud_agrupacion', [
+            'fecha_solicitada' => '2026-09-20',
+            'hora_solicitada' => '10:30:00',
+            'fecha_asignada' => null,
+            'hora_asignada' => null,
+        ]);
+    }
+
+    public function test_aprobar_una_solicitud_guarda_fecha_y_hora_asignadas(): void
+    {
+        $this->crearEstadoPendiente();
+        $encargado = Encargado::create($this->baseEncargado());
+        $agrupacion = Agrupacion::create($this->baseAgrupacion($encargado->cedula));
+        $solicitud = SolicitudAgrupacion::create([
+            'id_agrupacion' => $agrupacion->id,
+            'fecha_solicitud' => now(),
+            'fecha_solicitada' => '2026-09-20',
+            'hora_solicitada' => '10:30',
+            'id_estado' => Estado::where('nom_estado', 'pendiente')->value('id'),
+        ]);
+
+        $this->patchJson("/api/solicitudes-agrupaciones/{$solicitud->id}/aprobar", [
+            'fecha_asignada' => '2026-09-21',
+            'hora_asignada' => '11:00',
+        ])->assertOk();
+
+        $this->assertDatabaseHas('solicitud_agrupacion', [
+            'id' => $solicitud->id,
+            'fecha_solicitada' => '2026-09-20',
+            'hora_solicitada' => '10:30:00',
+            'fecha_asignada' => '2026-09-21',
+            'hora_asignada' => '11:00:00',
+        ]);
+    }
+
+    public function test_archivo_adjunto_es_obligatorio_en_una_solicitud_nueva(): void
+    {
+        $payload = $this->baseSolicitudCompleta();
+        unset($payload['agrupacion']['archivo_adjunto']);
+
+        $this->postJson('/api/solicitudes-agrupaciones/nueva', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('agrupacion.archivo_adjunto');
+
+        $this->assertDatabaseMissing('encargado', ['cedula' => '123456789']);
     }
 }

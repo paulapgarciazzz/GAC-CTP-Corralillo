@@ -27,9 +27,12 @@ class AgrupacionController
 
     public function listar(): AnonymousResourceCollection
     {
-        return AgrupacionResource::collection(
-            $this->service->listarAprobadas()
-        );
+        return AgrupacionResource::collection($this->service->listarAdministrativa());
+    }
+
+    public function listarAprobadas(): AnonymousResourceCollection
+    {
+        return AgrupacionResource::collection($this->service->listarAprobadas());
     }
 
     public function store(StoreAgrupacionRequest $request): JsonResponse
