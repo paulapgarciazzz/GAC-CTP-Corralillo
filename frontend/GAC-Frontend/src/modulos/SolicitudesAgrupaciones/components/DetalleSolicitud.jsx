@@ -66,6 +66,8 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
                 <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Datos de la solicitud</h3>
                 <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
                     <Campo etiqueta="Fecha de solicitud" valor={formatearFecha(solicitud.fecha_solicitud)} />
+                    <Campo etiqueta="Fecha deseada de participación" valor={formatearFecha(solicitud.fecha_solicitada)} />
+                    <Campo etiqueta="Hora deseada de participación" valor={solicitud.hora_solicitada || '—'} />
                     <Campo etiqueta="Fecha asignada" valor={solicitud.fecha_asignada || 'Sin asignar'} />
                     <Campo etiqueta="Hora asignada" valor={solicitud.hora_asignada || '—'} />
                     <div className="col-span-full">

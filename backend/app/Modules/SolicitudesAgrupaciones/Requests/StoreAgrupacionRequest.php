@@ -47,7 +47,7 @@ class StoreAgrupacionRequest extends FormRequest
             ],
 
             'archivo_adjunto' => [
-                'nullable',
+                'required',
                 'string',
                 new ArchivoAdjuntoValido(),
             ],

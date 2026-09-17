@@ -4,6 +4,8 @@ namespace App\Modules\SolicitudesAgrupaciones\Services;
 
 use App\Modules\SolicitudesAgrupaciones\Models\Estado;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
+use App\Modules\SolicitudesAgrupaciones\Services\AgrupacionService;
+use App\Modules\SolicitudesAgrupaciones\Services\EncargadoService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -44,11 +46,13 @@ class SolicitudAgrupacionService
 
             $solicitud = SolicitudAgrupacion::create([
                 'id_agrupacion' => $datos['id_agrupacion'],
-                'fecha_solicitud' => $datos['fecha_solicitud'],
+                'fecha_solicitud' => $datos['fecha_solicitud'] ?? now(),
+                'fecha_solicitada' => $datos['fecha_solicitada'] ?? null,
+                'hora_solicitada' => $datos['hora_solicitada'] ?? null,
                 'id_estado' => $estadoPendiente->id,
                 'comentarios' => $datos['comentarios'] ?? null,
-                'fecha_asignada' => $datos['fecha_asignada'] ?? null,
-                'hora_asignada' => $datos['hora_asignada'] ?? null,
+                'fecha_asignada' => null,
+                'hora_asignada' => null,
             ]);
 
             return $solicitud->load([
@@ -56,6 +60,52 @@ class SolicitudAgrupacionService
                 'estado',
             ]);
         });
+    }
+
+    public function crearConEncargadoNuevo(array $datos): SolicitudAgrupacion
+    {
+        return DB::transaction(function () use ($datos) {
+            $encargado = app(EncargadoService::class)->crear($datos['encargado']);
+            $agrupacion = app(AgrupacionService::class)->crear([
+                'ced_encargado' => $encargado->cedula,
+                ...$datos['agrupacion'],
+            ]);
+
+            return $this->crearSolicitudPendiente($agrupacion->id, $datos['solicitud']);
+        });
+    }
+
+    public function crearParaEncargadoExistente(array $datos): SolicitudAgrupacion
+    {
+        return DB::transaction(function () use ($datos) {
+            $idAgrupacion = $datos['id_agrupacion'] ?? null;
+
+            if ($idAgrupacion === null) {
+                $agrupacion = app(AgrupacionService::class)->crear([
+                    'ced_encargado' => $datos['cedula'],
+                    ...$datos['agrupacion'],
+                ]);
+                $idAgrupacion = $agrupacion->id;
+            }
+
+            return $this->crearSolicitudPendiente($idAgrupacion, $datos['solicitud']);
+        });
+    }
+
+    private function crearSolicitudPendiente(
+        int $idAgrupacion,
+        array $datos
+    ): SolicitudAgrupacion {
+        $estadoPendiente = Estado::where('nom_estado', 'pendiente')->firstOrFail();
+
+        return SolicitudAgrupacion::create([
+            'id_agrupacion' => $idAgrupacion,
+            'fecha_solicitud' => now(),
+            'fecha_solicitada' => $datos['fecha_solicitada'],
+            'hora_solicitada' => $datos['hora_solicitada'],
+            'id_estado' => $estadoPendiente->id,
+            'comentarios' => $datos['comentarios'] ?? null,
+        ])->load(['agrupacion.encargado', 'estado']);
     }
 
     public function aprobar(

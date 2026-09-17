@@ -46,7 +46,6 @@ Route::prefix('encargados')->group(function () {
         [AgrupacionController::class, 'index']
     );
 });
-
 /*
 |--------------------------------------------------------------------------
 | Agrupaciones
@@ -56,6 +55,11 @@ Route::prefix('encargados')->group(function () {
 Route::get(
     'agrupaciones',
     [AgrupacionController::class, 'listar']
+);
+
+Route::get(
+    'agrupaciones/aprobadas',
+    [AgrupacionController::class, 'listarAprobadas']
 );
 
 Route::apiResource('agrupaciones', AgrupacionController::class)
@@ -84,6 +88,16 @@ Route::prefix('solicitudes-agrupaciones')->group(function () {
     Route::get(
         '/',
         [SolicitudAgrupacionController::class, 'index']
+    );
+
+    Route::post(
+        '/nueva',
+        [SolicitudAgrupacionController::class, 'storeNueva']
+    );
+
+    Route::post(
+        '/encargado-existente',
+        [SolicitudAgrupacionController::class, 'storeParaEncargadoExistente']
     );
 
     Route::post(

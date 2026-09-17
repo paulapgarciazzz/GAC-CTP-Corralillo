@@ -13,6 +13,8 @@ class SolicitudAgrupacion extends Model
     protected $fillable = [
         'id_agrupacion',
         'fecha_solicitud',
+        'fecha_solicitada',
+        'hora_solicitada',
         'fecha_asignada',
         'hora_asignada',
         'id_estado',
@@ -21,6 +23,7 @@ class SolicitudAgrupacion extends Model
 
     protected $casts = [
         'fecha_solicitud' => 'datetime',
+        'fecha_solicitada' => 'date',
         'fecha_asignada' => 'date',
     ];
 

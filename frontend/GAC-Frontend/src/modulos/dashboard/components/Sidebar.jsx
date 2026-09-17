@@ -15,10 +15,10 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
                 {name: "Gestion de Agrupaciones", icon: PersonStanding},
             ]
         },
-        {name: "Inventario", icon: ShelvingUnit, active:false,
+        {name: "Beneficios", icon: ShelvingUnit, active:false,
             children: [
-                {name: "Gestion de Inventario", icon: SquareLibrary},
-                {name: "Agregar a inventario", icon: CirclePile},
+                {name: "Gestion de beneficios", icon: SquareLibrary},
+                {name: "Asignar beneficios", icon: CirclePile},
             ]
         },
         {name: "Calendario", icon: CalendarDays, active:false},
@@ -53,6 +53,7 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
                 if(link.children){
                     return {...link, open: !link.open};
                 }
+                onSelectView?.(link.name === 'Inicio' ? null : link.name);
                 return{ ...link, active: true}
             }
             return link.children ? {...link, active:false} : {...link,active:false};
