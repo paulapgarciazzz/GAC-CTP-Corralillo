@@ -46,8 +46,6 @@ Route::prefix('encargados')->group(function () {
         [AgrupacionController::class, 'index']
     );
 });
-
-<<<<<<< HEAD
 /*
 |--------------------------------------------------------------------------
 | Agrupaciones
@@ -59,10 +57,11 @@ Route::get(
     [AgrupacionController::class, 'listar']
 );
 
-=======
-Route::get('agrupaciones', [AgrupacionController::class, 'listar']);
-Route::get('agrupaciones/aprobadas', [AgrupacionController::class, 'listarAprobadas']);
->>>>>>> 82bb425 (fix: corregir flujo transaccional de solicitudes y listados de agrupaciones)
+Route::get(
+    'agrupaciones/aprobadas',
+    [AgrupacionController::class, 'listarAprobadas']
+);
+
 Route::apiResource('agrupaciones', AgrupacionController::class)
     ->only(['store', 'show', 'update', 'destroy'])
     ->parameters([
@@ -86,10 +85,19 @@ Route::get(
 */
 
 Route::prefix('solicitudes-agrupaciones')->group(function () {
-<<<<<<< HEAD
     Route::get(
         '/',
         [SolicitudAgrupacionController::class, 'index']
+    );
+
+    Route::post(
+        '/nueva',
+        [SolicitudAgrupacionController::class, 'storeNueva']
+    );
+
+    Route::post(
+        '/encargado-existente',
+        [SolicitudAgrupacionController::class, 'storeParaEncargadoExistente']
     );
 
     Route::post(
@@ -126,18 +134,6 @@ Route::prefix('solicitudes-agrupaciones')->group(function () {
         '/{id}',
         [SolicitudAgrupacionController::class, 'destroy']
     );
-=======
-    Route::get('/', [SolicitudAgrupacionController::class, 'index']);
-    Route::post('/nueva', [SolicitudAgrupacionController::class, 'storeNueva']);
-    Route::post('/encargado-existente', [SolicitudAgrupacionController::class, 'storeParaEncargadoExistente']);
-    Route::post('/', [SolicitudAgrupacionController::class, 'store']);
-    Route::get('/{id}', [SolicitudAgrupacionController::class, 'show']);
-    Route::patch('/{id}/aprobar', [SolicitudAgrupacionController::class, 'aprobar']);
-    Route::patch('/{id}/rechazar', [SolicitudAgrupacionController::class, 'rechazar']);
-    Route::post('/{id}/enviar-detalles', [SolicitudAgrupacionController::class, 'enviarDetalles']);
-    Route::put('/{id}', [SolicitudAgrupacionController::class, 'update']);
-    Route::delete('/{id}', [SolicitudAgrupacionController::class, 'destroy']);
->>>>>>> 82bb425 (fix: corregir flujo transaccional de solicitudes y listados de agrupaciones)
 });
 
 /*
