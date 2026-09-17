@@ -10,6 +10,8 @@ use App\Modules\Beneficios\Models\Tarima;
 use App\Modules\Beneficios\Models\Transporte;
 use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\Encargado;
+use App\Modules\SolicitudesAgrupaciones\Models\Estado;
+use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -121,118 +123,125 @@ class BeneficiosBackendTest extends TestCase
             );
     }
 
-    public function test_crea_asignacion_completa_de_beneficios(): void
+    public function test_crea_asignacion_para_solicitud_aprobada_con_varios_beneficios_del_mismo_tipo(): void
     {
+        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
+
+        $solicitud = SolicitudAgrupacion::create([
+            'id_agrupacion' => $this->agrupacion->id,
+            'ced_encargado' => '123456789',
+            'fecha_solicitud' => now(),
+            'id_estado' => $estadoAprobada->id,
+        ]);
+
         $response = $this->postJson(
             '/api/asignaciones-beneficios',
             [
-                'id_agrupacion' => $this->agrupacion->id,
-                'fecha_solicitud' => '2026-09-11',
-
-                'id_alimentacion' =>
-                    $this->alimentacion->id_alimentacion,
-
-                'mobiliario' => [
-                    'id_mobiliario' =>
-                        $this->mobiliario->id_mobiliario,
-                    'cantidad' => 20,
+                'id_solicitud_agrupacion' => $solicitud->id,
+                'observaciones' => 'Asignación revisada',
+                'mobiliarios' => [
+                    ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 20],
+                    ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 5],
                 ],
-
-                'id_tarima' =>
-                    $this->tarima->id_tarima,
-
-                'id_aula' =>
-                    $this->aula->id_aula,
-
-                'transporte' => [
-                    'matricula' =>
-                        $this->transporte->matricula,
-                    'id_ruta' =>
-                        $this->ruta->id_ruta,
+                'alimentaciones' => [
+                    ['id_alimentacion' => $this->alimentacion->id_alimentacion, 'cantidad' => 30],
+                    ['id_alimentacion' => $this->alimentacion->id_alimentacion, 'cantidad' => 30],
+                ],
+                'aulas' => [
+                    ['id_aula' => $this->aula->id_aula],
+                ],
+                'tarimas' => [
+                    ['id_tarima' => $this->tarima->id_tarima],
+                ],
+                'transportes' => [
+                    ['matricula' => $this->transporte->matricula, 'id_ruta' => $this->ruta->id_ruta],
                 ],
             ]
         );
 
         $response->assertCreated()
-            ->assertJsonPath(
-                'data.agrupacion.id',
-                $this->agrupacion->id
-            )
-            ->assertJsonPath(
-                'data.alimentacion.alimentacion.id_alimentacion',
-                $this->alimentacion->id_alimentacion
-            )
-            ->assertJsonPath(
-                'data.mobiliario.cantidad',
-                20
-            )
-            ->assertJsonPath(
-                'data.aula.id_aula',
-                $this->aula->id_aula
-            )
-            ->assertJsonPath(
-                'data.tarima.id_tarima',
-                $this->tarima->id_tarima
-            )
-            ->assertJsonPath(
-                'data.transporte.transporte.matricula',
-                'BUS001'
-            )
-            ->assertJsonPath(
-                'data.transporte.ruta.id_ruta',
-                $this->ruta->id_ruta
-            );
+            ->assertJsonPath('data.id_solicitud_agrupacion', $solicitud->id)
+            ->assertJsonPath('data.observaciones', 'Asignación revisada')
+            ->assertJsonPath('data.mobiliarios.0.cantidad', 20)
+            ->assertJsonPath('data.mobiliarios.1.cantidad', 5)
+            ->assertJsonPath('data.alimentaciones.1.cantidad', 30);
 
-        $this->assertDatabaseHas(
-            'asignacion_beneficios',
-            [
-                'id_agrupacion' =>
-                    $this->agrupacion->id,
-                'id_tarima' =>
-                    $this->tarima->id_tarima,
-                'id_aula' =>
-                    $this->aula->id_aula,
-            ]
-        );
+        $this->assertDatabaseHas('asignacion_beneficios', [
+            'id_solicitud_agrupacion' => $solicitud->id,
+            'observaciones' => 'Asignación revisada',
+        ]);
 
-        $this->assertDatabaseHas(
-            'solicitud_alimentacion',
-            [
-                'id_alimentacion' =>
-                    $this->alimentacion->id_alimentacion,
-            ]
-        );
-
-        $this->assertDatabaseHas(
-            'solicitud_mobiliario',
-            [
-                'cantidad' => 20,
-                'id_sol_mobiliario' =>
-                    $this->mobiliario->id_mobiliario,
-            ]
-        );
-
-        $this->assertDatabaseHas(
-            'solicitud_transporte',
-            [
-                'matricula' => 'BUS001',
-                'id_ruta' =>
-                    $this->ruta->id_ruta,
-            ]
-        );
+        $this->assertDatabaseCount('asignacion_mobiliario', 2);
+        $this->assertDatabaseCount('asignacion_alimentacion', 2);
     }
 
-    public function test_rechaza_asignacion_con_datos_invalidos(): void
+    public function test_rechaza_asignacion_para_solicitud_inexistente(): void
     {
         $response = $this->postJson(
             '/api/asignaciones-beneficios',
             [
-                'fecha_solicitud' => '2026-09-11',
+                'id_solicitud_agrupacion' => 999999,
+                'mobiliarios' => [
+                    ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 10],
+                ],
+            ]
+        );
 
-                'mobiliario' => [
-                    'id_mobiliario' =>
-                        $this->mobiliario->id_mobiliario,
-                    'cantidad' => 0,
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['id_solicitud_agrupacion']);
+
+        $this->assertDatabaseCount('asignacion_beneficios', 0);
+    }
+
+    public function test_rechaza_asignacion_si_la_solicitud_no_esta_aprobada(): void
+    {
+        $estadoPendiente = Estado::where('nom_estado', 'pendiente')->firstOrFail();
+
+        $solicitud = SolicitudAgrupacion::create([
+            'id_agrupacion' => $this->agrupacion->id,
+            'ced_encargado' => '123456789',
+            'fecha_solicitud' => now(),
+            'id_estado' => $estadoPendiente->id,
+        ]);
+
+        $response = $this->postJson(
+            '/api/asignaciones-beneficios',
+            [
+                'id_solicitud_agrupacion' => $solicitud->id,
+                'mobiliarios' => [
+                    ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 10],
+                ],
+            ]
+        );
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['id_solicitud_agrupacion']);
+    }
+
+    public function test_no_acepta_campos_legacy_del_contrato_anterior(): void
+    {
+        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
+
+        $solicitud = SolicitudAgrupacion::create([
+            'id_agrupacion' => $this->agrupacion->id,
+            'ced_encargado' => '123456789',
+            'fecha_solicitud' => now(),
+            'id_estado' => $estadoAprobada->id,
+        ]);
+
+        $response = $this->postJson(
+            '/api/asignaciones-beneficios',
+            [
+                'id_solicitud_agrupacion' => $solicitud->id,
+                'id_agrupacion' => $this->agrupacion->id,
+                'fecha_solicitud' => '2026-09-11',
+                'id_solicitud_mobiliario' => 99,
+                'id_solicitud_alimentacion' => 99,
+                'id_solicitud_transporte' => 99,
+                'id_tarima' => $this->tarima->id_tarima,
+                'id_aula' => $this->aula->id_aula,
+                'mobiliarios' => [
+                    ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 10],
                 ],
             ]
         );
@@ -240,149 +249,144 @@ class BeneficiosBackendTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors([
                 'id_agrupacion',
-                'mobiliario.cantidad',
-            ]);
-
-        $this->assertDatabaseCount(
-            'asignacion_beneficios',
-            0
-        );
-
-        $this->assertDatabaseCount(
-            'solicitud_mobiliario',
-            0
-        );
-    }
-
-    public function test_asignacion_inexistente_devuelve_404(): void
-    {
-        $this->getJson(
-            '/api/asignaciones-beneficios/999999'
-        )->assertNotFound();
-    }
-
-    public function test_no_acepta_ids_internos_de_solicitudes(): void
-    {
-        $response = $this->postJson(
-            '/api/asignaciones-beneficios',
-            [
-                'id_agrupacion' =>
-                    $this->agrupacion->id,
-
-                'fecha_solicitud' =>
-                    '2026-09-11',
-
-                'id_solicitud_mobiliario' => 999,
-                'id_solicitud_alimentacion' => 999,
-                'id_solicitud_transporte' => 999,
-            ]
-        );
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors([
+                'fecha_solicitud',
                 'id_solicitud_mobiliario',
                 'id_solicitud_alimentacion',
                 'id_solicitud_transporte',
+                'id_tarima',
+                'id_aula',
             ]);
+    }
 
-        $this->assertDatabaseCount(
-            'asignacion_beneficios',
-            0
+    public function test_no_permite_mas_de_una_cabecera_por_solicitud(): void
+    {
+        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
+
+        $solicitud = SolicitudAgrupacion::create([
+            'id_agrupacion' => $this->agrupacion->id,
+            'ced_encargado' => '123456789',
+            'fecha_solicitud' => now(),
+            'id_estado' => $estadoAprobada->id,
+        ]);
+
+        $this->postJson('/api/asignaciones-beneficios', [
+            'id_solicitud_agrupacion' => $solicitud->id,
+            'mobiliarios' => [
+                ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 10],
+            ],
+        ]);
+
+        $response = $this->postJson('/api/asignaciones-beneficios', [
+            'id_solicitud_agrupacion' => $solicitud->id,
+            'mobiliarios' => [
+                ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 5],
+            ],
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['id_solicitud_agrupacion']);
+    }
+
+    public function test_arrays_vacios_eliminan_detalles(): void
+    {
+        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
+
+        $solicitud = SolicitudAgrupacion::create([
+            'id_agrupacion' => $this->agrupacion->id,
+            'ced_encargado' => '123456789',
+            'fecha_solicitud' => now(),
+            'id_estado' => $estadoAprobada->id,
+        ]);
+
+        $crear = $this->postJson('/api/asignaciones-beneficios', [
+            'id_solicitud_agrupacion' => $solicitud->id,
+            'observaciones' => 'Inicial',
+            'mobiliarios' => [
+                ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 20],
+            ],
+            'alimentaciones' => [
+                ['id_alimentacion' => $this->alimentacion->id_alimentacion, 'cantidad' => 15],
+            ],
+        ]);
+
+        $crear->assertCreated();
+
+        $idAsignacion = $crear->json('data.id');
+
+        $response = $this->patchJson(
+            "/api/asignaciones-beneficios/{$idAsignacion}",
+            [
+                'mobiliarios' => [],
+                'alimentaciones' => [],
+            ]
         );
+
+        $response->assertOk();
+        $this->assertDatabaseCount('asignacion_mobiliario', 0);
+        $this->assertDatabaseCount('asignacion_alimentacion', 0);
     }
 
     public function test_actualiza_asignacion_de_beneficios(): void
     {
+        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
+
+        $solicitud = SolicitudAgrupacion::create([
+            'id_agrupacion' => $this->agrupacion->id,
+            'ced_encargado' => '123456789',
+            'fecha_solicitud' => now(),
+            'id_estado' => $estadoAprobada->id,
+        ]);
+
         $crear = $this->postJson(
             '/api/asignaciones-beneficios',
             [
-                'id_agrupacion' =>
-                    $this->agrupacion->id,
-
-                'fecha_solicitud' =>
-                    '2026-09-11',
-
-                'id_alimentacion' =>
-                    $this->alimentacion->id_alimentacion,
-
-                'mobiliario' => [
-                    'id_mobiliario' =>
-                        $this->mobiliario->id_mobiliario,
-                    'cantidad' => 20,
+                'id_solicitud_agrupacion' => $solicitud->id,
+                'observaciones' => 'Inicial',
+                'mobiliarios' => [
+                    ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 20],
                 ],
-
-                'id_tarima' =>
-                    $this->tarima->id_tarima,
-
-                'id_aula' =>
-                    $this->aula->id_aula,
-
-                'transporte' => [
-                    'matricula' =>
-                        $this->transporte->matricula,
-                    'id_ruta' =>
-                        $this->ruta->id_ruta,
+                'alimentaciones' => [
+                    ['id_alimentacion' => $this->alimentacion->id_alimentacion, 'cantidad' => 15],
+                ],
+                'aulas' => [
+                    ['id_aula' => $this->aula->id_aula],
+                ],
+                'tarimas' => [
+                    ['id_tarima' => $this->tarima->id_tarima],
+                ],
+                'transportes' => [
+                    ['matricula' => $this->transporte->matricula, 'id_ruta' => $this->ruta->id_ruta],
                 ],
             ]
         );
 
         $crear->assertCreated();
 
-        $idAsignacion = $crear->json(
-            'data.id_solicitud_beneficios'
-        );
+        $idAsignacion = $crear->json('data.id');
 
         $response = $this->patchJson(
             "/api/asignaciones-beneficios/{$idAsignacion}",
             [
-                'fecha_solicitud' =>
-                    '2026-09-12',
-
-                'mobiliario' => [
-                    'id_mobiliario' =>
-                        $this->mobiliario->id_mobiliario,
-                    'cantidad' => 30,
+                'observaciones' => 'Actualizada',
+                'mobiliarios' => [
+                    ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 30],
                 ],
             ]
         );
 
         $response->assertOk()
-            ->assertJsonPath(
-                'data.id_solicitud_beneficios',
-                $idAsignacion
-            )
-            ->assertJsonPath(
-                'data.fecha_solicitud',
-                '2026-09-12'
-            )
-            ->assertJsonPath(
-                'data.mobiliario.cantidad',
-                30
-            );
+            ->assertJsonPath('data.id', $idAsignacion)
+            ->assertJsonPath('data.observaciones', 'Actualizada')
+            ->assertJsonPath('data.mobiliarios.0.cantidad', 30);
 
-        $this->assertDatabaseHas(
-            'asignacion_beneficios',
-            [
-                'id_solicitud_beneficios' =>
-                    $idAsignacion,
-                'fecha_solicitud' =>
-                    '2026-09-12',
-            ]
-        );
+        $this->assertDatabaseHas('asignacion_beneficios', [
+            'id' => $idAsignacion,
+            'observaciones' => 'Actualizada',
+        ]);
 
-        $idSolicitudMobiliario = $response->json(
-            'data.mobiliario.id_solicitud_mobiliario'
-        );
-
-        $this->assertDatabaseHas(
-            'solicitud_mobiliario',
-            [
-                'id_solicitud_mobiliario' =>
-                    $idSolicitudMobiliario,
-                'cantidad' => 30,
-                'id_sol_mobiliario' =>
-                    $this->mobiliario->id_mobiliario,
-            ]
-        );
+        $this->assertDatabaseHas('asignacion_mobiliario', [
+            'id_asignacion_beneficios' => $idAsignacion,
+            'cantidad' => 30,
+        ]);
     }
 }

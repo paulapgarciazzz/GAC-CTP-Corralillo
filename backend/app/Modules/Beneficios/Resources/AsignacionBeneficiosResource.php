@@ -2,7 +2,7 @@
 
 namespace App\Modules\Beneficios\Resources;
 
-use App\Modules\SolicitudesAgrupaciones\Resources\AgrupacionResource;
+use App\Modules\SolicitudesAgrupaciones\Resources\SolicitudAgrupacionResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -11,31 +11,32 @@ class AsignacionBeneficiosResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id_solicitud_beneficios' => $this->id_solicitud_beneficios,
-            'fecha_solicitud' => $this->fecha_solicitud?->toDateString(),
+            'id' => $this->id,
+            'id_solicitud_agrupacion' => $this->id_solicitud_agrupacion,
+            'observaciones' => $this->observaciones,
 
-            'agrupacion' => new AgrupacionResource(
-                $this->whenLoaded('agrupacion')
+            'solicitud_agrupacion' => new SolicitudAgrupacionResource(
+                $this->whenLoaded('solicitudAgrupacion')
             ),
 
-            'alimentacion' => new SolicitudAlimentacionResource(
-                $this->whenLoaded('solicitudAlimentacion')
+            'mobiliarios' => AsignacionMobiliarioResource::collection(
+                $this->whenLoaded('mobiliarios')
             ),
 
-            'mobiliario' => new SolicitudMobiliarioResource(
-                $this->whenLoaded('solicitudMobiliario')
+            'alimentaciones' => AsignacionAlimentacionResource::collection(
+                $this->whenLoaded('alimentaciones')
             ),
 
-            'tarima' => new TarimaResource(
-                $this->whenLoaded('tarima')
+            'aulas' => AsignacionAulaResource::collection(
+                $this->whenLoaded('aulas')
             ),
 
-            'aula' => new AulaResource(
-                $this->whenLoaded('aula')
+            'tarimas' => AsignacionTarimaResource::collection(
+                $this->whenLoaded('tarimas')
             ),
 
-            'transporte' => new SolicitudTransporteResource(
-                $this->whenLoaded('solicitudTransporte')
+            'transportes' => AsignacionTransporteResource::collection(
+                $this->whenLoaded('transportes')
             ),
         ];
     }

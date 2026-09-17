@@ -2,10 +2,12 @@
 
 namespace App\Modules\Beneficios\Services;
 
+use App\Modules\Beneficios\Models\AsignacionAlimentacion;
+use App\Modules\Beneficios\Models\AsignacionAula;
 use App\Modules\Beneficios\Models\AsignacionBeneficios;
-use App\Modules\Beneficios\Models\SolicitudAlimentacion;
-use App\Modules\Beneficios\Models\SolicitudMobiliario;
-use App\Modules\Beneficios\Models\SolicitudTransporte;
+use App\Modules\Beneficios\Models\AsignacionMobiliario;
+use App\Modules\Beneficios\Models\AsignacionTarima;
+use App\Modules\Beneficios\Models\AsignacionTransporte;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -15,15 +17,15 @@ class AsignacionBeneficiosService
     {
         return AsignacionBeneficios::query()
             ->with([
-                'agrupacion',
-                'solicitudAlimentacion.alimentacion',
-                'solicitudMobiliario.mobiliario',
-                'tarima',
-                'aula',
-                'solicitudTransporte.transporte',
-                'solicitudTransporte.ruta',
+                'solicitudAgrupacion.estado',
+                'mobiliarios.mobiliario',
+                'alimentaciones.alimentacion',
+                'aulas.aula',
+                'tarimas.tarima',
+                'transportes.transporte',
+                'transportes.ruta',
             ])
-            ->orderBy('id_solicitud_beneficios')
+            ->orderBy('id')
             ->get();
     }
 
@@ -31,13 +33,13 @@ class AsignacionBeneficiosService
     {
         return AsignacionBeneficios::query()
             ->with([
-                'agrupacion',
-                'solicitudAlimentacion.alimentacion',
-                'solicitudMobiliario.mobiliario',
-                'tarima',
-                'aula',
-                'solicitudTransporte.transporte',
-                'solicitudTransporte.ruta',
+                'solicitudAgrupacion.estado',
+                'mobiliarios.mobiliario',
+                'alimentaciones.alimentacion',
+                'aulas.aula',
+                'tarimas.tarima',
+                'transportes.transporte',
+                'transportes.ruta',
             ])
             ->findOrFail($id);
     }
@@ -45,186 +47,158 @@ class AsignacionBeneficiosService
     public function crear(array $datos): AsignacionBeneficios
     {
         return DB::transaction(function () use ($datos) {
-            $idSolicitudAlimentacion = null;
-            $idSolicitudMobiliario = null;
-            $idSolicitudTransporte = null;
-
-            if (!empty($datos['id_alimentacion'])) {
-                $solicitudAlimentacion = SolicitudAlimentacion::create([
-                    'id_alimentacion' => $datos['id_alimentacion'],
-                ]);
-
-                $idSolicitudAlimentacion =
-                    $solicitudAlimentacion->id_solicitud_alimentacion;
-            }
-
-            if (!empty($datos['mobiliario'])) {
-                $solicitudMobiliario = SolicitudMobiliario::create([
-                    'cantidad' => $datos['mobiliario']['cantidad'],
-                    'id_sol_mobiliario' =>
-                        $datos['mobiliario']['id_mobiliario'],
-                ]);
-
-                $idSolicitudMobiliario =
-                    $solicitudMobiliario->id_solicitud_mobiliario;
-            }
-
-            if (!empty($datos['transporte'])) {
-                $solicitudTransporte = SolicitudTransporte::create([
-                    'matricula' => $datos['transporte']['matricula'],
-                    'id_ruta' => $datos['transporte']['id_ruta'],
-                ]);
-
-                $idSolicitudTransporte =
-                    $solicitudTransporte->id_solicitud_transporte;
-            }
-
             $asignacion = AsignacionBeneficios::create([
-                'id_agrupacion' => $datos['id_agrupacion'],
-                'id_solicitud_alimentacion' =>
-                    $idSolicitudAlimentacion,
-                'id_solicitud_mobiliario' =>
-                    $idSolicitudMobiliario,
-                'id_tarima' => $datos['id_tarima'] ?? null,
-                'id_aula' => $datos['id_aula'] ?? null,
-                'id_solicitud_transporte' =>
-                    $idSolicitudTransporte,
-                'fecha_solicitud' => $datos['fecha_solicitud'],
+                'id_solicitud_agrupacion' => $datos['id_solicitud_agrupacion'],
+                'observaciones' => $datos['observaciones'] ?? null,
             ]);
 
-            return $this->obtenerPorId(
-                $asignacion->id_solicitud_beneficios
-            );
+            $this->guardarColeccion($asignacion, 'mobiliarios', $datos, function ($item) use ($asignacion) {
+                return AsignacionMobiliario::create([
+                    'id_asignacion_beneficios' => $asignacion->id,
+                    'id_mobiliario' => $item['id_mobiliario'],
+                    'cantidad' => $item['cantidad'],
+                ]);
+            });
+
+            $this->guardarColeccion($asignacion, 'alimentaciones', $datos, function ($item) use ($asignacion) {
+                return AsignacionAlimentacion::create([
+                    'id_asignacion_beneficios' => $asignacion->id,
+                    'id_alimentacion' => $item['id_alimentacion'],
+                    'cantidad' => $item['cantidad'],
+                ]);
+            });
+
+            $this->guardarColeccion($asignacion, 'aulas', $datos, function ($item) use ($asignacion) {
+                return AsignacionAula::create([
+                    'id_asignacion_beneficios' => $asignacion->id,
+                    'id_aula' => $item['id_aula'],
+                ]);
+            });
+
+            $this->guardarColeccion($asignacion, 'tarimas', $datos, function ($item) use ($asignacion) {
+                return AsignacionTarima::create([
+                    'id_asignacion_beneficios' => $asignacion->id,
+                    'id_tarima' => $item['id_tarima'],
+                ]);
+            });
+
+            $this->guardarColeccion($asignacion, 'transportes', $datos, function ($item) use ($asignacion) {
+                return AsignacionTransporte::create([
+                    'id_asignacion_beneficios' => $asignacion->id,
+                    'matricula' => $item['matricula'],
+                    'id_ruta' => $item['id_ruta'],
+                ]);
+            });
+
+            return $this->obtenerPorId($asignacion->id);
         });
     }
 
-    public function actualizar(
-        AsignacionBeneficios $asignacion,
-        array $datos
-    ): AsignacionBeneficios {
+    public function actualizar(AsignacionBeneficios $asignacion, array $datos): AsignacionBeneficios
+    {
         return DB::transaction(function () use ($asignacion, $datos) {
-
-            if (array_key_exists('id_agrupacion', $datos)) {
-                $asignacion->id_agrupacion = $datos['id_agrupacion'];
+            if (array_key_exists('id_solicitud_agrupacion', $datos)) {
+                $asignacion->id_solicitud_agrupacion = $datos['id_solicitud_agrupacion'];
             }
 
-            if (array_key_exists('fecha_solicitud', $datos)) {
-                $asignacion->fecha_solicitud = $datos['fecha_solicitud'];
-            }
-
-            if (array_key_exists('id_tarima', $datos)) {
-                $asignacion->id_tarima = $datos['id_tarima'];
-            }
-
-            if (array_key_exists('id_aula', $datos)) {
-                $asignacion->id_aula = $datos['id_aula'];
-            }
-
-            if (array_key_exists('id_alimentacion', $datos)) {
-                if ($datos['id_alimentacion'] === null) {
-                    if ($asignacion->id_solicitud_alimentacion !== null) {
-                        $solicitud = SolicitudAlimentacion::find(
-                            $asignacion->id_solicitud_alimentacion
-                        );
-
-                        $asignacion->id_solicitud_alimentacion = null;
-                        $asignacion->save();
-
-                        $solicitud?->delete();
-                    }
-                } elseif (
-                    $asignacion->id_solicitud_alimentacion !== null
-                ) {
-                    SolicitudAlimentacion::findOrFail(
-                        $asignacion->id_solicitud_alimentacion
-                    )->update([
-                        'id_alimentacion' => $datos['id_alimentacion'],
-                    ]);
-                } else {
-                    $solicitud = SolicitudAlimentacion::create([
-                        'id_alimentacion' => $datos['id_alimentacion'],
-                    ]);
-
-                    $asignacion->id_solicitud_alimentacion =
-                        $solicitud->id_solicitud_alimentacion;
-                }
-            }
-
-            if (array_key_exists('mobiliario', $datos)) {
-                if ($datos['mobiliario'] === null) {
-                    if ($asignacion->id_solicitud_mobiliario !== null) {
-                        $solicitud = SolicitudMobiliario::find(
-                            $asignacion->id_solicitud_mobiliario
-                        );
-
-                        $asignacion->id_solicitud_mobiliario = null;
-                        $asignacion->save();
-
-                        $solicitud?->delete();
-                    }
-                } elseif (
-                    $asignacion->id_solicitud_mobiliario !== null
-                ) {
-                    SolicitudMobiliario::findOrFail(
-                        $asignacion->id_solicitud_mobiliario
-                    )->update([
-                        'cantidad' => $datos['mobiliario']['cantidad'],
-                        'id_sol_mobiliario' =>
-                            $datos['mobiliario']['id_mobiliario'],
-                    ]);
-                } else {
-                    $solicitud = SolicitudMobiliario::create([
-                        'cantidad' => $datos['mobiliario']['cantidad'],
-                        'id_sol_mobiliario' =>
-                            $datos['mobiliario']['id_mobiliario'],
-                    ]);
-
-                    $asignacion->id_solicitud_mobiliario =
-                        $solicitud->id_solicitud_mobiliario;
-                }
-            }
-
-            if (array_key_exists('transporte', $datos)) {
-                if ($datos['transporte'] === null) {
-                    if ($asignacion->id_solicitud_transporte !== null) {
-                        $solicitud = SolicitudTransporte::find(
-                            $asignacion->id_solicitud_transporte
-                        );
-
-                        $asignacion->id_solicitud_transporte = null;
-                        $asignacion->save();
-
-                        $solicitud?->delete();
-                    }
-                } elseif (
-                    $asignacion->id_solicitud_transporte !== null
-                ) {
-                    SolicitudTransporte::findOrFail(
-                        $asignacion->id_solicitud_transporte
-                    )->update([
-                        'matricula' =>
-                            $datos['transporte']['matricula'],
-                        'id_ruta' =>
-                            $datos['transporte']['id_ruta'],
-                    ]);
-                } else {
-                    $solicitud = SolicitudTransporte::create([
-                        'matricula' =>
-                            $datos['transporte']['matricula'],
-                        'id_ruta' =>
-                            $datos['transporte']['id_ruta'],
-                    ]);
-
-                    $asignacion->id_solicitud_transporte =
-                        $solicitud->id_solicitud_transporte;
-                }
+            if (array_key_exists('observaciones', $datos)) {
+                $asignacion->observaciones = $datos['observaciones'];
             }
 
             $asignacion->save();
 
-            return $this->obtenerPorId(
-                $asignacion->id_solicitud_beneficios
-            );
+            foreach (['mobiliarios', 'alimentaciones', 'aulas', 'tarimas', 'transportes'] as $coleccion) {
+                if (! array_key_exists($coleccion, $datos)) {
+                    continue;
+                }
+
+                $this->reemplazarColeccion($asignacion, $coleccion, $datos[$coleccion]);
+            }
+
+            return $this->obtenerPorId($asignacion->id);
         });
+    }
+
+    private function guardarColeccion(AsignacionBeneficios $asignacion, string $coleccion, array $datos, callable $factory): void
+    {
+        if (! isset($datos[$coleccion]) || ! is_array($datos[$coleccion])) {
+            return;
+        }
+
+        foreach ($datos[$coleccion] as $item) {
+            $factory($item);
+        }
+    }
+
+    private function reemplazarColeccion(AsignacionBeneficios $asignacion, string $coleccion, ?array $items): void
+    {
+        if ($items === null) {
+            return;
+        }
+
+        $map = [
+            'mobiliarios' => [
+                'model' => AsignacionMobiliario::class,
+                'campo' => 'id_mobiliario',
+                'cantidad' => 'cantidad',
+            ],
+            'alimentaciones' => [
+                'model' => AsignacionAlimentacion::class,
+                'campo' => 'id_alimentacion',
+                'cantidad' => 'cantidad',
+            ],
+            'aulas' => [
+                'model' => AsignacionAula::class,
+                'campo' => 'id_aula',
+                'cantidad' => null,
+            ],
+            'tarimas' => [
+                'model' => AsignacionTarima::class,
+                'campo' => 'id_tarima',
+                'cantidad' => null,
+            ],
+            'transportes' => [
+                'model' => AsignacionTransporte::class,
+                'campo' => 'matricula',
+                'cantidad' => null,
+            ],
+        ];
+
+        $config = $map[$coleccion] ?? null;
+
+        if ($config === null) {
+            return;
+        }
+
+        $asignacion->{$coleccion}()->delete();
+
+        foreach ($items as $item) {
+            $payload = ['id_asignacion_beneficios' => $asignacion->id];
+
+            if (isset($item['id_mobiliario'])) {
+                $payload['id_mobiliario'] = $item['id_mobiliario'];
+                $payload['cantidad'] = $item['cantidad'];
+            }
+
+            if (isset($item['id_alimentacion'])) {
+                $payload['id_alimentacion'] = $item['id_alimentacion'];
+                $payload['cantidad'] = $item['cantidad'];
+            }
+
+            if (isset($item['id_aula'])) {
+                $payload['id_aula'] = $item['id_aula'];
+            }
+
+            if (isset($item['id_tarima'])) {
+                $payload['id_tarima'] = $item['id_tarima'];
+            }
+
+            if (isset($item['matricula'])) {
+                $payload['matricula'] = $item['matricula'];
+                $payload['id_ruta'] = $item['id_ruta'];
+            }
+
+            $config['model']::create($payload);
+        }
     }
 }
