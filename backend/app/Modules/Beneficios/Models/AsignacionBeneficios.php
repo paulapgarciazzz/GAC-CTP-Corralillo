@@ -54,15 +54,6 @@ class AsignacionBeneficios extends Model
         );
     }
 
-    public function tarimas(): HasMany
-    {
-        return $this->hasMany(
-            AsignacionTarima::class,
-            'id_asignacion_beneficios',
-            'id'
-        );
-    }
-
     public function transportes(): HasMany
     {
         return $this->hasMany(

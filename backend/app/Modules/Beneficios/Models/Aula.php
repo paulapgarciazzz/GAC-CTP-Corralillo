@@ -3,7 +3,6 @@
 namespace App\Modules\Beneficios\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Aula extends Model
 {
@@ -14,14 +13,6 @@ class Aula extends Model
     protected $fillable = [
         'nombre',
         'capacidad',
+        'encargado',
     ];
-
-    public function asignacionesBeneficios(): HasMany
-    {
-        return $this->hasMany(
-            AsignacionBeneficios::class,
-            'id_aula',
-            'id_aula'
-        );
-    }
 }

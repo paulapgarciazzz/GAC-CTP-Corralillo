@@ -6,8 +6,8 @@ use App\Modules\Beneficios\Models\AsignacionAlimentacion;
 use App\Modules\Beneficios\Models\AsignacionAula;
 use App\Modules\Beneficios\Models\AsignacionBeneficios;
 use App\Modules\Beneficios\Models\AsignacionMobiliario;
-use App\Modules\Beneficios\Models\AsignacionTarima;
 use App\Modules\Beneficios\Models\AsignacionTransporte;
+use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -21,7 +21,6 @@ class AsignacionBeneficiosService
                 'mobiliarios.mobiliario',
                 'alimentaciones.alimentacion',
                 'aulas.aula',
-                'tarimas.tarima',
                 'transportes.transporte',
                 'transportes.ruta',
             ])
@@ -37,7 +36,6 @@ class AsignacionBeneficiosService
                 'mobiliarios.mobiliario',
                 'alimentaciones.alimentacion',
                 'aulas.aula',
-                'tarimas.tarima',
                 'transportes.transporte',
                 'transportes.ruta',
             ])
@@ -52,6 +50,8 @@ class AsignacionBeneficiosService
                 'observaciones' => $datos['observaciones'] ?? null,
             ]);
 
+            $cantidadIntegrantes = $this->obtenerCantidadIntegrantes($asignacion->id_solicitud_agrupacion);
+
             $this->guardarColeccion($asignacion, 'mobiliarios', $datos, function ($item) use ($asignacion) {
                 return AsignacionMobiliario::create([
                     'id_asignacion_beneficios' => $asignacion->id,
@@ -60,11 +60,11 @@ class AsignacionBeneficiosService
                 ]);
             });
 
-            $this->guardarColeccion($asignacion, 'alimentaciones', $datos, function ($item) use ($asignacion) {
+            $this->guardarColeccion($asignacion, 'alimentaciones', $datos, function ($item) use ($asignacion, $cantidadIntegrantes) {
                 return AsignacionAlimentacion::create([
                     'id_asignacion_beneficios' => $asignacion->id,
                     'id_alimentacion' => $item['id_alimentacion'],
-                    'cantidad' => $item['cantidad'],
+                    'cantidad' => $cantidadIntegrantes,
                 ]);
             });
 
@@ -72,13 +72,6 @@ class AsignacionBeneficiosService
                 return AsignacionAula::create([
                     'id_asignacion_beneficios' => $asignacion->id,
                     'id_aula' => $item['id_aula'],
-                ]);
-            });
-
-            $this->guardarColeccion($asignacion, 'tarimas', $datos, function ($item) use ($asignacion) {
-                return AsignacionTarima::create([
-                    'id_asignacion_beneficios' => $asignacion->id,
-                    'id_tarima' => $item['id_tarima'],
                 ]);
             });
 
@@ -107,7 +100,7 @@ class AsignacionBeneficiosService
 
             $asignacion->save();
 
-            foreach (['mobiliarios', 'alimentaciones', 'aulas', 'tarimas', 'transportes'] as $coleccion) {
+            foreach (['mobiliarios', 'alimentaciones', 'aulas', 'transportes'] as $coleccion) {
                 if (! array_key_exists($coleccion, $datos)) {
                     continue;
                 }
@@ -117,6 +110,19 @@ class AsignacionBeneficiosService
 
             return $this->obtenerPorId($asignacion->id);
         });
+    }
+
+    /**
+     * La cantidad de cada alimentación asignada no la decide el cliente: siempre
+     * se toma de agrupacion.cantidad_integrantes para que no pueda desincronizarse
+     * ni ser manipulada desde el frontend.
+     */
+    private function obtenerCantidadIntegrantes(int $idSolicitudAgrupacion): int
+    {
+        return SolicitudAgrupacion::with('agrupacion')
+            ->findOrFail($idSolicitudAgrupacion)
+            ->agrupacion
+            ->cantidad_integrantes;
     }
 
     private function guardarColeccion(AsignacionBeneficios $asignacion, string $coleccion, array $datos, callable $factory): void
@@ -139,28 +145,15 @@ class AsignacionBeneficiosService
         $map = [
             'mobiliarios' => [
                 'model' => AsignacionMobiliario::class,
-                'campo' => 'id_mobiliario',
-                'cantidad' => 'cantidad',
             ],
             'alimentaciones' => [
                 'model' => AsignacionAlimentacion::class,
-                'campo' => 'id_alimentacion',
-                'cantidad' => 'cantidad',
             ],
             'aulas' => [
                 'model' => AsignacionAula::class,
-                'campo' => 'id_aula',
-                'cantidad' => null,
-            ],
-            'tarimas' => [
-                'model' => AsignacionTarima::class,
-                'campo' => 'id_tarima',
-                'cantidad' => null,
             ],
             'transportes' => [
                 'model' => AsignacionTransporte::class,
-                'campo' => 'matricula',
-                'cantidad' => null,
             ],
         ];
 
@@ -172,6 +165,10 @@ class AsignacionBeneficiosService
 
         $asignacion->{$coleccion}()->delete();
 
+        $cantidadIntegrantes = $coleccion === 'alimentaciones'
+            ? $this->obtenerCantidadIntegrantes($asignacion->id_solicitud_agrupacion)
+            : null;
+
         foreach ($items as $item) {
             $payload = ['id_asignacion_beneficios' => $asignacion->id];
 
@@ -182,15 +179,11 @@ class AsignacionBeneficiosService
 
             if (isset($item['id_alimentacion'])) {
                 $payload['id_alimentacion'] = $item['id_alimentacion'];
-                $payload['cantidad'] = $item['cantidad'];
+                $payload['cantidad'] = $cantidadIntegrantes;
             }
 
             if (isset($item['id_aula'])) {
                 $payload['id_aula'] = $item['id_aula'];
-            }
-
-            if (isset($item['id_tarima'])) {
-                $payload['id_tarima'] = $item['id_tarima'];
             }
 
             if (isset($item['matricula'])) {

@@ -178,13 +178,22 @@ Route::apiResource(
 );
 
 Route::apiResource(
-    'tarimas',
-    TarimaController::class
-);
-
-Route::apiResource(
     'transportes',
     TransporteController::class
+);
+
+/*
+|--------------------------------------------------------------------------
+| Tarima (pendiente de mover a Calendario/Actividades)
+|--------------------------------------------------------------------------
+| Tarima ya no forma parte de la asignación de beneficios ni de las
+| pantallas de Beneficios. El catálogo se deja funcionando aquí solo como
+| almacenamiento temporal hasta que exista el módulo Calendario/Actividades.
+*/
+
+Route::apiResource(
+    'tarimas',
+    TarimaController::class
 );
 
 /*

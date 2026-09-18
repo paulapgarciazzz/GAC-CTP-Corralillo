@@ -14,7 +14,7 @@ class UpdateTarimaRequest extends FormRequest
 
     public function rules(): array
     {
-        $idTarima = $this->route('id');
+        $idTarima = $this->route('tarima');
 
         return [
             'nombre' => [

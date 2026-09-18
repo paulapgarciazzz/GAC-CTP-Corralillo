@@ -13,6 +13,8 @@ class Mobiliario extends Model
 
     protected $fillable = [
         'nombre',
+        'cantidad_disponible',
+        'encargado',
     ];
 
     public function solicitudes(): HasMany

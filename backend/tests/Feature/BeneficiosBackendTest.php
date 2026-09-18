@@ -20,11 +20,17 @@ class BeneficiosBackendTest extends TestCase
     use RefreshDatabase;
 
     private Agrupacion $agrupacion;
+
     private Alimentacion $alimentacion;
+
     private Mobiliario $mobiliario;
+
     private Aula $aula;
+
     private Tarima $tarima;
+
     private Ruta $ruta;
+
     private Transporte $transporte;
 
     protected function setUp(): void
@@ -53,11 +59,14 @@ class BeneficiosBackendTest extends TestCase
 
         $this->mobiliario = Mobiliario::create([
             'nombre' => 'Sillas',
+            'cantidad_disponible' => 100,
+            'encargado' => 'Carlos Pérez',
         ]);
 
         $this->aula = Aula::create([
             'nombre' => 'Aula Principal',
             'capacidad' => 50,
+            'encargado' => 'María Rodríguez',
         ]);
 
         $this->tarima = Tarima::create([
@@ -78,6 +87,18 @@ class BeneficiosBackendTest extends TestCase
         ]);
     }
 
+    private function crearSolicitudAprobada(?Agrupacion $agrupacion = null): SolicitudAgrupacion
+    {
+        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
+
+        return SolicitudAgrupacion::create([
+            'id_agrupacion' => ($agrupacion ?? $this->agrupacion)->id,
+            'ced_encargado' => '123456789',
+            'fecha_solicitud' => now(),
+            'id_estado' => $estadoAprobada->id,
+        ]);
+    }
+
     public function test_lista_catalogos_de_beneficios(): void
     {
         $this->getJson('/api/alimentaciones')
@@ -89,17 +110,14 @@ class BeneficiosBackendTest extends TestCase
 
         $this->getJson('/api/aulas')
             ->assertOk()
-            ->assertJsonPath(
-                'data.0.nombre',
-                'Aula Principal'
-            );
+            ->assertJsonPath('data.0.nombre', 'Aula Principal')
+            ->assertJsonPath('data.0.encargado', 'María Rodríguez');
 
         $this->getJson('/api/mobiliarios')
             ->assertOk()
-            ->assertJsonPath(
-                'data.0.nombre',
-                'Sillas'
-            );
+            ->assertJsonPath('data.0.nombre', 'Sillas')
+            ->assertJsonPath('data.0.cantidad_disponible', 100)
+            ->assertJsonPath('data.0.encargado', 'Carlos Pérez');
 
         $this->getJson('/api/rutas')
             ->assertOk()
@@ -123,16 +141,97 @@ class BeneficiosBackendTest extends TestCase
             );
     }
 
+    public function test_actualiza_catalogos_sin_cambiar_valores_unicos_y_rechaza_duplicados(): void
+    {
+        $this->patchJson("/api/alimentaciones/{$this->alimentacion->id_alimentacion}", [
+            'tiempo_comida' => 'Almuerzo',
+        ])->assertOk();
+
+        $alimentacionDuplicada = Alimentacion::create(['tiempo_comida' => 'Cena']);
+        $this->patchJson("/api/alimentaciones/{$this->alimentacion->id_alimentacion}", [
+            'tiempo_comida' => $alimentacionDuplicada->tiempo_comida,
+        ])->assertStatus(422)->assertJsonValidationErrors(['tiempo_comida']);
+
+        $this->patchJson("/api/aulas/{$this->aula->id_aula}", [
+            'nombre' => 'Aula Principal',
+            'encargado' => 'María Rodríguez Solano',
+        ])->assertOk()
+            ->assertJsonPath('data.encargado', 'María Rodríguez Solano');
+
+        $aulaDuplicada = Aula::create(['nombre' => 'Aula Secundaria', 'capacidad' => 30]);
+        $this->patchJson("/api/aulas/{$this->aula->id_aula}", [
+            'nombre' => $aulaDuplicada->nombre,
+        ])->assertStatus(422)->assertJsonValidationErrors(['nombre']);
+
+        $this->patchJson("/api/mobiliarios/{$this->mobiliario->id_mobiliario}", [
+            'nombre' => 'Sillas',
+            'cantidad_disponible' => 120,
+        ])->assertOk()
+            ->assertJsonPath('data.cantidad_disponible', 120);
+
+        $mobiliarioDuplicado = Mobiliario::create(['nombre' => 'Mesas']);
+        $this->patchJson("/api/mobiliarios/{$this->mobiliario->id_mobiliario}", [
+            'nombre' => $mobiliarioDuplicado->nombre,
+        ])->assertStatus(422)->assertJsonValidationErrors(['nombre']);
+
+        $this->patchJson("/api/rutas/{$this->ruta->id_ruta}", [
+            'nombre_ruta' => 'Ruta Santa Cruz',
+        ])->assertOk();
+
+        $rutaDuplicada = Ruta::create(['nombre_ruta' => 'Ruta Liberia']);
+        $this->patchJson("/api/rutas/{$this->ruta->id_ruta}", [
+            'nombre_ruta' => $rutaDuplicada->nombre_ruta,
+        ])->assertStatus(422)->assertJsonValidationErrors(['nombre_ruta']);
+
+        $this->patchJson("/api/tarimas/{$this->tarima->id_tarima}", [
+            'nombre' => 'Tarima Principal',
+        ])->assertOk();
+
+        $tarimaDuplicada = Tarima::create(['nombre' => 'Tarima Secundaria']);
+        $this->patchJson("/api/tarimas/{$this->tarima->id_tarima}", [
+            'nombre' => $tarimaDuplicada->nombre,
+        ])->assertStatus(422)->assertJsonValidationErrors(['nombre']);
+    }
+
+    public function test_aula_guarda_encargado(): void
+    {
+        $response = $this->postJson('/api/aulas', [
+            'nombre' => 'Aula Nueva',
+            'capacidad' => 25,
+            'encargado' => 'Ana Jiménez',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.encargado', 'Ana Jiménez');
+
+        $this->assertDatabaseHas('aula', [
+            'nombre' => 'Aula Nueva',
+            'encargado' => 'Ana Jiménez',
+        ]);
+    }
+
+    public function test_mobiliario_guarda_cantidad_y_encargado(): void
+    {
+        $response = $this->postJson('/api/mobiliarios', [
+            'nombre' => 'Mesas plegables',
+            'cantidad_disponible' => 40,
+            'encargado' => 'Luis Vargas',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.cantidad_disponible', 40)
+            ->assertJsonPath('data.encargado', 'Luis Vargas');
+
+        $this->assertDatabaseHas('mobiliario', [
+            'nombre' => 'Mesas plegables',
+            'cantidad_disponible' => 40,
+            'encargado' => 'Luis Vargas',
+        ]);
+    }
+
     public function test_crea_asignacion_para_solicitud_aprobada_con_varios_beneficios_del_mismo_tipo(): void
     {
-        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
-
-        $solicitud = SolicitudAgrupacion::create([
-            'id_agrupacion' => $this->agrupacion->id,
-            'ced_encargado' => '123456789',
-            'fecha_solicitud' => now(),
-            'id_estado' => $estadoAprobada->id,
-        ]);
+        $solicitud = $this->crearSolicitudAprobada();
 
         $response = $this->postJson(
             '/api/asignaciones-beneficios',
@@ -144,14 +243,10 @@ class BeneficiosBackendTest extends TestCase
                     ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 5],
                 ],
                 'alimentaciones' => [
-                    ['id_alimentacion' => $this->alimentacion->id_alimentacion, 'cantidad' => 30],
-                    ['id_alimentacion' => $this->alimentacion->id_alimentacion, 'cantidad' => 30],
+                    ['id_alimentacion' => $this->alimentacion->id_alimentacion],
                 ],
                 'aulas' => [
                     ['id_aula' => $this->aula->id_aula],
-                ],
-                'tarimas' => [
-                    ['id_tarima' => $this->tarima->id_tarima],
                 ],
                 'transportes' => [
                     ['matricula' => $this->transporte->matricula, 'id_ruta' => $this->ruta->id_ruta],
@@ -164,7 +259,8 @@ class BeneficiosBackendTest extends TestCase
             ->assertJsonPath('data.observaciones', 'Asignación revisada')
             ->assertJsonPath('data.mobiliarios.0.cantidad', 20)
             ->assertJsonPath('data.mobiliarios.1.cantidad', 5)
-            ->assertJsonPath('data.alimentaciones.1.cantidad', 30);
+            ->assertJsonPath('data.alimentaciones.0.cantidad', 20)
+            ->assertJsonMissingPath('data.tarimas');
 
         $this->assertDatabaseHas('asignacion_beneficios', [
             'id_solicitud_agrupacion' => $solicitud->id,
@@ -172,7 +268,64 @@ class BeneficiosBackendTest extends TestCase
         ]);
 
         $this->assertDatabaseCount('asignacion_mobiliario', 2);
-        $this->assertDatabaseCount('asignacion_alimentacion', 2);
+        $this->assertDatabaseCount('asignacion_alimentacion', 1);
+        $this->assertDatabaseCount('asignacion_tarima', 0);
+    }
+
+    public function test_alimentacion_asignada_usa_automaticamente_cantidad_integrantes(): void
+    {
+        $solicitud = $this->crearSolicitudAprobada();
+
+        $response = $this->postJson('/api/asignaciones-beneficios', [
+            'id_solicitud_agrupacion' => $solicitud->id,
+            'alimentaciones' => [
+                ['id_alimentacion' => $this->alimentacion->id_alimentacion],
+            ],
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.alimentaciones.0.cantidad', 20);
+
+        $this->assertDatabaseHas('asignacion_alimentacion', [
+            'id_alimentacion' => $this->alimentacion->id_alimentacion,
+            'cantidad' => 20,
+        ]);
+    }
+
+    public function test_solicitud_de_22_integrantes_con_desayuno_y_almuerzo_produce_cantidades_automaticas(): void
+    {
+        $agrupacionGrande = Agrupacion::create([
+            'ced_encargado' => $this->agrupacion->ced_encargado,
+            'nombre' => 'Agrupacion Grande',
+            'lugar_procedencia' => 'Guanacaste',
+            'cantidad_integrantes' => 22,
+        ]);
+
+        $solicitud = $this->crearSolicitudAprobada($agrupacionGrande);
+
+        $desayuno = Alimentacion::create(['tiempo_comida' => 'Desayuno']);
+
+        $response = $this->postJson('/api/asignaciones-beneficios', [
+            'id_solicitud_agrupacion' => $solicitud->id,
+            'alimentaciones' => [
+                ['id_alimentacion' => $desayuno->id_alimentacion],
+                ['id_alimentacion' => $this->alimentacion->id_alimentacion],
+            ],
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.alimentaciones.0.cantidad', 22)
+            ->assertJsonPath('data.alimentaciones.1.cantidad', 22);
+
+        $this->assertDatabaseHas('asignacion_alimentacion', [
+            'id_alimentacion' => $desayuno->id_alimentacion,
+            'cantidad' => 22,
+        ]);
+
+        $this->assertDatabaseHas('asignacion_alimentacion', [
+            'id_alimentacion' => $this->alimentacion->id_alimentacion,
+            'cantidad' => 22,
+        ]);
     }
 
     public function test_rechaza_asignacion_para_solicitud_inexistente(): void
@@ -220,14 +373,7 @@ class BeneficiosBackendTest extends TestCase
 
     public function test_no_acepta_campos_legacy_del_contrato_anterior(): void
     {
-        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
-
-        $solicitud = SolicitudAgrupacion::create([
-            'id_agrupacion' => $this->agrupacion->id,
-            'ced_encargado' => '123456789',
-            'fecha_solicitud' => now(),
-            'id_estado' => $estadoAprobada->id,
-        ]);
+        $solicitud = $this->crearSolicitudAprobada();
 
         $response = $this->postJson(
             '/api/asignaciones-beneficios',
@@ -240,6 +386,9 @@ class BeneficiosBackendTest extends TestCase
                 'id_solicitud_transporte' => 99,
                 'id_tarima' => $this->tarima->id_tarima,
                 'id_aula' => $this->aula->id_aula,
+                'tarimas' => [
+                    ['id_tarima' => $this->tarima->id_tarima],
+                ],
                 'mobiliarios' => [
                     ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 10],
                 ],
@@ -255,19 +404,15 @@ class BeneficiosBackendTest extends TestCase
                 'id_solicitud_transporte',
                 'id_tarima',
                 'id_aula',
+                'tarimas',
             ]);
+
+        $this->assertDatabaseCount('asignacion_beneficios', 0);
     }
 
     public function test_no_permite_mas_de_una_cabecera_por_solicitud(): void
     {
-        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
-
-        $solicitud = SolicitudAgrupacion::create([
-            'id_agrupacion' => $this->agrupacion->id,
-            'ced_encargado' => '123456789',
-            'fecha_solicitud' => now(),
-            'id_estado' => $estadoAprobada->id,
-        ]);
+        $solicitud = $this->crearSolicitudAprobada();
 
         $this->postJson('/api/asignaciones-beneficios', [
             'id_solicitud_agrupacion' => $solicitud->id,
@@ -289,14 +434,7 @@ class BeneficiosBackendTest extends TestCase
 
     public function test_arrays_vacios_eliminan_detalles(): void
     {
-        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
-
-        $solicitud = SolicitudAgrupacion::create([
-            'id_agrupacion' => $this->agrupacion->id,
-            'ced_encargado' => '123456789',
-            'fecha_solicitud' => now(),
-            'id_estado' => $estadoAprobada->id,
-        ]);
+        $solicitud = $this->crearSolicitudAprobada();
 
         $crear = $this->postJson('/api/asignaciones-beneficios', [
             'id_solicitud_agrupacion' => $solicitud->id,
@@ -305,7 +443,7 @@ class BeneficiosBackendTest extends TestCase
                 ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 20],
             ],
             'alimentaciones' => [
-                ['id_alimentacion' => $this->alimentacion->id_alimentacion, 'cantidad' => 15],
+                ['id_alimentacion' => $this->alimentacion->id_alimentacion],
             ],
         ]);
 
@@ -328,14 +466,7 @@ class BeneficiosBackendTest extends TestCase
 
     public function test_actualiza_asignacion_de_beneficios(): void
     {
-        $estadoAprobada = Estado::where('nom_estado', 'aprobada')->firstOrFail();
-
-        $solicitud = SolicitudAgrupacion::create([
-            'id_agrupacion' => $this->agrupacion->id,
-            'ced_encargado' => '123456789',
-            'fecha_solicitud' => now(),
-            'id_estado' => $estadoAprobada->id,
-        ]);
+        $solicitud = $this->crearSolicitudAprobada();
 
         $crear = $this->postJson(
             '/api/asignaciones-beneficios',
@@ -346,13 +477,10 @@ class BeneficiosBackendTest extends TestCase
                     ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 20],
                 ],
                 'alimentaciones' => [
-                    ['id_alimentacion' => $this->alimentacion->id_alimentacion, 'cantidad' => 15],
+                    ['id_alimentacion' => $this->alimentacion->id_alimentacion],
                 ],
                 'aulas' => [
                     ['id_aula' => $this->aula->id_aula],
-                ],
-                'tarimas' => [
-                    ['id_tarima' => $this->tarima->id_tarima],
                 ],
                 'transportes' => [
                     ['matricula' => $this->transporte->matricula, 'id_ruta' => $this->ruta->id_ruta],
@@ -371,13 +499,17 @@ class BeneficiosBackendTest extends TestCase
                 'mobiliarios' => [
                     ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 30],
                 ],
+                'alimentaciones' => [
+                    ['id_alimentacion' => $this->alimentacion->id_alimentacion],
+                ],
             ]
         );
 
         $response->assertOk()
             ->assertJsonPath('data.id', $idAsignacion)
             ->assertJsonPath('data.observaciones', 'Actualizada')
-            ->assertJsonPath('data.mobiliarios.0.cantidad', 30);
+            ->assertJsonPath('data.mobiliarios.0.cantidad', 30)
+            ->assertJsonPath('data.alimentaciones.0.cantidad', 20);
 
         $this->assertDatabaseHas('asignacion_beneficios', [
             'id' => $idAsignacion,
@@ -387,6 +519,11 @@ class BeneficiosBackendTest extends TestCase
         $this->assertDatabaseHas('asignacion_mobiliario', [
             'id_asignacion_beneficios' => $idAsignacion,
             'cantidad' => 30,
+        ]);
+
+        $this->assertDatabaseHas('asignacion_alimentacion', [
+            'id_asignacion_beneficios' => $idAsignacion,
+            'cantidad' => 20,
         ]);
     }
 }

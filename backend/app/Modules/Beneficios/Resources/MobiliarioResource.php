@@ -12,6 +12,8 @@ class MobiliarioResource extends JsonResource
         return [
             'id_mobiliario' => $this->id_mobiliario,
             'nombre' => $this->nombre,
+            'cantidad_disponible' => $this->cantidad_disponible,
+            'encargado' => $this->encargado,
         ];
     }
 }

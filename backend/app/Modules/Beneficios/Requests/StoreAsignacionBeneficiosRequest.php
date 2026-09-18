@@ -40,13 +40,11 @@ class StoreAsignacionBeneficiosRequest extends FormRequest
 
             'alimentaciones' => ['nullable', 'array'],
             'alimentaciones.*.id_alimentacion' => ['required_with:alimentaciones', 'integer', 'exists:alimentacion,id_alimentacion'],
-            'alimentaciones.*.cantidad' => ['required_with:alimentaciones', 'integer', 'min:1'],
 
             'aulas' => ['nullable', 'array'],
             'aulas.*.id_aula' => ['required_with:aulas', 'integer', 'exists:aula,id_aula'],
 
-            'tarimas' => ['nullable', 'array'],
-            'tarimas.*.id_tarima' => ['required_with:tarimas', 'integer', 'exists:tarima,id_tarima'],
+            'tarimas' => ['prohibited'],
 
             'transportes' => ['nullable', 'array'],
             'transportes.*.matricula' => ['required_with:transportes', 'string', 'max:6', 'exists:transporte,matricula'],

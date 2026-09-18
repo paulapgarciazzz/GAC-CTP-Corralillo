@@ -37,15 +37,12 @@ class UpdateAsignacionBeneficiosRequest extends FormRequest
             'alimentaciones' => ['sometimes', 'nullable', 'array'],
             'alimentaciones.*.id' => ['nullable', 'integer'],
             'alimentaciones.*.id_alimentacion' => ['required_with:alimentaciones', 'integer', 'exists:alimentacion,id_alimentacion'],
-            'alimentaciones.*.cantidad' => ['required_with:alimentaciones', 'integer', 'min:1'],
 
             'aulas' => ['sometimes', 'nullable', 'array'],
             'aulas.*.id' => ['nullable', 'integer'],
             'aulas.*.id_aula' => ['required_with:aulas', 'integer', 'exists:aula,id_aula'],
 
-            'tarimas' => ['sometimes', 'nullable', 'array'],
-            'tarimas.*.id' => ['nullable', 'integer'],
-            'tarimas.*.id_tarima' => ['required_with:tarimas', 'integer', 'exists:tarima,id_tarima'],
+            'tarimas' => ['prohibited'],
 
             'transportes' => ['sometimes', 'nullable', 'array'],
             'transportes.*.id' => ['nullable', 'integer'],

@@ -14,7 +14,7 @@ class UpdateAlimentacionRequest extends FormRequest
 
     public function rules(): array
     {
-        $idAlimentacion = $this->route('id');
+        $idAlimentacion = $this->route('alimentacion');
 
         return [
             'tiempo_comida' => [

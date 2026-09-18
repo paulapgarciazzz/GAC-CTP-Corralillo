@@ -7,6 +7,9 @@ import GestionAgrupaciones from '../../Agrupaciones/pages/GestionAgrupaciones';
 import ReportesAgrupaciones from '../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones';
 import GestionAgrupacionesAjustes from '../../Agrupaciones/pages/GestionAgrupacionesAjustes';
 import GestionEncargadosAjustes from '../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes';
+import GestionBeneficios from '../../Beneficios/pages/GestionBeneficios';
+import AsignarBeneficios from '../../Beneficios/pages/AsignarBeneficios';
+import VerBeneficiosAsignados from '../../Beneficios/pages/VerBeneficiosAsignados';
 import { useTheme } from '../../../hooks/useTheme';
 
 const Dashboard =()=>{
@@ -68,6 +71,9 @@ const Dashboard =()=>{
                     {selectedView === 'Gestion de Solicitudes' && <GestionSolicitudes />}
                     {selectedView === 'Gestion de Agrupaciones' && <GestionAgrupaciones />}
                     {selectedView === 'Reportes de Agrupaciones' && <ReportesAgrupaciones />}
+                    {selectedView === 'Gestion de beneficios' && <GestionBeneficios />}
+                    {selectedView === 'Asignar beneficios' && <AsignarBeneficios />}
+                    {selectedView === 'Ver beneficios asignados' && <VerBeneficiosAsignados />}
                     {selectedView === 'Gestión de agrupaciones' && <GestionAgrupacionesAjustes />}
                     {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
                 </main>

@@ -31,10 +31,6 @@ class AsignacionBeneficiosResource extends JsonResource
                 $this->whenLoaded('aulas')
             ),
 
-            'tarimas' => AsignacionTarimaResource::collection(
-                $this->whenLoaded('tarimas')
-            ),
-
             'transportes' => AsignacionTransporteResource::collection(
                 $this->whenLoaded('transportes')
             ),
