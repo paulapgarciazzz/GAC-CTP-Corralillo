@@ -7,6 +7,7 @@ import GestionAgrupaciones from '../../Agrupaciones/pages/GestionAgrupaciones';
 import ReportesAgrupaciones from '../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones';
 import GestionAgrupacionesAjustes from '../../Agrupaciones/pages/GestionAgrupacionesAjustes';
 import GestionEncargadosAjustes from '../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes';
+import Calendario from '../../Calendario/pages/Calendario';
 import { useTheme } from '../../../hooks/useTheme';
 
 const Dashboard =()=>{
@@ -70,6 +71,7 @@ const Dashboard =()=>{
                     {selectedView === 'Reportes de Agrupaciones' && <ReportesAgrupaciones />}
                     {selectedView === 'Gestión de agrupaciones' && <GestionAgrupacionesAjustes />}
                     {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
+                    {selectedView === 'Calendario' && <Calendario />}
                 </main>
             </div>
 
