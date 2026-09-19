@@ -42,7 +42,7 @@ class AgrupacionService
 
     public function listarAdministrativa(): Collection
     {
-        return Agrupacion::with(['encargado'])
+        return Agrupacion::with(['encargado', 'participaciones'])
             ->withCount('solicitudes')
             ->get();
     }

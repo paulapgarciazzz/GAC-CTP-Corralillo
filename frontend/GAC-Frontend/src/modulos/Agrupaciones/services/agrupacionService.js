@@ -5,15 +5,19 @@ const extraerMensajeError = (error, fallback) =>
     || Object.values(error.response?.data?.errors || {})[0]?.[0]
     || fallback;
 
-export const obtenerAgrupaciones = async () => {
+const obtenerListadoAgrupaciones = async (endpoint) => {
     try {
-        const response = await api.get('/agrupaciones');
+        const response = await api.get(endpoint);
         return { success: true, data: response.data.data };
     } catch (error) {
         const mensaje = extraerMensajeError(error, 'No se pudieron cargar las agrupaciones.');
         return { success: false, error: mensaje };
     }
 };
+
+export const obtenerAgrupacionesAdministrativas = () => obtenerListadoAgrupaciones('/agrupaciones');
+
+export const obtenerAgrupacionesAprobadas = () => obtenerListadoAgrupaciones('/agrupaciones/aprobadas');
 
 export const crearAgrupacion = async (payload) => {
     try {

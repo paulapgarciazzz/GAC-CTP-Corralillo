@@ -60,6 +60,11 @@ const Dashboard =()=>{
                     isMobile={isMobile}
                 />
                 <main className="p-4 sm:p-6">
+                    {selectedView === null && (
+                        <section className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
+                            <h1 className="text-2xl font-semibold text-foreground">Panel principal</h1>
+                        </section>
+                    )}
                     {selectedView === 'Gestion de Solicitudes' && <GestionSolicitudes />}
                     {selectedView === 'Gestion de Agrupaciones' && <GestionAgrupaciones />}
                     {selectedView === 'Reportes de Agrupaciones' && <ReportesAgrupaciones />}
