@@ -25,6 +25,11 @@ class StoreAulaRequest extends FormRequest
                 'integer',
                 'min:1',
             ],
+            'encargado' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
         ];
     }
 }

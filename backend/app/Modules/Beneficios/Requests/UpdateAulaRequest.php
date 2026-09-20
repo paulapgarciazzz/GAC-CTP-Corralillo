@@ -14,7 +14,7 @@ class UpdateAulaRequest extends FormRequest
 
     public function rules(): array
     {
-        $idAula = $this->route('id');
+        $idAula = $this->route('aula');
 
         return [
             'nombre' => [
@@ -30,6 +30,12 @@ class UpdateAulaRequest extends FormRequest
                 'required',
                 'integer',
                 'min:1',
+            ],
+            'encargado' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:150',
             ],
         ];
     }

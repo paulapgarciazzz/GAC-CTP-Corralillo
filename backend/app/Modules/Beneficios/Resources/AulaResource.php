@@ -13,6 +13,7 @@ class AulaResource extends JsonResource
             'id_aula' => $this->id_aula,
             'nombre' => $this->nombre,
             'capacidad' => $this->capacidad,
+            'encargado' => $this->encargado,
         ];
     }
 }

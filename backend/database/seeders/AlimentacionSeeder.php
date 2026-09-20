@@ -7,25 +7,24 @@ use Illuminate\Support\Facades\DB;
 
 class AlimentacionSeeder extends Seeder
 {
-    public function run(): void{
+    public function run(): void
+    {
         DB::table('alimentacion')->upsert([
             [
-                'tiempo_comida' => 'desayuno',
+                'tiempo_comida' => 'Desayuno',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'tiempo_comida' => 'almuerzo',
+                'tiempo_comida' => 'Almuerzo',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'tiempo_comida' => 'cena',
+                'tiempo_comida' => 'Cena',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        ],
-        ['tiempo_comida'],
-        ['updated_at']);
+        ], ['tiempo_comida'], ['updated_at']);
     }
 }

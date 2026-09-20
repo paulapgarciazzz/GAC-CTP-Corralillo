@@ -14,7 +14,7 @@ class UpdateMobiliarioRequest extends FormRequest
 
     public function rules(): array
     {
-        $idMobiliario = $this->route('id');
+        $idMobiliario = $this->route('mobiliario');
 
         return [
             'nombre' => [
@@ -24,6 +24,18 @@ class UpdateMobiliarioRequest extends FormRequest
                 'max:100',
                 Rule::unique('mobiliario', 'nombre')
                     ->ignore($idMobiliario, 'id_mobiliario'),
+            ],
+            'cantidad_disponible' => [
+                'sometimes',
+                'nullable',
+                'integer',
+                'min:0',
+            ],
+            'encargado' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:150',
             ],
         ];
     }

@@ -1,28 +1,51 @@
 import axios from 'axios'
 
+const apiBaseURL = import.meta.env.APP_URL || 'http://localhost:8000/api';
+const backendBaseURL = apiBaseURL.replace(/\/api\/?$/, '');
+
 const api = axios.create({
-    baseURL: import.meta.env.APP_URL || 'http://localhost:8000/api',
+    baseURL: apiBaseURL,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     },
-    withCredentials: true, // Para cookies de Sanctum
+    withCredentials: true, // Envía/recibe la cookie de sesión de Sanctum
+    withXSRFToken: true, // Fuerza a Axios a leer XSRF-TOKEN y enviar X-XSRF-TOKEN aunque frontend y backend sean orígenes distintos
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN',
 })
+
+const csrfClient = axios.create({
+    baseURL: backendBaseURL,
+    headers: {
+        'Accept': 'application/json',
+    },
+    withCredentials: true,
+});
+
+let csrfRequest = null;
+
+export const getCsrfCookie = () => {
+    csrfRequest ??= csrfClient.get('/sanctum/csrf-cookie').finally(() => {
+        csrfRequest = null;
+    });
+
+    return csrfRequest;
+};
 
 // Interceptor para agregar token
 api.interceptors.request.use(
-    (config) => {
+    async (config) => {
+        const metodo = config.method?.toUpperCase();
+        if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(metodo)) {
+            await getCsrfCookie();
+        }
+
         const token = localStorage.getItem('access_token')
         if (token) {
             config.headers.Authorization = `Bearer ${token}`
-            const csrfToken = document.cookie
-                .split(', ')
-                .find(row => row.startsWith('XSRF-TOKEN='))
-                ?.split('=')[1];
-            if(csrfToken){
-                config.headers['X-CSRF-TOKEN'] = decodeURIComponent(csrfToken);
-            }
         }
+
         return config
     },
     (error) => Promise.reject(error)
