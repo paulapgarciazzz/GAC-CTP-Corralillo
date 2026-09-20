@@ -2,6 +2,7 @@ import Topbar from '../components/Topbar';
 import Sidebar from '../components/Sidebar';
 import { useState } from 'react'
 import { useEffect } from 'react';
+import { getRouteApi } from '@tanstack/react-router';
 import GestionSolicitudes from '../../SolicitudesAgrupaciones/pages/GestionSolicitudes';
 import GestionAgrupaciones from '../../Agrupaciones/pages/GestionAgrupaciones';
 import ReportesAgrupaciones from '../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones';
@@ -12,11 +13,18 @@ import AsignarBeneficios from '../../Beneficios/pages/AsignarBeneficios';
 import VerBeneficiosAsignados from '../../Beneficios/pages/VerBeneficiosAsignados';
 import { useTheme } from '../../../hooks/useTheme';
 
+const routeApi = getRouteApi('/dashboard');
+
 const Dashboard =()=>{
     const { isDark, toggleTheme } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-    const [selectedView, setSelectedView] = useState(null);
+    const { view } = routeApi.useSearch();
+    const navigate = routeApi.useNavigate();
+    const selectedView = view ?? null;
+    const setSelectedView = (nuevaVista) => {
+        navigate({ search: (prev) => ({ ...prev, view: nuevaVista ?? undefined }) });
+    };
 
     useEffect(() => {
         const handleResize = () =>{
