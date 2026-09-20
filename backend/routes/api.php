@@ -11,6 +11,7 @@ use App\Modules\SolicitudesAgrupaciones\Controllers\SolicitudAgrupacionControlle
 use App\Modules\Beneficios\Controllers\AlimentacionController;
 use App\Modules\Beneficios\Controllers\AsignacionBeneficiosController;
 use App\Modules\Beneficios\Controllers\AulaController;
+use App\Modules\Beneficios\Controllers\BeneficiosReportController;
 use App\Modules\Beneficios\Controllers\MobiliarioController;
 use App\Modules\Beneficios\Controllers\RutaController;
 use App\Modules\Beneficios\Controllers\TarimaController;
@@ -146,6 +147,11 @@ Route::prefix('reportes')->group(function () {
     Route::get(
         '/agrupaciones',
         [ReporteController::class, 'agrupaciones']
+    );
+
+    Route::get(
+        '/beneficios',
+        [BeneficiosReportController::class, 'index']
     );
 });
 

@@ -83,8 +83,10 @@ const mapearFila = (categoria, fila) => {
 
 const describirFila = (categoria, fila, catalogos, cantidadIntegrantes) => {
     if (categoria.key === 'transportes') {
+        const transporte = (catalogos.transporte ?? []).find((t) => t.matricula === fila.matricula);
         const ruta = (catalogos.ruta ?? []).find((r) => String(r.id_ruta) === String(fila.id_ruta));
-        return `${fila.matricula} + ${ruta?.nombre_ruta ?? 'Ruta'}`;
+        const conductor = transporte ? `${transporte.nombre_conductor ?? ''} ${transporte.apellido_conductor ?? ''}`.trim() : '';
+        return `${fila.matricula} — ${transporte?.tipo ?? '—'} — Capacidad ${transporte?.capacidad ?? '—'} — Conductor ${conductor || '—'} (Cédula ${transporte?.cedula_conductor ?? '—'}) — Ruta ${ruta?.nombre_ruta ?? '—'}`;
     }
     const catalogo = catalogos[categoria.catalogoKey] ?? [];
     const item = catalogo.find((it) => String(it[categoria.campoId]) === String(fila[categoria.campoId]));
@@ -187,6 +189,12 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
             .map((fila) => describirFila(categoria, fila, catalogos, cantidadIntegrantes)),
     }));
 
+    const aulasSobrecapacidad = cantidadIntegrantes === null ? [] : filas.aulas
+        .filter((fila) => Boolean(fila.id_aula))
+        .map((fila) => (catalogos.aula ?? []).find((a) => String(a.id_aula) === String(fila.id_aula)))
+        .filter((aula) => aula && cantidadIntegrantes > aula.capacidad)
+        .map((aula) => ({ nombre: aula.nombre, capacidad: aula.capacidad, exceso: cantidadIntegrantes - aula.capacidad }));
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={loading ? undefined : onClose}>
             <div role="dialog" aria-modal="true" aria-labelledby="titulo-modal-asignacion" onClick={(event) => event.stopPropagation()} className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-surface rounded-2xl shadow-2xl p-6 sm:p-8 relative">
@@ -255,6 +263,17 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
                     <div className="space-y-5">
                         <ResumenAsignacion solicitud={solicitud} observaciones={observaciones.trim()} secciones={construirResumen()} />
 
+                        {aulasSobrecapacidad.length > 0 && (
+                            <div role="alert" className="p-3 bg-warning-soft border border-warning/30 rounded-lg text-warning text-sm space-y-1">
+                                <p className="font-semibold">Capacidad de aula sobrepasada</p>
+                                {aulasSobrecapacidad.map((item, indice) => (
+                                    <p key={indice}>
+                                        La agrupación tiene {cantidadIntegrantes} personas. El aula "{item.nombre}" tiene capacidad para {item.capacidad}. La capacidad está sobrepasada por {item.exceso} personas.
+                                    </p>
+                                ))}
+                            </div>
+                        )}
+
                         <div className="flex gap-3">
                             <button
                                 type="button"
@@ -271,7 +290,7 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
                                 className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors cursor-pointer"
                             >
                                 {loading && <Loader2 size={18} className="animate-spin" />}
-                                {loading ? 'Guardando...' : 'Confirmar y guardar'}
+                                {loading ? 'Guardando...' : aulasSobrecapacidad.length > 0 ? 'Asignar de todas formas' : 'Confirmar y guardar'}
                             </button>
                         </div>
                     </div>

@@ -34,7 +34,11 @@ const construirSecciones = (asignacion) => {
     if (asignacion.transportes?.length) {
         secciones.push({
             titulo: 'Transporte',
-            items: asignacion.transportes.map((item) => `${item.transporte?.matricula ?? item.matricula} — ${item.ruta?.nombre_ruta ?? '—'}`),
+            items: asignacion.transportes.map((item) => {
+                const transporte = item.transporte;
+                const conductor = transporte ? `${transporte.nombre_conductor ?? ''} ${transporte.apellido_conductor ?? ''}`.trim() : '';
+                return `${item.matricula} — ${transporte?.tipo ?? '—'} — Capacidad ${transporte?.capacidad ?? '—'} — Conductor ${conductor || '—'} (Cédula ${transporte?.cedula_conductor ?? '—'}) — Ruta ${item.ruta?.nombre_ruta ?? '—'}`;
+            }),
         });
     }
 
