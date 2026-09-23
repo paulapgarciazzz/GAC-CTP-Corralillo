@@ -207,6 +207,21 @@ class BeneficiosReportTest extends TestCase
             ->assertJsonPath('data.mobiliario.total_general', 60);
     }
 
+    public function test_mobiliario_incluye_el_encargado(): void
+    {
+        $asignacion = $this->crearAsignacion('2026-09-10', 20, 'Agrupacion Mobiliario');
+
+        $sillas = Mobiliario::create(['nombre' => 'Sillas', 'encargado' => 'Carlos Pérez']);
+
+        AsignacionMobiliario::create(['id_asignacion_beneficios' => $asignacion->id, 'id_mobiliario' => $sillas->id_mobiliario, 'cantidad' => 20]);
+
+        $response = $this->getJson('/api/reportes/beneficios?fecha_desde=2026-09-01&fecha_hasta=2026-09-30&categoria=mobiliario');
+
+        $response->assertOk()
+            ->assertJsonPath('data.mobiliario.detalle.0.mobiliario', 'Sillas')
+            ->assertJsonPath('data.mobiliario.detalle.0.encargado', 'Carlos Pérez');
+    }
+
     public function test_total_de_vehiculos_asignados(): void
     {
         $a = $this->crearAsignacion('2026-09-10');

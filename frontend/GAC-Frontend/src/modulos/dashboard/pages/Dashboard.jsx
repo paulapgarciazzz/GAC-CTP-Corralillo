@@ -11,9 +11,22 @@ import GestionEncargadosAjustes from '../../SolicitudesAgrupaciones/pages/Gestio
 import GestionBeneficios from '../../Beneficios/pages/GestionBeneficios';
 import AsignarBeneficios from '../../Beneficios/pages/AsignarBeneficios';
 import VerBeneficiosAsignados from '../../Beneficios/pages/VerBeneficiosAsignados';
+import ReportesBeneficios from '../../Beneficios/pages/ReportesBeneficios';
 import { useTheme } from '../../../hooks/useTheme';
 
 const routeApi = getRouteApi('/dashboard');
+
+const VISTAS_VALIDAS = [
+    'Gestion de Solicitudes',
+    'Gestion de Agrupaciones',
+    'Reportes de Agrupaciones',
+    'Gestion de beneficios',
+    'Asignar beneficios',
+    'Ver beneficios asignados',
+    'Reportes de beneficios',
+    'Gestión de agrupaciones',
+    'Gestión de encargados',
+];
 
 const Dashboard =()=>{
     const { isDark, toggleTheme } = useTheme();
@@ -21,7 +34,7 @@ const Dashboard =()=>{
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
     const { view } = routeApi.useSearch();
     const navigate = routeApi.useNavigate();
-    const selectedView = view ?? null;
+    const selectedView = view && VISTAS_VALIDAS.includes(view) ? view : null;
     const setSelectedView = (nuevaVista) => {
         navigate({ search: (prev) => ({ ...prev, view: nuevaVista ?? undefined }) });
     };
@@ -82,6 +95,7 @@ const Dashboard =()=>{
                     {selectedView === 'Gestion de beneficios' && <GestionBeneficios />}
                     {selectedView === 'Asignar beneficios' && <AsignarBeneficios />}
                     {selectedView === 'Ver beneficios asignados' && <VerBeneficiosAsignados />}
+                    {selectedView === 'Reportes de beneficios' && <ReportesBeneficios />}
                     {selectedView === 'Gestión de agrupaciones' && <GestionAgrupacionesAjustes />}
                     {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
                 </main>

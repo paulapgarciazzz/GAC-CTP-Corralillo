@@ -32,13 +32,15 @@ export const BENEFICIO_CONFIG = {
 const extraerErrores = (error) => error.response?.data?.errors ?? {};
 
 const mensajePorEstado = (status, fallback) => {
+    if (status === 401 || status === 403) return 'No tienes permisos para realizar esta acción.';
     if (status === 404) return 'No se encontró el beneficio solicitado.';
     if (status === 422) return 'Revisa los datos ingresados.';
     if (status === 500) return 'Ocurrió un error interno del servidor.';
+    if (!status) return 'No se pudo conectar con el servidor. Revisa tu conexión.';
     return fallback;
 };
 
-const manejarError = (error, fallback) => ({
+export const manejarError = (error, fallback) => ({
     success: false,
     status: error.response?.status,
     error: error.response?.data?.message

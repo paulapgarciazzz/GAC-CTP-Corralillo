@@ -13,7 +13,7 @@ const routeApi = getRouteApi('/dashboard');
 export default function GestionBeneficios() {
     const { categoria: categoriaUrl } = routeApi.useSearch();
     const navigate = routeApi.useNavigate();
-    const categoria = categoriaUrl ?? 'alimentacion';
+    const categoria = categoriaUrl && BENEFICIO_CONFIG[categoriaUrl] ? categoriaUrl : 'alimentacion';
     const setCategoria = (nuevaCategoria) => {
         navigate({ search: (prev) => ({ ...prev, categoria: nuevaCategoria }) });
     };
