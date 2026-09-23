@@ -46,7 +46,7 @@ export default function MonthView({ currentDate, events, onDayClick }) {
                     return (
                         <div
                             key={day.toISOString()}
-                            className={`flex min-h-[90px] flex-col gap-1 p-1.5 sm:min-h-[130px] sm:p-2 ${
+                            className={`flex min-h-[56px] flex-col gap-1 p-1.5 sm:min-h-[80px] sm:p-2 ${
                                 inMonth ? 'bg-surface' : 'bg-background/60'
                             }`}
                         >

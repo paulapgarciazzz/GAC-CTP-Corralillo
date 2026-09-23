@@ -21,9 +21,9 @@ export default function EventChip({ event, variant = 'pill', style }) {
     }
 
     return (
-        <div className={`flex w-full items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[11px] font-medium ${colors.bg} ${colors.text}`}>
+        <div className={`flex min-w-0 max-w-full items-start gap-1 overflow-hidden rounded-md px-1.5 py-0.5 text-[11px] font-medium ${colors.bg} ${colors.text}`}>
             {!event.allDay && <span className="shrink-0 opacity-70">{format(event.start, 'HH:mm')}</span>}
-            <span className="truncate">{event.title}</span>
+            <span className="min-w-0 whitespace-normal break-words leading-tight">{event.title}</span>
         </div>
     );
 }

@@ -27,6 +27,7 @@ const VISTAS_VALIDAS = [
     'Reportes de beneficios',
     'Gestión de agrupaciones',
     'Gestión de encargados',
+    'Calendario',
 ];
 
 const Dashboard =()=>{

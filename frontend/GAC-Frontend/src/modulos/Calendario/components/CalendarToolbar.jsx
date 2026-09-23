@@ -35,42 +35,32 @@ export default function CalendarToolbar({ currentDate, viewMode, onViewModeChang
                 >
                     Hoy
                 </button>
-                <div className="flex items-center gap-1">
-                    <button
-                        type="button"
-                        onClick={onPrev}
-                        aria-label="Anterior"
-                        className="rounded-lg p-1.5 text-foreground-soft transition-colors hover:bg-primary/10 hover:text-primary"
-                    >
-                        <ChevronLeft size={18} />
-                    </button>
-                    <button
-                        type="button"
-                        onClick={onNext}
-                        aria-label="Siguiente"
-                        className="rounded-lg p-1.5 text-foreground-soft transition-colors hover:bg-primary/10 hover:text-primary"
-                    >
-                        <ChevronRight size={18} />
-                    </button>
-                </div>
+                
                 <h2 className="ml-1 text-lg font-semibold capitalize text-foreground sm:text-xl">{label}</h2>
             </div>
-
-            <div className="inline-flex self-start rounded-xl border border-border bg-background p-1 sm:self-auto">
-                {VIEW_OPTIONS.map((opt) => (
-                    <button
-                        key={opt.key}
-                        type="button"
-                        onClick={() => onViewModeChange(opt.key)}
-                        className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                            viewMode === opt.key
-                                ? 'bg-primary text-white shadow-sm'
-                                : 'text-foreground-soft hover:bg-primary/10 hover:text-primary'
-                        }`}
-                    >
-                        {opt.label}
-                    </button>
-                ))}
+            <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
+                <button className="rounded-lg bg-primary px-6 py-2 font-medium text-white shadow-md transition duration-300 hover:bg-primary-hover hover:shadow-lg"
+                    type="button"
+                    
+                >
+                    + Crear evento
+                </button>
+                <div className="inline-flex rounded-xl border border-border bg-background p-1">
+                    {VIEW_OPTIONS.map((opt) => (
+                        <button
+                            key={opt.key}
+                            type="button"
+                            onClick={() => onViewModeChange(opt.key)}
+                            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                                viewMode === opt.key
+                                    ? 'bg-primary text-white shadow-sm'
+                                    : 'text-foreground-soft hover:bg-primary/10 hover:text-primary'
+                            }`}
+                        >
+                            {opt.label}
+                        </button>
+                    ))}
+                </div>
             </div>
         </div>
     );
