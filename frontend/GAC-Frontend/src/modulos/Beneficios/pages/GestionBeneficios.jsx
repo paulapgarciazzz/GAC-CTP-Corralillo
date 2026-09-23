@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getRouteApi } from '@tanstack/react-router';
 import { Loader2, Plus, RefreshCw } from 'lucide-react';
 import ModalBeneficio from '../components/ModalBeneficio';
 import ModalConfirmarEliminacionBeneficio from '../components/ModalConfirmarEliminacionBeneficio';
@@ -7,8 +8,15 @@ import SelectorCategoriaBeneficio from '../components/SelectorCategoriaBeneficio
 import TarjetaBeneficio from '../components/TarjetaBeneficio';
 import { BENEFICIO_CONFIG, actualizarBeneficio, crearBeneficio, eliminarBeneficio, obtenerBeneficios } from '../services/beneficioService';
 
+const routeApi = getRouteApi('/dashboard');
+
 export default function GestionBeneficios() {
-    const [categoria, setCategoria] = useState('alimentacion');
+    const { categoria: categoriaUrl } = routeApi.useSearch();
+    const navigate = routeApi.useNavigate();
+    const categoria = categoriaUrl && BENEFICIO_CONFIG[categoriaUrl] ? categoriaUrl : 'alimentacion';
+    const setCategoria = (nuevaCategoria) => {
+        navigate({ search: (prev) => ({ ...prev, categoria: nuevaCategoria }) });
+    };
     const [beneficios, setBeneficios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [guardando, setGuardando] = useState(false);

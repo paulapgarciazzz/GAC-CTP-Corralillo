@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Loader2, X } from 'lucide-react';
 import SeccionCategoriaAsignacion from './SeccionCategoriaAsignacion';
+import SeccionAlimentacionAsignacion from './SeccionAlimentacionAsignacion';
 import ResumenAsignacion from './ResumenAsignacion';
 import { obtenerBeneficios } from '../services/beneficioService';
 
@@ -166,6 +167,18 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
         }));
     };
 
+    const alternarAlimentacion = (idAlimentacion) => {
+        setFilas((prev) => {
+            const yaSeleccionada = prev.alimentaciones.some((fila) => fila.id_alimentacion === idAlimentacion);
+            return {
+                ...prev,
+                alimentaciones: yaSeleccionada
+                    ? prev.alimentaciones.filter((fila) => fila.id_alimentacion !== idAlimentacion)
+                    : [...prev.alimentaciones, { id_alimentacion: idAlimentacion }],
+            };
+        });
+    };
+
     const hayFilasIncompletas = CATEGORIAS.some((categoria) =>
         filas[categoria.key].some((fila) => !filaCompleta(categoria, fila))
     );
@@ -217,18 +230,29 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
                 ) : paso === 'formulario' ? (
                     <div className="space-y-5">
                         {CATEGORIAS.map((categoria) => (
-                            <SeccionCategoriaAsignacion
-                                key={categoria.key}
-                                titulo={categoria.titulo}
-                                nota={categoria.cantidadAutomatica ? `Se asignará x${cantidadIntegrantes ?? '—'} automáticamente (integrantes de la agrupación).` : undefined}
-                                filas={filas[categoria.key]}
-                                campos={construirCampos(categoria, catalogos)}
-                                tieneCantidad={categoria.tieneCantidad}
-                                disabled={loading}
-                                onAgregar={() => agregarFila(categoria.key)}
-                                onEliminar={(indice) => eliminarFila(categoria.key, indice)}
-                                onCambiarFila={(indice, campo, valor) => cambiarFila(categoria.key, indice, campo, valor)}
-                            />
+                            categoria.key === 'alimentaciones' ? (
+                                <SeccionAlimentacionAsignacion
+                                    key={categoria.key}
+                                    opciones={catalogos.alimentacion ?? []}
+                                    seleccionadas={filas.alimentaciones.map((fila) => fila.id_alimentacion)}
+                                    cantidadIntegrantes={cantidadIntegrantes}
+                                    disabled={loading}
+                                    onToggle={alternarAlimentacion}
+                                />
+                            ) : (
+                                <SeccionCategoriaAsignacion
+                                    key={categoria.key}
+                                    titulo={categoria.titulo}
+                                    nota={categoria.cantidadAutomatica ? `Se asignará x${cantidadIntegrantes ?? '—'} automáticamente (integrantes de la agrupación).` : undefined}
+                                    filas={filas[categoria.key]}
+                                    campos={construirCampos(categoria, catalogos)}
+                                    tieneCantidad={categoria.tieneCantidad}
+                                    disabled={loading}
+                                    onAgregar={() => agregarFila(categoria.key)}
+                                    onEliminar={(indice) => eliminarFila(categoria.key, indice)}
+                                    onCambiarFila={(indice, campo, valor) => cambiarFila(categoria.key, indice, campo, valor)}
+                                />
+                            )
                         ))}
 
                         <div className="space-y-1">

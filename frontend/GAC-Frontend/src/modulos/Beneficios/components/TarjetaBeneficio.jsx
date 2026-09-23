@@ -32,7 +32,7 @@ export default function TarjetaBeneficio({ categoria, beneficio, onEditar, onEli
                 {categoria === 'transporte' && <><Dato label="Tipo" value={beneficio.tipo} /><Dato label="Capacidad" value={beneficio.capacidad} /><Dato label="Conductor" value={`${beneficio.nombre_conductor ?? ''} ${beneficio.apellido_conductor ?? ''}`.trim()} /><Dato label="Cédula" value={beneficio.cedula_conductor} /></>}
             </div>
 
-            <div className="flex justify-end gap-2 border-t border-border pt-3">
+            <div className="flex items-center justify-end gap-2 border-t border-border pt-3">
                 <button type="button" onClick={() => onEditar(beneficio)} aria-label={`Editar ${config.label.toLowerCase()} ${identificador}`} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary/10 text-sm font-medium transition-colors cursor-pointer">
                     <Pencil size={14} />Editar
                 </button>

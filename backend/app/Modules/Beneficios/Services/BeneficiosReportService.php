@@ -135,6 +135,7 @@ class BeneficiosReportService
                 $detalle[] = array_merge($this->datosComunes($asignacion), [
                     'mobiliario' => $item->mobiliario?->nombre,
                     'cantidad' => $item->cantidad,
+                    'encargado' => $item->mobiliario?->encargado,
                 ]);
             }
         }

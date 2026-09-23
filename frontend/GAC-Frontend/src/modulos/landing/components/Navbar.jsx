@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import escudo from '../../../assets/escudo.png';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { useNavigate, Link } from '@tanstack/react-router';
@@ -8,14 +8,33 @@ const Navbar = ({isDark, onToggleTheme}) => {
     const {isAuthenticated, logout} = useAuth();
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
     const handleLogout = async () => {
        await logout();
        navigate({ to: '/'});
        setIsMenuOpen(false);
     }
 
+    // El navbar arranca transparente sobre el Hero y pasa a fondo sólido al
+    // hacer scroll, para no perder legibilidad una vez deja de estar sobre la foto.
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 40);
+        handleScroll();
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const textColorClass = isScrolled ? 'text-foreground' : 'text-white';
+    const iconColorClass = isScrolled ? 'text-foreground-soft' : 'text-white';
+
     return (
-        <nav className="sticky top-0 z-50 py-3 bg-background/95 backdrop-blur-lg border-b border-border text-foreground">
+        <nav
+            className={`fixed inset-x-0 top-0 z-50 py-3 transition-colors duration-300 ${
+                isScrolled
+                    ? 'bg-background/95 backdrop-blur-lg border-b border-border shadow-md'
+                    : 'bg-transparent border-b border-transparent'
+            } ${textColorClass}`}
+        >
             <div className="container px-4 mx-auto relative text-sm">
                 <div className="flex justify-center items-center">
                     <div className= "flex items-center shrink-0">
@@ -26,7 +45,7 @@ const Navbar = ({isDark, onToggleTheme}) => {
                         <li><Link to="/" className="hover:text-accent transition-colors">Inicio</Link></li>
                         <li><a href="#" className="hover:text-accent transition-colors">Calendario</a></li>
                         <li><a href="#conocenos" className="hover:text-accent transition-colors">Conocenos</a></li>
-                        <li><a href="#contacto" className="hover:text-accent transition-colors">Contacto</a></li>
+                        <li><a href="#ubicacion" className="hover:text-accent transition-colors">Ubicación</a></li>
                     </ul>
                     <div className="hidden lg:flex justify-center ml-14 space-x-4 items-center">
                         {!isAuthenticated ? (
@@ -41,11 +60,11 @@ const Navbar = ({isDark, onToggleTheme}) => {
                                         Panel de Gestión
                                     </button>
                                 </Link>
-                                <button onClick={onToggleTheme} className="p-2 rounded-lg hover:bg-primary/10 transition-colors" aria-label="Toggle Theme">
+                                <button onClick={onToggleTheme} className="p-2 rounded-lg hover:bg-white/10 transition-colors" aria-label="Toggle Theme">
                                     {isDark ? (
                                         <Sun className="w-5 h-5 text-warning"/>
                                     ):(
-                                        <Moon className="w-5 h-5 text-foreground-soft"/>
+                                        <Moon className={`w-5 h-5 ${iconColorClass}`}/>
                                     )}
                                 </button>
                             </>
@@ -57,18 +76,18 @@ const Navbar = ({isDark, onToggleTheme}) => {
                                         Panel de Gestión
                                     </button>
                                 </Link>
-                                
+
                                 <button
                                     onClick={handleLogout}
                                     className="px-6 py-2 bg-danger text-white rounded-lg hover:brightness-90 transition duration-300 font-medium shadow-md hover:shadow-lg"
                                 >
                                     Cerrar sesión
                                 </button>
-                                <button onClick={onToggleTheme} className="p-2 rounded-lg hover:bg-primary/10 transition-colors" aria-label="Toggle Theme">
+                                <button onClick={onToggleTheme} className="p-2 rounded-lg hover:bg-white/10 transition-colors" aria-label="Toggle Theme">
                                     {isDark ? (
                                         <Sun className="w-5 h-5 text-warning"/>
                                     ):(
-                                        <Moon className="w-5 h-5 text-foreground-soft"/>
+                                        <Moon className={`w-5 h-5 ${iconColorClass}`}/>
                                     )}
                                 </button>
                             </>
@@ -77,7 +96,7 @@ const Navbar = ({isDark, onToggleTheme}) => {
                     </div>
                      <div className="lg:hidden ml-14 space-x-4">
                         <button
-                            className="text-foreground focus:outline-none"
+                            className={`focus:outline-none ${textColorClass}`}
                             onClick={() => setIsMenuOpen((prev) => !prev)}
                             aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
                             aria-expanded={isMenuOpen}
@@ -87,14 +106,14 @@ const Navbar = ({isDark, onToggleTheme}) => {
                     </div>
                 </div>
                 {isMenuOpen && (
-                    <div className="lg:hidden mt-4 pb-2">
-                        <ul className="flex flex-col space-y-4">
+                    <div className="lg:hidden mt-4 pb-2 -mx-4 px-4 rounded-b-2xl bg-surface text-foreground shadow-lg">
+                        <ul className="flex flex-col space-y-4 pt-4">
                             <li><Link to="/" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Inicio</Link></li>
                             <li><a href="#" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Calendario</a></li>
                             <li><a href="#conocenos" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Conocenos</a></li>
-                            <li><a href="#contacto" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Contacto</a></li>
+                            <li><a href="#ubicacion" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Ubicación</a></li>
                         </ul>
-                        <div className="flex flex-col space-y-3 mt-6">
+                        <div className="flex flex-col space-y-3 mt-6 pb-4">
                             {!isAuthenticated ? (
                                 <>
                                     <Link to="/login" onClick={() => setIsMenuOpen(false)}>

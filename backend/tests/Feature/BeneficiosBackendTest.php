@@ -292,6 +292,31 @@ class BeneficiosBackendTest extends TestCase
         ]);
     }
 
+    public function test_cliente_no_puede_alterar_manualmente_la_cantidad_de_alimentacion(): void
+    {
+        $solicitud = $this->crearSolicitudAprobada();
+
+        $response = $this->postJson('/api/asignaciones-beneficios', [
+            'id_solicitud_agrupacion' => $solicitud->id,
+            'alimentaciones' => [
+                ['id_alimentacion' => $this->alimentacion->id_alimentacion, 'cantidad' => 999],
+            ],
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.alimentaciones.0.cantidad', 20);
+
+        $this->assertDatabaseHas('asignacion_alimentacion', [
+            'id_alimentacion' => $this->alimentacion->id_alimentacion,
+            'cantidad' => 20,
+        ]);
+
+        $this->assertDatabaseMissing('asignacion_alimentacion', [
+            'id_alimentacion' => $this->alimentacion->id_alimentacion,
+            'cantidad' => 999,
+        ]);
+    }
+
     public function test_solicitud_de_22_integrantes_con_desayuno_y_almuerzo_produce_cantidades_automaticas(): void
     {
         $agrupacionGrande = Agrupacion::create([

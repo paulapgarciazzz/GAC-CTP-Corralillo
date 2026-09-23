@@ -1,23 +1,24 @@
 import Navbar from '../components/Navbar'
-import Carousel from '../components/Carousel'
+import Hero from '../components/Hero'
+import EventoDestacado from '../components/EventoDestacado'
+import Contador from '../components/Contador'
 import VisionMision from '../components/VisionMision'
-import Contacto from '../components/Contacto'
+import Ubicacion from '../components/Ubicacion'
 import Footer from '../components/Footer'
 import { useTheme } from '../../../hooks/useTheme'
 
-const Landingpage = () =>{
+const Landingpage = () => {
     const { isDark, toggleTheme } = useTheme();
-    return(
-        <>
-            <div className= "Landing-page">
-                <Navbar isDark={isDark} onToggleTheme={toggleTheme}/>
-                <Carousel/>
-                <VisionMision/>
-                <Contacto/>
-                <Footer/>
-            </div>
-
-        </>
+    return (
+        <div>
+            <Navbar isDark={isDark} onToggleTheme={toggleTheme} />
+            <Hero />
+            <EventoDestacado />
+            <Contador />
+            <VisionMision />
+            <Ubicacion />
+            <Footer />
+        </div>
     )
 }
 export default Landingpage;

@@ -2,6 +2,7 @@ import Topbar from '../components/Topbar';
 import Sidebar from '../components/Sidebar';
 import { useState } from 'react'
 import { useEffect } from 'react';
+import { getRouteApi } from '@tanstack/react-router';
 import GestionSolicitudes from '../../SolicitudesAgrupaciones/pages/GestionSolicitudes';
 import GestionAgrupaciones from '../../Agrupaciones/pages/GestionAgrupaciones';
 import ReportesAgrupaciones from '../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones';
@@ -10,13 +11,33 @@ import GestionEncargadosAjustes from '../../SolicitudesAgrupaciones/pages/Gestio
 import GestionBeneficios from '../../Beneficios/pages/GestionBeneficios';
 import AsignarBeneficios from '../../Beneficios/pages/AsignarBeneficios';
 import VerBeneficiosAsignados from '../../Beneficios/pages/VerBeneficiosAsignados';
+import ReportesBeneficios from '../../Beneficios/pages/ReportesBeneficios';
 import { useTheme } from '../../../hooks/useTheme';
+
+const routeApi = getRouteApi('/dashboard');
+
+const VISTAS_VALIDAS = [
+    'Gestion de Solicitudes',
+    'Gestion de Agrupaciones',
+    'Reportes de Agrupaciones',
+    'Gestion de beneficios',
+    'Asignar beneficios',
+    'Ver beneficios asignados',
+    'Reportes de beneficios',
+    'Gestión de agrupaciones',
+    'Gestión de encargados',
+];
 
 const Dashboard =()=>{
     const { isDark, toggleTheme } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-    const [selectedView, setSelectedView] = useState(null);
+    const { view } = routeApi.useSearch();
+    const navigate = routeApi.useNavigate();
+    const selectedView = view && VISTAS_VALIDAS.includes(view) ? view : null;
+    const setSelectedView = (nuevaVista) => {
+        navigate({ search: (prev) => ({ ...prev, view: nuevaVista ?? undefined }) });
+    };
 
     useEffect(() => {
         const handleResize = () =>{
@@ -74,6 +95,7 @@ const Dashboard =()=>{
                     {selectedView === 'Gestion de beneficios' && <GestionBeneficios />}
                     {selectedView === 'Asignar beneficios' && <AsignarBeneficios />}
                     {selectedView === 'Ver beneficios asignados' && <VerBeneficiosAsignados />}
+                    {selectedView === 'Reportes de beneficios' && <ReportesBeneficios />}
                     {selectedView === 'Gestión de agrupaciones' && <GestionAgrupacionesAjustes />}
                     {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
                 </main>
