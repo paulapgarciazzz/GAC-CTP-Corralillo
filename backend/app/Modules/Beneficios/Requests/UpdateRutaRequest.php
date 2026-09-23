@@ -14,7 +14,7 @@ class UpdateRutaRequest extends FormRequest
 
     public function rules(): array
     {
-        $idRuta = $this->route('id');
+        $idRuta = $this->route('ruta');
 
         return [
             'nombre_ruta' => [

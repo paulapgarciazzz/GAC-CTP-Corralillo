@@ -11,6 +11,7 @@ use App\Modules\SolicitudesAgrupaciones\Controllers\SolicitudAgrupacionControlle
 use App\Modules\Beneficios\Controllers\AlimentacionController;
 use App\Modules\Beneficios\Controllers\AsignacionBeneficiosController;
 use App\Modules\Beneficios\Controllers\AulaController;
+use App\Modules\Beneficios\Controllers\BeneficiosReportController;
 use App\Modules\Beneficios\Controllers\MobiliarioController;
 use App\Modules\Beneficios\Controllers\RutaController;
 use App\Modules\Beneficios\Controllers\TarimaController;
@@ -147,6 +148,11 @@ Route::prefix('reportes')->group(function () {
         '/agrupaciones',
         [ReporteController::class, 'agrupaciones']
     );
+
+    Route::get(
+        '/beneficios',
+        [BeneficiosReportController::class, 'index']
+    );
 });
 
 /*
@@ -178,13 +184,22 @@ Route::apiResource(
 );
 
 Route::apiResource(
-    'tarimas',
-    TarimaController::class
-);
-
-Route::apiResource(
     'transportes',
     TransporteController::class
+);
+
+/*
+|--------------------------------------------------------------------------
+| Tarima (pendiente de mover a Calendario/Actividades)
+|--------------------------------------------------------------------------
+| Tarima ya no forma parte de la asignación de beneficios ni de las
+| pantallas de Beneficios. El catálogo se deja funcionando aquí solo como
+| almacenamiento temporal hasta que exista el módulo Calendario/Actividades.
+*/
+
+Route::apiResource(
+    'tarimas',
+    TarimaController::class
 );
 
 /*

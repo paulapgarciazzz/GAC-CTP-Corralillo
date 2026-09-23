@@ -1,4 +1,4 @@
-import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, UsersRound, Boxes, UserRoundArrowLeft, BookUser, SquareLibrary, CirclePile, ShieldAlert, Settings } from "lucide-react";
+import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, UsersRound, Boxes, UserRoundArrowLeft, BookUser, SquareLibrary, CirclePile, ShieldAlert, Settings, ClipboardList, FileBarChart2 } from "lucide-react";
 import { useState } from "react"
 import logo from '../../../assets/logo.png'
 import { ChevronDown } from "lucide-react";
@@ -19,6 +19,8 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
             children: [
                 {name: "Gestion de beneficios", icon: SquareLibrary},
                 {name: "Asignar beneficios", icon: CirclePile},
+                {name: "Ver beneficios asignados", icon: ClipboardList},
+                {name: "Reportes de beneficios", icon: FileBarChart2},
             ]
         },
         {name: "Calendario", icon: CalendarDays, active:false},

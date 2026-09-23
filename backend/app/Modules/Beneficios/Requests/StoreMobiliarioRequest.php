@@ -20,6 +20,16 @@ class StoreMobiliarioRequest extends FormRequest
                 'max:100',
                 'unique:mobiliario,nombre',
             ],
+            'cantidad_disponible' => [
+                'nullable',
+                'integer',
+                'min:0',
+            ],
+            'encargado' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
         ];
     }
 }
