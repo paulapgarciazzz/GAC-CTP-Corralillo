@@ -25,7 +25,7 @@ export default function TablaEventos({ events, onCreateClick }) {
     }, [events, busqueda, fechaDesde, fechaHasta]);
 
     return (
-        <div className="w-full max-w-5xl space-y-4">
+        <div className="mx-auto w-full max-w-5xl space-y-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h3 className="text-lg font-semibold text-foreground">Eventos</h3>
                 <button
