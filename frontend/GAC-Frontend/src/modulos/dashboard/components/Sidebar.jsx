@@ -11,7 +11,7 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         {name: "Inicio", icon: LayoutDashboard, active:false},
         {name: "Solicitudes", icon: FileUser, active:false,
             children: [
-                {name: "Gestion de Solicitudes", icon: BookUser},
+                {name: "Bandeja de Solicitudes", icon: BookUser},
                 {name: "Gestion de Agrupaciones", icon: PersonStanding},
             ]
         },
@@ -34,7 +34,7 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         },
         {name: "Reportes", icon: ClipboardMinus, active:false,
             children: [
-                {name: "Reportes de Agrupaciones", icon: FileUser},
+                {name: "Reportes de Solicitudes", icon: FileUser},
                 {name: "Reportes de Actividades", icon: Boxes},
                 {name: "Reportes de Asistencia", icon: UserRoundArrowLeft},
                 {name: "Reportes de Inventario", icon: UsersRound},
@@ -85,6 +85,7 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
                                     ? `bg-primary/15 text-primary border-l-2 border-primary`
                                     : `text-foreground-soft dark:text-white/70 hover:bg-primary/10 dark:hover:bg-white/10`
                                 }`}>
+                                <link.icon className="w-5 h-5 shrink-0 text-primary"/>
                                 <span className="flex-1 text-left text-sm font-medium"> {link.name}</span>
                                 {link.badge && (
                                     <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full font-semibold">
@@ -106,7 +107,7 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
                                                     ? 'bg-primary/15 text-primary'
                                                     : 'text-foreground-soft dark:text-white/70 hover:bg-primary/10 dark:hover:bg-white/10'
                                                 }`}>
-                                                <child.icon className="w-4 h-4 text-primary"/>
+                                                <child.icon className="w-5 h-5 shrink-0 text-primary"/>
                                                 <span>{child.name}</span>
                                             </button>
                                         </li>
