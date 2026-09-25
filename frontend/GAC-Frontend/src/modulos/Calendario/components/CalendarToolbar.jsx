@@ -38,13 +38,7 @@ export default function CalendarToolbar({ currentDate, viewMode, onViewModeChang
                 
                 <h2 className="ml-1 text-lg font-semibold capitalize text-foreground sm:text-xl">{label}</h2>
             </div>
-            <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
-                <button className="rounded-lg bg-primary px-6 py-2 font-medium text-white shadow-md transition duration-300 hover:bg-primary-hover hover:shadow-lg"
-                    type="button"
-                    
-                >
-                    + Crear evento
-                </button>
+            <div className="flex flex-wrap items-center gap-9 self-start sm:self-auto">
                 <div className="inline-flex rounded-xl border border-border bg-background p-1">
                     {VIEW_OPTIONS.map((opt) => (
                         <button

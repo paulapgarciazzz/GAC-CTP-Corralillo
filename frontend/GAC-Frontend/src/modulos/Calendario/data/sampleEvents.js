@@ -35,8 +35,6 @@ export const sampleEvents = [
 
     // Esta semana — varios días cargados para probar overflow
     timed('evt-5', 'Revisión de solicitudes pendientes', 0, 8, 0, 60, 'warning'),
-    timed('evt-6', 'Reunión de agrupación de Robótica', 0, 10, 0, 45, 'chart-1'),
-    timed('evt-7', 'Taller de encargados de beneficios', 0, 11, 0, 60, 'success'),
     timed('evt-8', 'Capacitación docente', 0, 13, 30, 90, 'info'),
     timed('evt-9', 'Entrevista con encargado nuevo', 0, 16, 0, 30, 'chart-2'),
 

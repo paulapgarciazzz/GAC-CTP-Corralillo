@@ -63,7 +63,19 @@ export default function MonthView({ currentDate, events, onDayClick }) {
                             >
                                 {format(day, 'd')}
                             </button>
-                            <div className="flex flex-1 flex-col gap-1 overflow-hidden">
+                            {dayEvents.length > 0 && (
+                                <div className="flex flex-wrap items-center gap-1 sm:hidden">
+                                    {dayEvents.slice(0, 4).map((event) => (
+                                        <EventChip key={event.id} event={event} variant="dot" />
+                                    ))}
+                                    {dayEvents.length > 4 && (
+                                        <span className="text-[9px] font-semibold text-foreground-faint">
+                                            +{dayEvents.length - 4}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                            <div className="hidden flex-1 flex-col gap-1 overflow-hidden sm:flex">
                                 {visibleEvents.map((event) => (
                                     <EventChip key={event.id} event={event} variant="pill" />
                                 ))}

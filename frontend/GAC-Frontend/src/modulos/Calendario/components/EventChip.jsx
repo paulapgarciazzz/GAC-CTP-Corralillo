@@ -4,6 +4,10 @@ import { CATEGORY_COLORS } from '../data/sampleEvents';
 export default function EventChip({ event, variant = 'pill', style }) {
     const colors = CATEGORY_COLORS[event.category] || CATEGORY_COLORS.info;
 
+    if (variant === 'dot') {
+        return <span className={`inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-current ${colors.text}`} />;
+    }
+
     if (variant === 'block') {
         return (
             <div
@@ -21,9 +25,9 @@ export default function EventChip({ event, variant = 'pill', style }) {
     }
 
     return (
-        <div className={`flex min-w-0 max-w-full items-start gap-1 overflow-hidden rounded-md px-1.5 py-0.5 text-[11px] font-medium ${colors.bg} ${colors.text}`}>
+        <div className={`flex min-w-0 max-w-full items-center gap-1 overflow-hidden rounded-md px-1.5 py-0.5 text-[11px] font-medium ${colors.bg} ${colors.text}`}>
             {!event.allDay && <span className="shrink-0 opacity-70">{format(event.start, 'HH:mm')}</span>}
-            <span className="min-w-0 whitespace-normal break-words leading-tight">{event.title}</span>
+            <span className="min-w-0 truncate leading-tight">{event.title}</span>
         </div>
     );
 }
