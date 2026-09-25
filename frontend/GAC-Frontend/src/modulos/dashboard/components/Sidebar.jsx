@@ -1,6 +1,5 @@
 import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, UsersRound, Boxes, UserRoundArrowLeft, BookUser, SquareLibrary, CirclePile, ShieldAlert, Settings, ClipboardList, FileBarChart2 } from "lucide-react";
 import { useState } from "react"
-import escudo from '../../../assets/escudo.png';
 import logo from '../../../assets/logo.png'
 import { ChevronDown } from "lucide-react";
 import { ChevronRight } from "lucide-react";
