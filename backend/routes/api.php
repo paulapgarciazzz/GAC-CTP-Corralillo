@@ -8,6 +8,8 @@ use App\Modules\SolicitudesAgrupaciones\Controllers\EncargadoController;
 use App\Modules\SolicitudesAgrupaciones\Controllers\ReporteController;
 use App\Modules\SolicitudesAgrupaciones\Controllers\SolicitudAgrupacionController;
 
+use App\Modules\Calendario\Controllers\EventoController;
+
 use App\Modules\Beneficios\Controllers\AlimentacionController;
 use App\Modules\Beneficios\Controllers\AsignacionBeneficiosController;
 use App\Modules\Beneficios\Controllers\AulaController;
@@ -167,6 +169,11 @@ Route::apiResource(
 )->parameters([
     'alimentaciones' => 'alimentacion',
 ]);
+
+Route::apiResource(
+    'eventos',
+    EventoController::class
+);
 
 Route::apiResource(
     'aulas',
