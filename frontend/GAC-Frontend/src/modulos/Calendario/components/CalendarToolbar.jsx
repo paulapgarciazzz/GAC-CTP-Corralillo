@@ -1,4 +1,3 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { es } from 'date-fns/locale';
 import MonthYearSelect from './MonthYearSelect';
@@ -21,7 +20,7 @@ function getLabel(currentDate, viewMode) {
     return format(currentDate, "EEEE d 'de' MMMM yyyy", { locale: es });
 }
 
-export default function CalendarToolbar({ currentDate, viewMode, onViewModeChange, onToday, onPrev, onNext, onDateChange }) {
+export default function CalendarToolbar({ currentDate, viewMode, onViewModeChange, onToday, onDateChange }) {
     const label = getLabel(currentDate, viewMode);
 
     return (
@@ -36,7 +35,7 @@ export default function CalendarToolbar({ currentDate, viewMode, onViewModeChang
                     Hoy
                 </button>
                 
-                <h2 className="ml-1 text-lg font-semibold capitalize text-foreground sm:text-xl">{label}</h2>
+                <h2 className="w-full text-center text-lg font-semibold capitalize text-foreground sm:ml-1 sm:w-auto sm:text-left sm:text-xl">{label}</h2>
             </div>
             <div className="flex flex-wrap items-center gap-9 self-start sm:self-auto">
                 <div className="inline-flex rounded-xl border border-border bg-background p-1">
