@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import EventChip from './EventChip';
 
@@ -40,7 +40,13 @@ export default function MoreEventsPopover({ date, events, onEventClick }) {
                     </p>
                     <div className="flex flex-col gap-1">
                         {events.map((event) => (
-                            <EventChip key={event.id} event={event} variant="pill" onClick={onEventClick} />
+                            <EventChip
+                                key={event.id}
+                                event={event}
+                                variant="pill"
+                                onClick={onEventClick}
+                                continuation={!isSameDay(event.start, date)}
+                            />
                         ))}
                     </div>
                 </div>

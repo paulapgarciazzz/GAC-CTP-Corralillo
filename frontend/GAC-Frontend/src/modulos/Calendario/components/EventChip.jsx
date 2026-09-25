@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { CATEGORY_COLORS } from '../lib/categorias';
 
-export default function EventChip({ event, variant = 'pill', style, onClick }) {
+export default function EventChip({ event, variant = 'pill', style, onClick, continuation = false }) {
     const colors = CATEGORY_COLORS[event.category] || CATEGORY_COLORS.info;
     const clickable = onClick
         ? {
@@ -44,7 +44,9 @@ export default function EventChip({ event, variant = 'pill', style, onClick }) {
             {...clickable}
             className={`flex min-w-0 max-w-full items-center gap-1 overflow-hidden rounded-md px-1.5 py-0.5 text-[11px] font-medium ${cursor} ${colors.bg} ${colors.text}`}
         >
-            {!event.allDay && <span className="shrink-0 opacity-70">{format(event.start, 'HH:mm')}</span>}
+            {!event.allDay && !continuation && (
+                <span className="shrink-0 opacity-70">{format(event.start, 'HH:mm')}</span>
+            )}
             <span className="min-w-0 truncate leading-tight">{event.title}</span>
         </div>
     );

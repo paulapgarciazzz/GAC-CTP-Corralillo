@@ -2,13 +2,14 @@ import { startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isToday, format, 
 import { es } from 'date-fns/locale';
 import EventChip from './EventChip';
 import { HOURS, topOffsetPx, heightPx } from '../lib/timeGrid';
+import { ocurreEnDia, segmentoDelDia } from '../lib/eventosPorDia';
 
 export default function WeekView({ currentDate, events, onEventClick }) {
     const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
     const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
-    const eventsForDay = (day) => events.filter((event) => isSameDay(event.start, day));
+    const eventsForDay = (day) => events.filter((event) => ocurreEnDia(event, day));
 
     return (
         <div className="flex flex-col">
@@ -42,7 +43,7 @@ export default function WeekView({ currentDate, events, onEventClick }) {
                             return (
                                 <div key={day.toISOString()} className="flex min-h-0 min-w-0 flex-col items-stretch gap-1 border-l border-border p-1">
                                     {allDayEvents.map((event) => (
-                                        <EventChip key={event.id} event={event} variant="pill" onClick={onEventClick} />
+                                        <EventChip key={event.id} event={event} variant="pill" onClick={onEventClick} continuation={!isSameDay(event.start, day)} />
                                     ))}
                                 </div>
                             );
@@ -74,7 +75,7 @@ export default function WeekView({ currentDate, events, onEventClick }) {
                                                 event={event}
                                                 variant="block"
                                                 onClick={onEventClick}
-                                                style={{ top: `${topOffsetPx(event)}px`, height: `${heightPx(event)}px` }}
+                                                style={{ top: `${topOffsetPx(segmentoDelDia(event, day))}px`, height: `${heightPx(segmentoDelDia(event, day))}px` }}
                                             />
                                         ))}
                                     </div>

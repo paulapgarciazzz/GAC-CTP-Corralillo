@@ -11,6 +11,7 @@ import {
 } from 'date-fns';
 import EventChip from './EventChip';
 import MoreEventsPopover from './MoreEventsPopover';
+import { ocurreEnDia } from '../lib/eventosPorDia';
 
 const WEEKDAY_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 const MAX_VISIBLE_EVENTS = 3;
@@ -22,7 +23,7 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
     const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
     const days = eachDayOfInterval({ start: gridStart, end: gridEnd });
 
-    const eventsForDay = (day) => events.filter((event) => isSameDay(event.start, day));
+    const eventsForDay = (day) => events.filter((event) => ocurreEnDia(event, day));
 
     return (
         <div>
@@ -77,7 +78,13 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
                             )}
                             <div className="hidden flex-1 flex-col gap-1 overflow-hidden sm:flex">
                                 {visibleEvents.map((event) => (
-                                    <EventChip key={event.id} event={event} variant="pill" onClick={onEventClick} />
+                                    <EventChip
+                                        key={event.id}
+                                        event={event}
+                                        variant="pill"
+                                        onClick={onEventClick}
+                                        continuation={!isSameDay(event.start, day)}
+                                    />
                                 ))}
                                 {overflowEvents.length > 0 && (
                                     <MoreEventsPopover date={day} events={overflowEvents} onEventClick={onEventClick} />
