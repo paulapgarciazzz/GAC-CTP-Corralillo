@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modules\Calendario\Models\Evento;
 use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\Encargado;
 use App\Modules\SolicitudesAgrupaciones\Models\Estado;
@@ -425,5 +426,102 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
             ->assertJsonValidationErrors('agrupacion.archivo_adjunto');
 
         $this->assertDatabaseMissing('encargado', ['cedula' => '123456789']);
+    }
+
+    private function crearEvento(string $nombre = 'Festival'): Evento
+    {
+        return Evento::create([
+            'nombre' => $nombre,
+            'fecha_inicio' => '2026-10-10',
+            'fecha_fin' => '2026-10-10',
+            'estado' => true,
+        ]);
+    }
+
+    public function test_una_solicitud_nueva_guarda_el_evento_a_participar(): void
+    {
+        $evento = $this->crearEvento();
+
+        $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta([
+            'solicitud' => ['id_evento' => $evento->id_evento],
+        ]))->assertCreated();
+
+        $this->assertDatabaseHas('solicitud_agrupacion', ['id_evento' => $evento->id_evento]);
+    }
+
+    public function test_una_solicitud_nueva_sin_evento_sigue_siendo_valida(): void
+    {
+        $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta())
+            ->assertCreated();
+
+        $this->assertDatabaseHas('solicitud_agrupacion', ['id_evento' => null]);
+    }
+
+    public function test_una_solicitud_con_evento_inexistente_es_rechazada(): void
+    {
+        $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta([
+            'solicitud' => ['id_evento' => 9999],
+        ]))->assertStatus(422)->assertJsonValidationErrors('solicitud.id_evento');
+
+        $this->assertDatabaseCount('solicitud_agrupacion', 0);
+    }
+
+    public function test_encargado_existente_guarda_el_evento_a_participar(): void
+    {
+        $evento = $this->crearEvento();
+        $encargado = Encargado::create($this->baseEncargado());
+
+        $this->postJson('/api/solicitudes-agrupaciones/encargado-existente', [
+            'cedula' => $encargado->cedula,
+            'agrupacion' => $this->baseAgrupacion($encargado->cedula),
+            'solicitud' => [
+                'fecha_solicitada' => '2026-09-20',
+                'hora_solicitada' => '10:30',
+                'id_evento' => $evento->id_evento,
+            ],
+        ])->assertCreated();
+
+        $this->assertDatabaseHas('solicitud_agrupacion', ['id_evento' => $evento->id_evento]);
+    }
+
+    public function test_actualizar_una_solicitud_cambia_y_limpia_el_evento(): void
+    {
+        $evento = $this->crearEvento();
+        $encargado = Encargado::create($this->baseEncargado());
+        $agrupacion = Agrupacion::create($this->baseAgrupacion($encargado->cedula));
+        $solicitud = SolicitudAgrupacion::create([
+            'id_agrupacion' => $agrupacion->id,
+            'fecha_solicitud' => now(),
+            'fecha_solicitada' => '2026-09-20',
+            'hora_solicitada' => '10:30',
+            'id_estado' => Estado::where('nom_estado', 'pendiente')->value('id'),
+        ]);
+
+        $this->putJson("/api/solicitudes-agrupaciones/{$solicitud->id}", [
+            'solicitud' => ['id_evento' => $evento->id_evento],
+        ])->assertOk()->assertJsonPath('data.id_evento', $evento->id_evento);
+
+        $this->putJson("/api/solicitudes-agrupaciones/{$solicitud->id}", [
+            'solicitud' => ['id_evento' => null],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('solicitud_agrupacion', ['id' => $solicitud->id, 'id_evento' => null]);
+    }
+
+    public function test_no_se_puede_eliminar_un_evento_con_solicitudes(): void
+    {
+        $evento = $this->crearEvento();
+        $encargado = Encargado::create($this->baseEncargado());
+        $agrupacion = Agrupacion::create($this->baseAgrupacion($encargado->cedula));
+        SolicitudAgrupacion::create([
+            'id_agrupacion' => $agrupacion->id,
+            'id_evento' => $evento->id_evento,
+            'fecha_solicitud' => now(),
+            'fecha_solicitada' => '2026-09-20',
+            'hora_solicitada' => '10:30',
+            'id_estado' => Estado::where('nom_estado', 'pendiente')->value('id'),
+        ]);
+
+        $this->deleteJson("/api/eventos/{$evento->id_evento}")->assertStatus(409);
     }
 }

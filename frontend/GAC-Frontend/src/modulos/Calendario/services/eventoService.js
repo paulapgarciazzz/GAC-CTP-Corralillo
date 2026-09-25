@@ -16,6 +16,8 @@ const desdeApi = (evento) => {
         end: new Date(`${evento.fecha_fin}T${allDay ? '23:59' : evento.hora_fin || '23:59'}`),
         category: evento.categoria || 'info',
         allDay,
+        fechaInicio: evento.fecha_inicio,
+        activo: evento.estado !== false,
     };
 };
 

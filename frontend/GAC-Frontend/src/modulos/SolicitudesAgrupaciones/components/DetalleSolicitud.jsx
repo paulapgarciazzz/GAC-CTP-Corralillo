@@ -65,6 +65,7 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
             <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Datos de la solicitud</h3>
                 <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
+                    <Campo etiqueta="Evento a participar" valor={solicitud.evento?.nombre || 'Sin evento'} />
                     <Campo etiqueta="Fecha de solicitud" valor={formatearFecha(solicitud.fecha_solicitud)} />
                     <Campo etiqueta="Fecha deseada de participación" valor={formatearFecha(solicitud.fecha_solicitada)} />
                     <Campo etiqueta="Hora deseada de participación" valor={solicitud.hora_solicitada || '—'} />

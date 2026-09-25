@@ -13,6 +13,7 @@ export default function GestionSolicitudes() {
     const [error, setError] = useState('');
     const [mensajeExito, setMensajeExito] = useState('');
     const [busqueda, setBusqueda] = useState('');
+    const [filtroEvento, setFiltroEvento] = useState('todos');
 
     useEffect(() => {
         (async () => {
@@ -56,22 +57,41 @@ export default function GestionSolicitudes() {
     };
 
     const solicitudSeleccionada = solicitudes.find((s) => s.id === selectedId) ?? null;
-    const solicitudesFiltradas = solicitudes.filter((s) =>
-        s.agrupacion.nombre.toLowerCase().includes(busqueda.trim().toLowerCase())
-    );
+    const eventosConSolicitudes = [
+        ...new Map(solicitudes.filter((s) => s.evento).map((s) => [String(s.evento.id_evento), s.evento])).values(),
+    ].sort((a, b) => a.nombre.localeCompare(b.nombre));
+    const solicitudesFiltradas = solicitudes.filter((s) => {
+        const coincideNombre = s.agrupacion.nombre.toLowerCase().includes(busqueda.trim().toLowerCase());
+        const coincideEvento = filtroEvento === 'todos' || String(s.id_evento ?? 'ninguno') === filtroEvento;
+        return coincideNombre && coincideEvento;
+    });
 
     return (
         <div className="space-y-4">
 
-            <div className="relative max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-faint" />
-                <input
-                    type="text"
-                    value={busqueda}
-                    onChange={(e) => setBusqueda(e.target.value)}
-                    placeholder="Buscar agrupación por nombre..."
-                    className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+            <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative w-full max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-faint" />
+                    <input
+                        type="text"
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                        placeholder="Buscar agrupación por nombre..."
+                        className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                </div>
+                <select
+                    value={filtroEvento}
+                    onChange={(e) => setFiltroEvento(e.target.value)}
+                    aria-label="Filtrar por evento"
+                    className="w-full sm:w-64 px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                    <option value="todos">Todos los eventos</option>
+                    <option value="ninguno">Sin evento</option>
+                    {eventosConSolicitudes.map((evento) => (
+                        <option key={evento.id_evento} value={String(evento.id_evento)}>{evento.nombre}</option>
+                    ))}
+                </select>
             </div>
 
             {error && (
@@ -102,7 +122,7 @@ export default function GestionSolicitudes() {
                             onEditar={setSolicitudEditando}
                             onEnviarDetalles={handleEnviarDetalles}
                             onEliminar={handleEliminar}
-                            hayBusqueda={busqueda.trim().length > 0}
+                            hayBusqueda={busqueda.trim().length > 0 || filtroEvento !== 'todos'}
                         />
                     </div>
 

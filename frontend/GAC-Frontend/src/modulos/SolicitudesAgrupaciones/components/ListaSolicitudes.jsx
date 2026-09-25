@@ -11,7 +11,7 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
         return (
             <div className="h-full flex items-center justify-center p-6">
                 <p className="text-sm text-foreground-faint text-center">
-                    {hayBusqueda ? 'Ninguna agrupación coincide con la búsqueda.' : 'No hay solicitudes por el momento.'}
+                    {hayBusqueda ? 'Ninguna solicitud coincide con la búsqueda o el filtro.' : 'No hay solicitudes por el momento.'}
                 </p>
             </div>
         );

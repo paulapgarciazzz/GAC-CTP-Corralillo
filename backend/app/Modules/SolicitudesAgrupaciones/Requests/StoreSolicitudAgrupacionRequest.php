@@ -20,6 +20,12 @@ class StoreSolicitudAgrupacionRequest extends FormRequest
                 'exists:agrupacion,id',
             ],
 
+            'id_evento' => [
+                'nullable',
+                'integer',
+                'exists:evento,id_evento',
+            ],
+
             'fecha_solicitud' => [
                 'nullable',
                 'date',
