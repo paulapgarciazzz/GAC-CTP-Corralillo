@@ -2,7 +2,7 @@ import { isSameDay, format, setHours } from 'date-fns';
 import EventChip from './EventChip';
 import { HOURS, topOffsetPx, heightPx } from '../lib/timeGrid';
 
-export default function DayView({ currentDate, events }) {
+export default function DayView({ currentDate, events, onEventClick }) {
     const dayEvents = events.filter((event) => isSameDay(event.start, currentDate));
     const allDayEvents = dayEvents.filter((event) => event.allDay);
     const timedEvents = dayEvents.filter((event) => !event.allDay);
@@ -16,7 +16,7 @@ export default function DayView({ currentDate, events }) {
                         {allDayEvents.length === 0 ? (
                             <span className="text-xs text-foreground-faint">Sin eventos de todo el día</span>
                         ) : (
-                            allDayEvents.map((event) => <EventChip key={event.id} event={event} variant="pill" />)
+                            allDayEvents.map((event) => <EventChip key={event.id} event={event} variant="pill" onClick={onEventClick} />)
                         )}
                     </div>
 
@@ -41,6 +41,7 @@ export default function DayView({ currentDate, events }) {
                                         key={event.id}
                                         event={event}
                                         variant="block"
+                                        onClick={onEventClick}
                                         style={{ top: `${topOffsetPx(event)}px`, height: `${heightPx(event)}px` }}
                                     />
                                 ))}

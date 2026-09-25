@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import EventChip from './EventChip';
 
-export default function MoreEventsPopover({ date, events }) {
+export default function MoreEventsPopover({ date, events, onEventClick }) {
     const [open, setOpen] = useState(false);
     const containerRef = useRef(null);
 
@@ -40,7 +40,7 @@ export default function MoreEventsPopover({ date, events }) {
                     </p>
                     <div className="flex flex-col gap-1">
                         {events.map((event) => (
-                            <EventChip key={event.id} event={event} variant="pill" />
+                            <EventChip key={event.id} event={event} variant="pill" onClick={onEventClick} />
                         ))}
                     </div>
                 </div>

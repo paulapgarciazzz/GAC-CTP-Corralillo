@@ -15,7 +15,7 @@ import MoreEventsPopover from './MoreEventsPopover';
 const WEEKDAY_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 const MAX_VISIBLE_EVENTS = 3;
 
-export default function MonthView({ currentDate, events, onDayClick }) {
+export default function MonthView({ currentDate, events, onDayClick, onEventClick }) {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
@@ -77,10 +77,10 @@ export default function MonthView({ currentDate, events, onDayClick }) {
                             )}
                             <div className="hidden flex-1 flex-col gap-1 overflow-hidden sm:flex">
                                 {visibleEvents.map((event) => (
-                                    <EventChip key={event.id} event={event} variant="pill" />
+                                    <EventChip key={event.id} event={event} variant="pill" onClick={onEventClick} />
                                 ))}
                                 {overflowEvents.length > 0 && (
-                                    <MoreEventsPopover date={day} events={overflowEvents} />
+                                    <MoreEventsPopover date={day} events={overflowEvents} onEventClick={onEventClick} />
                                 )}
                             </div>
                         </div>

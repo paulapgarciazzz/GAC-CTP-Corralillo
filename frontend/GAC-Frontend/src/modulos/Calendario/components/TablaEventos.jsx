@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Search, CalendarPlus } from 'lucide-react';
-import { CATEGORY_COLORS } from '../data/sampleEvents';
+import { Search, CalendarPlus, Pencil, Trash2 } from 'lucide-react';
+import { CATEGORY_COLORS } from '../lib/categorias';
 
-export default function TablaEventos({ events, onCreateClick }) {
+export default function TablaEventos({ events, cargando, onCreateClick, onEdit, onDelete }) {
     const [busqueda, setBusqueda] = useState('');
     const [fechaDesde, setFechaDesde] = useState('');
     const [fechaHasta, setFechaHasta] = useState('');
@@ -23,6 +23,12 @@ export default function TablaEventos({ events, onCreateClick }) {
             })
             .sort((a, b) => a.start - b.start);
     }, [events, busqueda, fechaDesde, fechaHasta]);
+
+    const handleDelete = (evento) => {
+        if (window.confirm(`¿Eliminar el evento "${evento.title}"?`)) {
+            onDelete(evento.id);
+        }
+    };
 
     return (
         <div className="mx-auto w-full max-w-5xl space-y-4">
@@ -79,11 +85,13 @@ export default function TablaEventos({ events, onCreateClick }) {
 
             {eventosFiltrados.length === 0 ? (
                 <div className="flex items-center justify-center py-12 border border-border rounded-xl bg-surface">
-                    <p className="text-sm text-foreground-faint text-center">No se encontraron eventos con esos criterios.</p>
+                    <p className="text-sm text-foreground-faint text-center">
+                        {cargando ? 'Cargando eventos...' : 'No se encontraron eventos con esos criterios.'}
+                    </p>
                 </div>
             ) : (
                 <div className="bg-surface border border-border rounded-xl overflow-x-auto">
-                    <table className="w-full min-w-[760px] text-sm">
+                    <table className="w-full min-w-[860px] text-sm">
                         <thead className="bg-background border-b border-border">
                             <tr className="text-left text-xs uppercase tracking-wider text-foreground-faint">
                                 <th className="px-4 py-3 font-semibold">Evento</th>
@@ -91,6 +99,7 @@ export default function TablaEventos({ events, onCreateClick }) {
                                 <th className="px-4 py-3 font-semibold">Hora inicio</th>
                                 <th className="px-4 py-3 font-semibold">Fecha fin</th>
                                 <th className="px-4 py-3 font-semibold">Hora fin</th>
+                                <th className="px-4 py-3 font-semibold text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
@@ -114,6 +123,28 @@ export default function TablaEventos({ events, onCreateClick }) {
                                         </td>
                                         <td className="px-4 py-4 text-foreground-faint whitespace-nowrap">
                                             {evento.allDay ? 'Todo el día' : format(evento.end, 'HH:mm')}
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="flex justify-end gap-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onEdit(evento)}
+                                                    aria-label={`Editar ${evento.title}`}
+                                                    title="Editar"
+                                                    className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
+                                                >
+                                                    <Pencil size={16} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDelete(evento)}
+                                                    aria-label={`Eliminar ${evento.title}`}
+                                                    title="Eliminar"
+                                                    className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-danger-soft hover:text-danger cursor-pointer"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 );

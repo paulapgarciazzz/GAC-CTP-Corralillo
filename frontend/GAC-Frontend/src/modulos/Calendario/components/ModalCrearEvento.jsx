@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { X } from 'lucide-react';
 import FormularioEventoNuevo from './FormularioEventoNuevo';
 
-export default function ModalCrearEvento({ open, onClose, onCreate }){
+export default function ModalCrearEvento({ open, evento, onClose, onCreate, onUpdate, onDelete }){
     useEffect(() => {
         if (!open) return;
         const handleKeyDown = (e) => {
@@ -13,9 +13,19 @@ export default function ModalCrearEvento({ open, onClose, onCreate }){
     },[open, onClose]);
     if (!open) return null;
 
-    const handleSubmit = (evento) => {
-        onCreate?.(evento);
-        onClose();
+    const eventoId = evento?.id;
+
+    const handleSubmit = async (datos) => {
+        const resultado = evento ? await onUpdate(eventoId, datos) : await onCreate(datos);
+        if (resultado?.success) onClose();
+        return resultado;
+    };
+
+    const handleDelete = async () => {
+        if (!evento) return { success: false };
+        const resultado = await onDelete(eventoId);
+        if (resultado?.success) onClose();
+        return resultado;
     };
 
     return (
@@ -36,9 +46,14 @@ export default function ModalCrearEvento({ open, onClose, onCreate }){
                     <X size={22} />
                 </button>
                 <h2 id="titulo-modal-crear-evento" className="text-xl sm:text-2xl text-center font-bold text-primary mb-6">
-                    Crear evento
+                    {evento ? 'Editar evento' : 'Crear evento'}
                 </h2>
-                <FormularioEventoNuevo onSubmit={handleSubmit} onCancel={onClose} />
+                <FormularioEventoNuevo
+                    evento={evento}
+                    onSubmit={handleSubmit}
+                    onCancel={onClose}
+                    onDelete={handleDelete}
+                />
             </div>
         </div>
     );

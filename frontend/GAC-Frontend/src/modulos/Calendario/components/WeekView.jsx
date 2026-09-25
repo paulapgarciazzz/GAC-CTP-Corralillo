@@ -3,7 +3,7 @@ import { es } from 'date-fns/locale';
 import EventChip from './EventChip';
 import { HOURS, topOffsetPx, heightPx } from '../lib/timeGrid';
 
-export default function WeekView({ currentDate, events }) {
+export default function WeekView({ currentDate, events, onEventClick }) {
     const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
     const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
@@ -42,7 +42,7 @@ export default function WeekView({ currentDate, events }) {
                             return (
                                 <div key={day.toISOString()} className="flex min-h-0 min-w-0 flex-col items-stretch gap-1 border-l border-border p-1">
                                     {allDayEvents.map((event) => (
-                                        <EventChip key={event.id} event={event} variant="pill" />
+                                        <EventChip key={event.id} event={event} variant="pill" onClick={onEventClick} />
                                     ))}
                                 </div>
                             );
@@ -73,6 +73,7 @@ export default function WeekView({ currentDate, events }) {
                                                 key={event.id}
                                                 event={event}
                                                 variant="block"
+                                                onClick={onEventClick}
                                                 style={{ top: `${topOffsetPx(event)}px`, height: `${heightPx(event)}px` }}
                                             />
                                         ))}
