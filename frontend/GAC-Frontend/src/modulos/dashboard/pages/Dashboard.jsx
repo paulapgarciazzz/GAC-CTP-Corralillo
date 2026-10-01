@@ -6,8 +6,10 @@ import { getRouteApi } from '@tanstack/react-router';
 import GestionSolicitudes from '../../SolicitudesAgrupaciones/pages/GestionSolicitudes';
 import GestionAgrupaciones from '../../Agrupaciones/pages/GestionAgrupaciones';
 import ReportesAgrupaciones from '../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones';
+import ReportesInventario from '../../Reportes/pages/Reportes_inventario/ReportesInventario';
 import GestionAgrupacionesAjustes from '../../Agrupaciones/pages/GestionAgrupacionesAjustes';
 import GestionEncargadosAjustes from '../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes';
+import Calendario from '../../Calendario/pages/Calendario';
 import GestionBeneficios from '../../Beneficios/pages/GestionBeneficios';
 import AsignarBeneficios from '../../Beneficios/pages/AsignarBeneficios';
 import VerBeneficiosAsignados from '../../Beneficios/pages/VerBeneficiosAsignados';
@@ -20,12 +22,14 @@ const VISTAS_VALIDAS = [
     'Gestion de Solicitudes',
     'Gestion de Agrupaciones',
     'Reportes de Agrupaciones',
+    'Reportes de Inventario',
     'Gestion de beneficios',
     'Asignar beneficios',
     'Ver beneficios asignados',
     'Reportes de beneficios',
     'Gestión de agrupaciones',
     'Gestión de encargados',
+    'Calendario',
 ];
 
 const Dashboard =()=>{
@@ -92,12 +96,14 @@ const Dashboard =()=>{
                     {selectedView === 'Gestion de Solicitudes' && <GestionSolicitudes />}
                     {selectedView === 'Gestion de Agrupaciones' && <GestionAgrupaciones />}
                     {selectedView === 'Reportes de Agrupaciones' && <ReportesAgrupaciones />}
+                    {selectedView === 'Reportes de Inventario' && <ReportesInventario />}
                     {selectedView === 'Gestion de beneficios' && <GestionBeneficios />}
                     {selectedView === 'Asignar beneficios' && <AsignarBeneficios />}
                     {selectedView === 'Ver beneficios asignados' && <VerBeneficiosAsignados />}
                     {selectedView === 'Reportes de beneficios' && <ReportesBeneficios />}
                     {selectedView === 'Gestión de agrupaciones' && <GestionAgrupacionesAjustes />}
                     {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
+                    {selectedView === 'Calendario' && <Calendario />}
                 </main>
             </div>
 

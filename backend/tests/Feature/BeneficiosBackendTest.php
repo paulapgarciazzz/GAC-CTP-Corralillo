@@ -6,7 +6,6 @@ use App\Modules\Beneficios\Models\Alimentacion;
 use App\Modules\Beneficios\Models\Aula;
 use App\Modules\Beneficios\Models\Mobiliario;
 use App\Modules\Beneficios\Models\Ruta;
-use App\Modules\Beneficios\Models\Tarima;
 use App\Modules\Beneficios\Models\Transporte;
 use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\Encargado;
@@ -26,8 +25,6 @@ class BeneficiosBackendTest extends TestCase
     private Mobiliario $mobiliario;
 
     private Aula $aula;
-
-    private Tarima $tarima;
 
     private Ruta $ruta;
 
@@ -67,10 +64,6 @@ class BeneficiosBackendTest extends TestCase
             'nombre' => 'Aula Principal',
             'capacidad' => 50,
             'encargado' => 'María Rodríguez',
-        ]);
-
-        $this->tarima = Tarima::create([
-            'nombre' => 'Tarima Principal',
         ]);
 
         $this->ruta = Ruta::create([
@@ -126,13 +119,6 @@ class BeneficiosBackendTest extends TestCase
                 'Ruta Santa Cruz'
             );
 
-        $this->getJson('/api/tarimas')
-            ->assertOk()
-            ->assertJsonPath(
-                'data.0.nombre',
-                'Tarima Principal'
-            );
-
         $this->getJson('/api/transportes')
             ->assertOk()
             ->assertJsonPath(
@@ -182,15 +168,6 @@ class BeneficiosBackendTest extends TestCase
         $this->patchJson("/api/rutas/{$this->ruta->id_ruta}", [
             'nombre_ruta' => $rutaDuplicada->nombre_ruta,
         ])->assertStatus(422)->assertJsonValidationErrors(['nombre_ruta']);
-
-        $this->patchJson("/api/tarimas/{$this->tarima->id_tarima}", [
-            'nombre' => 'Tarima Principal',
-        ])->assertOk();
-
-        $tarimaDuplicada = Tarima::create(['nombre' => 'Tarima Secundaria']);
-        $this->patchJson("/api/tarimas/{$this->tarima->id_tarima}", [
-            'nombre' => $tarimaDuplicada->nombre,
-        ])->assertStatus(422)->assertJsonValidationErrors(['nombre']);
     }
 
     public function test_aula_guarda_encargado(): void
@@ -269,7 +246,6 @@ class BeneficiosBackendTest extends TestCase
 
         $this->assertDatabaseCount('asignacion_mobiliario', 2);
         $this->assertDatabaseCount('asignacion_alimentacion', 1);
-        $this->assertDatabaseCount('asignacion_tarima', 0);
     }
 
     public function test_alimentacion_asignada_usa_automaticamente_cantidad_integrantes(): void
@@ -409,10 +385,10 @@ class BeneficiosBackendTest extends TestCase
                 'id_solicitud_mobiliario' => 99,
                 'id_solicitud_alimentacion' => 99,
                 'id_solicitud_transporte' => 99,
-                'id_tarima' => $this->tarima->id_tarima,
+                'id_tarima' => 1,
                 'id_aula' => $this->aula->id_aula,
                 'tarimas' => [
-                    ['id_tarima' => $this->tarima->id_tarima],
+                    ['id_tarima' => 1],
                 ],
                 'mobiliarios' => [
                     ['id_mobiliario' => $this->mobiliario->id_mobiliario, 'cantidad' => 10],

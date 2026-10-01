@@ -76,6 +76,12 @@ class UpdateSolicitudAgrupacionRequest extends FormRequest
                 'sometimes',
                 'array',
             ],
+            'solicitud.id_evento' => [
+                'sometimes',
+                'nullable',
+                'integer',
+                'exists:evento,id_evento',
+            ],
             'solicitud.fecha_solicitada' => [
                 'sometimes',
                 'required',

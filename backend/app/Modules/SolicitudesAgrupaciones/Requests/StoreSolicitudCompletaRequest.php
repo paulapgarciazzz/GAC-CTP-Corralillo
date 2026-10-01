@@ -35,6 +35,7 @@ class StoreSolicitudCompletaRequest extends FormRequest
             'solicitud' => ['required', 'array'],
             'solicitud.fecha_solicitada' => ['required', 'date'],
             'solicitud.hora_solicitada' => ['required', 'date_format:H:i'],
+            'solicitud.id_evento' => ['nullable', 'integer', 'exists:evento,id_evento'],
             'solicitud.comentarios' => ['nullable', 'string', 'max:5000'],
             'solicitud.fecha_asignada' => ['prohibited'],
             'solicitud.hora_asignada' => ['prohibited'],

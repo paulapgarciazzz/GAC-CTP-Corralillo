@@ -2,6 +2,7 @@
 
 namespace App\Modules\SolicitudesAgrupaciones\Resources;
 
+use App\Modules\Calendario\Resources\EventoResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,6 +18,8 @@ class SolicitudAgrupacionResource extends JsonResource
             'fecha_asignada' => $this->fecha_asignada?->toDateString(),
             'hora_asignada' => $this->hora_asignada,
             'comentarios' => $this->comentarios,
+            'id_evento' => $this->id_evento,
+            'evento' => new EventoResource($this->whenLoaded('evento')),
             'estado' => $this->estado?->nom_estado,
             'agrupacion' => new AgrupacionResource($this->whenLoaded('agrupacion')),
             'auditorias' => AuditoriaResource::collection(

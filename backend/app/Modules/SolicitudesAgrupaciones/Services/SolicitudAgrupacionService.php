@@ -21,6 +21,7 @@ class SolicitudAgrupacionService
     {
         return SolicitudAgrupacion::with([
             'agrupacion.encargado',
+            'evento',
             'estado',
             'auditorias',
         ])->get();
@@ -31,6 +32,7 @@ class SolicitudAgrupacionService
         return SolicitudAgrupacion::with([
             'agrupacion.encargado',
             'agrupacion.participaciones',
+            'evento',
             'estado',
             'auditorias',
         ])->findOrFail($id);
@@ -46,6 +48,7 @@ class SolicitudAgrupacionService
 
             $solicitud = SolicitudAgrupacion::create([
                 'id_agrupacion' => $datos['id_agrupacion'],
+                'id_evento' => $datos['id_evento'] ?? null,
                 'fecha_solicitud' => $datos['fecha_solicitud'] ?? now(),
                 'fecha_solicitada' => $datos['fecha_solicitada'] ?? null,
                 'hora_solicitada' => $datos['hora_solicitada'] ?? null,
@@ -57,6 +60,7 @@ class SolicitudAgrupacionService
 
             return $solicitud->load([
                 'agrupacion.encargado',
+                'evento',
                 'estado',
             ]);
         });
@@ -100,12 +104,13 @@ class SolicitudAgrupacionService
 
         return SolicitudAgrupacion::create([
             'id_agrupacion' => $idAgrupacion,
+            'id_evento' => $datos['id_evento'] ?? null,
             'fecha_solicitud' => now(),
             'fecha_solicitada' => $datos['fecha_solicitada'],
             'hora_solicitada' => $datos['hora_solicitada'],
             'id_estado' => $estadoPendiente->id,
             'comentarios' => $datos['comentarios'] ?? null,
-        ])->load(['agrupacion.encargado', 'estado']);
+        ])->load(['agrupacion.encargado', 'evento', 'estado']);
     }
 
     public function aprobar(
@@ -205,6 +210,7 @@ class SolicitudAgrupacionService
 
             return $solicitud->fresh([
                 'agrupacion.encargado',
+                'evento',
                 'estado',
                 'auditorias',
             ]);

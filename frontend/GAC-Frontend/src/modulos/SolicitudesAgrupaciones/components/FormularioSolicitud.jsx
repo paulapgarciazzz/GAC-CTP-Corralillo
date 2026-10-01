@@ -4,6 +4,7 @@ import { crearSolicitud } from '../services/solicitudService';
 import { TIPOS_IDENTIFICACION, obtenerConfigIdentificacion, formatearValorIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono } from '../../../utils/telefono';
 import { obtenerFechaLocalISO } from '../../../utils/fecha';
+import SelectEvento from './SelectEvento';
 
 const valoresIniciales = {
     // Encargado
@@ -23,6 +24,7 @@ const valoresIniciales = {
     archivo_adjunto_nombre: '',
     resena: '',
     // Solicitud
+    id_evento: '',
     fecha_solicitada: '',
     hora_solicitada: '',
     comentarios: '',
@@ -134,6 +136,7 @@ export default function FormularioSolicitud({ onSuccess }) {
                 resena: valores.resena,
             },
             solicitud: {
+                id_evento: valores.id_evento || null,
                 fecha_solicitada: valores.fecha_solicitada,
                 hora_solicitada: valores.hora_solicitada,
                 comentarios: valores.comentarios,
@@ -268,6 +271,7 @@ export default function FormularioSolicitud({ onSuccess }) {
             <fieldset className="space-y-4">
                 <legend className="text-lg font-semibold text-primary">Datos de la solicitud</legend>
                 <div className="grid sm:grid-cols-2 gap-4">
+                    <SelectEvento value={valores.id_evento} onChange={handleChange} />
                     <div className="space-y-1">
                         <label htmlFor="fecha_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label>
                         <input id="fecha_solicitada" name="fecha_solicitada" type="date" min={hoy} value={valores.fecha_solicitada} onChange={handleChange} required

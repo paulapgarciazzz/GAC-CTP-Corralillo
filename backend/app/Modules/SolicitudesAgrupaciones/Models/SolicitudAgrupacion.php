@@ -2,6 +2,7 @@
 
 namespace App\Modules\SolicitudesAgrupaciones\Models;
 
+use App\Modules\Calendario\Models\Evento;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,6 +13,7 @@ class SolicitudAgrupacion extends Model
 
     protected $fillable = [
         'id_agrupacion',
+        'id_evento',
         'fecha_solicitud',
         'fecha_solicitada',
         'hora_solicitada',
@@ -33,6 +35,15 @@ class SolicitudAgrupacion extends Model
             Agrupacion::class,
             'id_agrupacion',
             'id'
+        );
+    }
+
+    public function evento(): BelongsTo
+    {
+        return $this->belongsTo(
+            Evento::class,
+            'id_evento',
+            'id_evento'
         );
     }
 

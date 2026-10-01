@@ -4,6 +4,7 @@ import { actualizarSolicitud } from '../services/solicitudService';
 import { obtenerConfigIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono, parsearNumeroTelefono } from '../../../utils/telefono';
 import CampoArchivoAdjunto from '../../../components/CampoArchivoAdjunto';
+import SelectEvento from './SelectEvento';
 
 export default function ModalEditarSolicitud({ open, solicitud, onClose, onActualizado }) {
     if (!open || !solicitud) return null;
@@ -35,6 +36,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
         lugar_procedencia: solicitud.agrupacion?.lugar_procedencia ?? '',
         cantidad_integrantes: solicitud.agrupacion?.cantidad_integrantes ?? '',
         // Solicitud
+        id_evento: solicitud.id_evento ?? '',
         fecha_solicitada: solicitud.fecha_solicitada ?? '',
         hora_solicitada: solicitud.hora_solicitada ?? '',
         comentarios: solicitud.comentarios ?? '',
@@ -94,6 +96,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                 cantidad_integrantes: valores.cantidad_integrantes,
             },
             solicitud: {
+                id_evento: valores.id_evento || null,
                 fecha_solicitada: valores.fecha_solicitada,
                 hora_solicitada: valores.hora_solicitada,
                 comentarios: valores.comentarios,
@@ -215,6 +218,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                     <fieldset className="space-y-4">
                         <legend className="text-lg font-semibold text-primary">Datos de la solicitud</legend>
                         <div className="grid sm:grid-cols-2 gap-4">
+                            <SelectEvento value={valores.id_evento} onChange={handleChange} idIncluido={solicitud.id_evento} />
                             <div className="space-y-1">
                                 <label htmlFor="fecha_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label>
                                 <input id="fecha_solicitada" name="fecha_solicitada" type="date" value={valores.fecha_solicitada} onChange={handleChange} required
