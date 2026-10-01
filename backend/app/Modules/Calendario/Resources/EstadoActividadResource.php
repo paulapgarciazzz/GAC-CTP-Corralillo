@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Modules\Beneficios\Resources;
+namespace App\Modules\Calendario\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TarimaResource extends JsonResource
+class EstadoActividadResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
         return [
-            'id_tarima' => $this->id_tarima,
+            'id_estado_actividad' => $this->id_estado_actividad,
             'nombre' => $this->nombre,
+            'descripcion' => $this->descripcion,
         ];
     }
 }

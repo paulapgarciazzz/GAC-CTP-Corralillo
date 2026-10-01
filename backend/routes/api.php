@@ -8,7 +8,9 @@ use App\Modules\SolicitudesAgrupaciones\Controllers\EncargadoController;
 use App\Modules\SolicitudesAgrupaciones\Controllers\ReporteController;
 use App\Modules\SolicitudesAgrupaciones\Controllers\SolicitudAgrupacionController;
 
+use App\Modules\Calendario\Controllers\ActividadController;
 use App\Modules\Calendario\Controllers\EventoController;
+use App\Modules\Calendario\Controllers\UbicacionController;
 
 use App\Modules\Beneficios\Controllers\AlimentacionController;
 use App\Modules\Beneficios\Controllers\AsignacionBeneficiosController;
@@ -17,11 +19,12 @@ use App\Modules\Beneficios\Controllers\BeneficiosReportController;
 use App\Modules\Beneficios\Controllers\InventarioReportController;
 use App\Modules\Beneficios\Controllers\MobiliarioController;
 use App\Modules\Beneficios\Controllers\RutaController;
-use App\Modules\Beneficios\Controllers\TarimaController;
 use App\Modules\Beneficios\Controllers\TransporteController;
 
 Route::pattern('agrupacion', '[0-9]+');
 Route::pattern('id', '[0-9]+');
+Route::pattern('actividad', '[0-9]+');
+Route::pattern('ubicacion', '[0-9]+');
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -203,17 +206,38 @@ Route::apiResource(
 
 /*
 |--------------------------------------------------------------------------
-| Tarima (pendiente de mover a Calendario/Actividades)
+| Calendario: Actividades y Ubicaciones
 |--------------------------------------------------------------------------
-| Tarima ya no forma parte de la asignación de beneficios ni de las
-| pantallas de Beneficios. El catálogo se deja funcionando aquí solo como
-| almacenamiento temporal hasta que exista el módulo Calendario/Actividades.
 */
 
 Route::apiResource(
-    'tarimas',
-    TarimaController::class
+    'ubicaciones',
+    UbicacionController::class
+)->parameters([
+    'ubicaciones' => 'ubicacion',
+]);
+
+Route::get(
+    'eventos/{evento}/actividades',
+    [ActividadController::class, 'porEvento']
 );
+
+Route::get(
+    'estados-actividad',
+    [ActividadController::class, 'estados']
+);
+
+Route::post(
+    'actividades/{actividad}/duplicar',
+    [ActividadController::class, 'duplicar']
+);
+
+Route::apiResource(
+    'actividades',
+    ActividadController::class
+)->parameters([
+    'actividades' => 'actividad',
+]);
 
 /*
 |--------------------------------------------------------------------------

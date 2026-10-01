@@ -38,4 +38,13 @@ class Evento extends Model
             'id_evento'
         );
     }
+
+    public function actividades(): HasMany
+    {
+        return $this->hasMany(
+            Actividad::class,
+            'id_evento',
+            'id_evento'
+        );
+    }
 }
