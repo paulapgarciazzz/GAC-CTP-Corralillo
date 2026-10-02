@@ -1,10 +1,6 @@
 import { format } from 'date-fns';
 import api from '../../../services/axios';
-
-const extraerMensajeError = (error, fallback) =>
-    error.response?.data?.message
-    || Object.values(error.response?.data?.errors || {})[0]?.[0]
-    || fallback;
+import { manejarError } from './manejoErrores';
 
 const desdeApi = (evento) => {
     const allDay = Boolean(evento.todo_el_dia) || !evento.hora_inicio;
@@ -36,8 +32,7 @@ export const obtenerEventos = async () => {
         const response = await api.get('/eventos');
         return { success: true, data: response.data.data.map(desdeApi) };
     } catch (error) {
-        const mensaje = extraerMensajeError(error, 'No se pudieron cargar los eventos.');
-        return { success: false, error: mensaje };
+        return manejarError(error, 'No se pudieron cargar los eventos.');
     }
 };
 
@@ -46,8 +41,7 @@ export const crearEvento = async (evento) => {
         const response = await api.post('/eventos', haciaApi(evento));
         return { success: true, data: desdeApi(response.data.data) };
     } catch (error) {
-        const mensaje = extraerMensajeError(error, 'No se pudo crear el evento.');
-        return { success: false, error: mensaje };
+        return manejarError(error, 'No se pudo crear el evento.');
     }
 };
 
@@ -56,8 +50,7 @@ export const actualizarEvento = async (id, evento) => {
         const response = await api.patch(`/eventos/${encodeURIComponent(id)}`, haciaApi(evento));
         return { success: true, data: desdeApi(response.data.data) };
     } catch (error) {
-        const mensaje = extraerMensajeError(error, 'No se pudo actualizar el evento.');
-        return { success: false, error: mensaje };
+        return manejarError(error, 'No se pudo actualizar el evento.');
     }
 };
 
@@ -66,7 +59,6 @@ export const eliminarEvento = async (id) => {
         await api.delete(`/eventos/${encodeURIComponent(id)}`);
         return { success: true };
     } catch (error) {
-        const mensaje = extraerMensajeError(error, 'No se pudo eliminar el evento.');
-        return { success: false, error: mensaje };
+        return manejarError(error, 'No se pudo eliminar el evento.');
     }
 };

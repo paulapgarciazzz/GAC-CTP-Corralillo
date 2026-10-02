@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { Check } from 'lucide-react';
 import { CATEGORY_COLORS } from '../lib/categorias';
+import { BOTON_PELIGRO_CLASS, INPUT_CLASS, LABEL_CLASS } from '../lib/formulario';
+import { AlertaError, BotonesFormulario } from './Formulario';
 
 const DARK_SOLID_BG = {
     info: 'dark:bg-info',
@@ -35,7 +37,7 @@ const initialState = {
 function Campo({ label, name, value, onChange, type = 'text' }) {
     return (
         <div className="space-y-1">
-            <label htmlFor={`evento-${name}`} className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+            <label htmlFor={`evento-${name}`} className={LABEL_CLASS}>
                 {label}
             </label>
             <input
@@ -45,7 +47,7 @@ function Campo({ label, name, value, onChange, type = 'text' }) {
                 value={value}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                className={INPUT_CLASS}
             />
         </div>
     );
@@ -119,11 +121,7 @@ export default function FormularioEventoNuevo({ evento, onSubmit, onCancel, onDe
 
     return (
         <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-                <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">
-                    {error}
-                </div>
-            )}
+            <AlertaError mensaje={error} />
 
             <Campo label="Título del evento" name="titulo" value={form.titulo} onChange={handleChange} />
 
@@ -162,33 +160,17 @@ export default function FormularioEventoNuevo({ evento, onSubmit, onCancel, onDe
                 </div>
             </div>
 
-            <div className="flex items-center gap-3 pt-2">
+            <BotonesFormulario
+                guardando={guardando}
+                textoEnviar={esEdicion ? 'Guardar' : 'Crear evento'}
+                onCancel={onCancel}
+            >
                 {esEdicion && (
-                    <button
-                        type="button"
-                        onClick={handleDelete}
-                        disabled={guardando}
-                        className="w-full py-2 px-3 text-sm whitespace-nowrap border border-danger/40 rounded-lg text-danger font-semibold hover:bg-danger-soft transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
+                    <button type="button" onClick={handleDelete} disabled={guardando} className={BOTON_PELIGRO_CLASS}>
                         Eliminar
                     </button>
                 )}
-                <button
-                    type="button"
-                    onClick={onCancel}
-                    disabled={guardando}
-                    className="w-full py-2 px-3 text-sm whitespace-nowrap border border-border rounded-lg text-foreground-soft font-semibold hover:bg-surface-soft transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                    Cancelar
-                </button>
-                <button
-                    type="submit"
-                    disabled={guardando}
-                    className="w-full py-2 px-3 text-sm whitespace-nowrap bg-primary hover:bg-primary-hover text-white font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                    {guardando ? 'Guardando...' : esEdicion ? 'Guardar' : 'Crear evento'}
-                </button>
-            </div>
+            </BotonesFormulario>
         </form>
     );
 }

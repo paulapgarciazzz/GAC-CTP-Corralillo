@@ -10,6 +10,7 @@ import ReportesInventario from '../../Reportes/pages/Reportes_inventario/Reporte
 import GestionAgrupacionesAjustes from '../../Agrupaciones/pages/GestionAgrupacionesAjustes';
 import GestionEncargadosAjustes from '../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes';
 import Calendario from '../../Calendario/pages/Calendario';
+import GestionUbicacionesAjustes from '../../Calendario/pages/GestionUbicacionesAjustes';
 import GestionBeneficios from '../../Beneficios/pages/GestionBeneficios';
 import AsignarBeneficios from '../../Beneficios/pages/AsignarBeneficios';
 import VerBeneficiosAsignados from '../../Beneficios/pages/VerBeneficiosAsignados';
@@ -19,9 +20,9 @@ import { useTheme } from '../../../hooks/useTheme';
 const routeApi = getRouteApi('/dashboard');
 
 const VISTAS_VALIDAS = [
-    'Gestion de Solicitudes',
+    'Bandeja de Solicitudes',
     'Gestion de Agrupaciones',
-    'Reportes de Agrupaciones',
+    'Reportes de Solicitudes',
     'Reportes de Inventario',
     'Gestion de beneficios',
     'Asignar beneficios',
@@ -29,6 +30,7 @@ const VISTAS_VALIDAS = [
     'Reportes de beneficios',
     'Gestión de agrupaciones',
     'Gestión de encargados',
+    'Gestión de ubicaciones',
     'Calendario',
 ];
 
@@ -93,9 +95,9 @@ const Dashboard =()=>{
                             <h1 className="text-2xl font-semibold text-foreground">Panel principal</h1>
                         </section>
                     )}
-                    {selectedView === 'Gestion de Solicitudes' && <GestionSolicitudes />}
+                    {selectedView === 'Bandeja de Solicitudes' && <GestionSolicitudes />}
                     {selectedView === 'Gestion de Agrupaciones' && <GestionAgrupaciones />}
-                    {selectedView === 'Reportes de Agrupaciones' && <ReportesAgrupaciones />}
+                    {selectedView === 'Reportes de Solicitudes' && <ReportesAgrupaciones />}
                     {selectedView === 'Reportes de Inventario' && <ReportesInventario />}
                     {selectedView === 'Gestion de beneficios' && <GestionBeneficios />}
                     {selectedView === 'Asignar beneficios' && <AsignarBeneficios />}
@@ -103,6 +105,7 @@ const Dashboard =()=>{
                     {selectedView === 'Reportes de beneficios' && <ReportesBeneficios />}
                     {selectedView === 'Gestión de agrupaciones' && <GestionAgrupacionesAjustes />}
                     {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
+                    {selectedView === 'Gestión de ubicaciones' && <GestionUbicacionesAjustes />}
                     {selectedView === 'Calendario' && <Calendario />}
                 </main>
             </div>

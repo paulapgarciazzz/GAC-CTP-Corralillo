@@ -104,6 +104,16 @@ class ActividadController extends Controller
     }
 
     /**
+     * Lista las agrupaciones con solicitud aprobada para un evento.
+     */
+    public function agrupacionesAprobadas(Evento $evento): JsonResponse
+    {
+        return response()->json([
+            'data' => $this->actividadService->listarAgrupacionesAprobadas($evento),
+        ]);
+    }
+
+    /**
      * Lista el catálogo de estados de actividad.
      */
     public function estados(): AnonymousResourceCollection

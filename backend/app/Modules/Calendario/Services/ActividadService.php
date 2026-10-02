@@ -5,7 +5,9 @@ namespace App\Modules\Calendario\Services;
 use App\Modules\Calendario\Models\Actividad;
 use App\Modules\Calendario\Models\EstadoActividad;
 use App\Modules\Calendario\Models\Evento;
+use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
@@ -24,12 +26,13 @@ class ActividadService
      */
     public function listar(): Collection
     {
-        return $this->prepararColeccion(
-            Actividad::query()
-                ->orderBy('fecha')
-                ->orderBy('hora_inicio')
-                ->get()
-        );
+        $this->sincronizarEstados();
+
+        return Actividad::query()
+            ->with(self::RELACIONES)
+            ->orderBy('fecha')
+            ->orderBy('hora_inicio')
+            ->get();
     }
 
     /**
@@ -37,12 +40,13 @@ class ActividadService
      */
     public function listarPorEvento(Evento $evento): Collection
     {
-        return $this->prepararColeccion(
-            $evento->actividades()
-                ->orderBy('fecha')
-                ->orderBy('hora_inicio')
-                ->get()
-        );
+        $this->sincronizarEstados($evento->id_evento);
+
+        return $evento->actividades()
+            ->with(self::RELACIONES)
+            ->orderBy('fecha')
+            ->orderBy('hora_inicio')
+            ->get();
     }
 
     /**
@@ -145,6 +149,19 @@ class ActividadService
     }
 
     /**
+     * Obtiene las agrupaciones con una solicitud aprobada para el evento.
+     */
+    public function listarAgrupacionesAprobadas(Evento $evento): Collection
+    {
+        return Agrupacion::query()
+            ->whereHas('solicitudes', function ($query) use ($evento) {
+                $this->filtrarSolicitudesAprobadas($query, $evento->id_evento);
+            })
+            ->orderBy('nombre')
+            ->get(['id', 'nombre']);
+    }
+
+    /**
      * Valida las reglas de negocio de una actividad con sus datos completos.
      */
     private function validarReglas(array $datos, ?int $ignorarId = null): void
@@ -198,13 +215,19 @@ class ActividadService
 
     private function agrupacionAprobadaEnEvento(int $idAgrupacion, int $idEvento): bool
     {
-        return SolicitudAgrupacion::query()
-            ->where('id_agrupacion', $idAgrupacion)
+        return $this->filtrarSolicitudesAprobadas(
+            SolicitudAgrupacion::query()->where('id_agrupacion', $idAgrupacion),
+            $idEvento
+        )->exists();
+    }
+
+    private function filtrarSolicitudesAprobadas(Builder $query, int $idEvento): Builder
+    {
+        return $query
             ->where('id_evento', $idEvento)
             ->whereHas('estado', function ($query) {
                 $query->where('nom_estado', 'aprobada');
-            })
-            ->exists();
+            });
     }
 
     /**
@@ -250,11 +273,33 @@ class ActividadService
         }
     }
 
-    private function prepararColeccion(Collection $actividades): Collection
+    /**
+     * Actualiza en bloque el estado de las actividades (opcionalmente de un evento).
+     * Son siempre 3 consultas, sin importar cuántas actividades existan, y solo
+     * se modifican las filas cuyo estado cambió. Usa los mismos límites que calcularEstado().
+     */
+    private function sincronizarEstados(?int $idEvento = null): void
     {
-        $actividades->each(fn (Actividad $actividad) => $this->sincronizarEstado($actividad));
+        $ahora = now()->format('Y-m-d H:i:s');
+        $ids = $this->idsEstados();
 
-        return $actividades->load(self::RELACIONES);
+        $condiciones = [
+            EstadoActividad::FINALIZADA => fn (Builder $query) => $query
+                ->whereRaw('TIMESTAMP(fecha, hora_finalizacion) <= ?', [$ahora]),
+            EstadoActividad::EN_PROGRESO => fn (Builder $query) => $query
+                ->whereRaw('TIMESTAMP(fecha, hora_inicio) <= ?', [$ahora])
+                ->whereRaw('TIMESTAMP(fecha, hora_finalizacion) > ?', [$ahora]),
+            EstadoActividad::PROXIMAMENTE => fn (Builder $query) => $query
+                ->whereRaw('TIMESTAMP(fecha, hora_inicio) > ?', [$ahora]),
+        ];
+
+        foreach ($condiciones as $nombre => $condicion) {
+            Actividad::query()
+                ->when($idEvento, fn (Builder $query) => $query->where('id_evento', $idEvento))
+                ->where('id_estado_actividad', '!=', $ids[$nombre])
+                ->tap($condicion)
+                ->update(['id_estado_actividad' => $ids[$nombre]]);
+        }
     }
 
     private function datosActuales(Actividad $actividad): array

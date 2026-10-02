@@ -5,12 +5,19 @@ import WeekView from '../components/WeekView';
 import DayView from '../components/DayView';
 import ModalCrearEvento from '../components/ModalCrearEvento';
 import TablaEventos from '../components/TablaEventos';
+import ModalActividad from '../components/ModalActividad';
+import ModalActividadesEvento from '../components/ModalActividadesEvento';
+import ModalConfirmarEliminacion from '../components/ModalConfirmarEliminacion';
+import { useActividades } from '../hooks/useActividades';
 import {
     obtenerEventos,
     crearEvento,
     actualizarEvento,
     eliminarEvento,
 } from '../services/eventoService';
+import { obtenerActividades } from '../services/actividadService';
+
+const MODAL_ACTIVIDAD_CERRADO = { abierto: false, evento: null, actividad: null };
 
 export default function Calendario() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -20,17 +27,34 @@ export default function Calendario() {
     const [error, setError] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [eventoEditando, setEventoEditando] = useState(null);
+    const [eventoConActividades, setEventoConActividades] = useState(null);
+    const [modalActividad, setModalActividad] = useState(MODAL_ACTIVIDAD_CERRADO);
+    const {
+        obtenerDeEvento,
+        establecerActividades,
+        guardarActividad,
+        quitarActividadesDeEvento,
+        eliminacion: eliminacionActividad,
+    } = useActividades();
 
     useEffect(() => {
         let activo = true;
 
         const cargar = async () => {
-            const resultado = await obtenerEventos();
+            const [resultadoEventos, resultadoActividades] = await Promise.all([
+                obtenerEventos(),
+                obtenerActividades(),
+            ]);
             if (!activo) return;
-            if (resultado.success) {
-                setEvents(resultado.data);
+            if (resultadoEventos.success) {
+                setEvents(resultadoEventos.data);
             } else {
-                setError(resultado.error);
+                setError(resultadoEventos.error);
+            }
+            if (resultadoActividades.success) {
+                establecerActividades(resultadoActividades.data);
+            } else if (resultadoEventos.success) {
+                setError(resultadoActividades.error);
             }
             setCargando(false);
         };
@@ -39,7 +63,7 @@ export default function Calendario() {
         return () => {
             activo = false;
         };
-    }, []);
+    }, [establecerActividades]);
 
     const goToday = () => setCurrentDate(new Date());
 
@@ -83,10 +107,19 @@ export default function Calendario() {
         const resultado = await eliminarEvento(id);
         if (resultado.success) {
             setEvents((prev) => prev.filter((item) => item.id !== id));
+            quitarActividadesDeEvento(id);
             setError('');
         } else {
             setError(resultado.error);
         }
+        return resultado;
+    };
+
+    const cerrarModalActividad = () => setModalActividad(MODAL_ACTIVIDAD_CERRADO);
+
+    const handleGuardarActividad = async (datos) => {
+        const resultado = await guardarActividad(modalActividad, datos);
+        if (resultado.success) cerrarModalActividad();
         return resultado;
     };
 
@@ -112,14 +145,14 @@ export default function Calendario() {
                         currentDate={currentDate}
                         events={events}
                         onDayClick={handleDayClick}
-                        onEventClick={abrirEditar}
+                        onEventClick={setEventoConActividades}
                     />
                 )}
                 {viewMode === 'week' && (
-                    <WeekView currentDate={currentDate} events={events} onEventClick={abrirEditar} />
+                    <WeekView currentDate={currentDate} events={events} onEventClick={setEventoConActividades} />
                 )}
                 {viewMode === 'day' && (
-                    <DayView currentDate={currentDate} events={events} onEventClick={abrirEditar} />
+                    <DayView currentDate={currentDate} events={events} onEventClick={setEventoConActividades} />
                 )}
             </div>
             <TablaEventos
@@ -128,6 +161,10 @@ export default function Calendario() {
                 onCreateClick={abrirCrear}
                 onEdit={abrirEditar}
                 onDelete={handleDeleteEvent}
+                actividadesDeEvento={obtenerDeEvento}
+                onAddActividad={(evento) => setModalActividad({ abierto: true, evento, actividad: null })}
+                onEditActividad={(evento, actividad) => setModalActividad({ abierto: true, evento, actividad })}
+                onDeleteActividad={eliminacionActividad.abrir}
             />
             <ModalCrearEvento
                 open={isModalOpen}
@@ -136,6 +173,28 @@ export default function Calendario() {
                 onCreate={handleCreateEvent}
                 onUpdate={handleUpdateEvent}
                 onDelete={handleDeleteEvent}
+            />
+            <ModalActividadesEvento
+                evento={eventoConActividades}
+                actividades={eventoConActividades ? obtenerDeEvento(eventoConActividades.id) : []}
+                onClose={() => setEventoConActividades(null)}
+            />
+            <ModalActividad
+                open={modalActividad.abierto}
+                evento={modalActividad.evento}
+                actividad={modalActividad.actividad}
+                onClose={cerrarModalActividad}
+                onGuardar={handleGuardarActividad}
+            />
+            <ModalConfirmarEliminacion
+                open={Boolean(eliminacionActividad.elemento)}
+                titulo="Eliminar actividad"
+                nombre={eliminacionActividad.elemento?.titulo}
+                textoBoton="Eliminar actividad"
+                loading={eliminacionActividad.eliminando}
+                error={eliminacionActividad.error}
+                onClose={eliminacionActividad.cerrar}
+                onConfirm={eliminacionActividad.confirmar}
             />
         </div>
     );

@@ -1,13 +1,34 @@
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Search, CalendarPlus, Pencil, Trash2 } from 'lucide-react';
+import { Search, CalendarPlus, ChevronDown, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
 import { CATEGORY_COLORS } from '../lib/categorias';
+import TablaActividades from './TablaActividades';
 
-export default function TablaEventos({ events, cargando, onCreateClick, onEdit, onDelete }) {
+export default function TablaEventos({
+    events,
+    cargando,
+    onCreateClick,
+    onEdit,
+    onDelete,
+    actividadesDeEvento,
+    onAddActividad,
+    onEditActividad,
+    onDeleteActividad,
+}) {
     const [busqueda, setBusqueda] = useState('');
     const [fechaDesde, setFechaDesde] = useState('');
     const [fechaHasta, setFechaHasta] = useState('');
+    const [expandidos, setExpandidos] = useState(() => new Set());
+
+    const alternarExpandido = (id) => {
+        setExpandidos((prev) => {
+            const siguiente = new Set(prev);
+            if (siguiente.has(id)) siguiente.delete(id);
+            else siguiente.add(id);
+            return siguiente;
+        });
+    };
 
     const eventosFiltrados = useMemo(() => {
         const desde = fechaDesde ? new Date(`${fechaDesde}T00:00:00`) : null;
@@ -105,12 +126,32 @@ export default function TablaEventos({ events, cargando, onCreateClick, onEdit, 
                         <tbody className="divide-y divide-border">
                             {eventosFiltrados.map((evento) => {
                                 const colors = CATEGORY_COLORS[evento.category] || CATEGORY_COLORS.info;
+                                const actividades = actividadesDeEvento(evento.id);
+                                const tieneActividades = actividades.length > 0;
+                                const expandido = tieneActividades && expandidos.has(evento.id);
                                 return (
-                                    <tr key={evento.id} className="hover:bg-background/60 transition-colors">
+                                    <Fragment key={evento.id}>
+                                    <tr className="hover:bg-background/60 transition-colors">
                                         <td className="px-4 py-4">
-                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ${colors.bg} ${colors.text}`}>
-                                                {evento.title}
-                                            </span>
+                                            <div className="flex items-center gap-1.5">
+                                                {tieneActividades ? (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => alternarExpandido(evento.id)}
+                                                        aria-expanded={expandido}
+                                                        aria-label={`${expandido ? 'Ocultar' : 'Mostrar'} actividades de ${evento.title}`}
+                                                        title={`${actividades.length} ${actividades.length === 1 ? 'actividad' : 'actividades'}`}
+                                                        className="shrink-0 rounded-md p-0.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
+                                                    >
+                                                        {expandido ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                                                    </button>
+                                                ) : (
+                                                    <span className="w-5 shrink-0" aria-hidden="true" />
+                                                )}
+                                                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ${colors.bg} ${colors.text}`}>
+                                                    {evento.title}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="px-4 py-4 text-foreground-soft whitespace-nowrap">
                                             {format(evento.start, "d MMM yyyy", { locale: es })}
@@ -126,6 +167,15 @@ export default function TablaEventos({ events, cargando, onCreateClick, onEdit, 
                                         </td>
                                         <td className="px-4 py-4">
                                             <div className="flex justify-end gap-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onAddActividad(evento)}
+                                                    aria-label={`Agregar actividad a ${evento.title}`}
+                                                    title="Agregar actividad"
+                                                    className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
+                                                >
+                                                    <Plus size={16} />
+                                                </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => onEdit(evento)}
@@ -147,6 +197,19 @@ export default function TablaEventos({ events, cargando, onCreateClick, onEdit, 
                                             </div>
                                         </td>
                                     </tr>
+                                    {expandido && (
+                                        <tr>
+                                            <td colSpan={6} className="p-0">
+                                                <TablaActividades
+                                                    actividades={actividades}
+                                                    embebida
+                                                    onEdit={(actividad) => onEditActividad(evento, actividad)}
+                                                    onDelete={onDeleteActividad}
+                                                />
+                                            </td>
+                                        </tr>
+                                    )}
+                                    </Fragment>
                                 );
                             })}
                         </tbody>
