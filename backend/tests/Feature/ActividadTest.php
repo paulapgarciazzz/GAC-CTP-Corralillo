@@ -12,6 +12,7 @@ use App\Modules\SolicitudesAgrupaciones\Models\Estado;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ActividadTest extends TestCase
@@ -161,6 +162,31 @@ class ActividadTest extends TestCase
             EstadoActividad::FINALIZADA,
             Actividad::find($actividad['id_actividad'])->estado->nombre
         );
+    }
+
+    public function test_listar_sincroniza_estados_en_bloque(): void
+    {
+        $terminada = $this->crearActividad(['hora_inicio' => '08:00', 'hora_finalizacion' => '09:00']);
+        $enCurso = $this->crearActividad(['hora_inicio' => '09:00', 'hora_finalizacion' => '11:00']);
+        $siguiente = $this->crearActividad(['hora_inicio' => '11:00', 'hora_finalizacion' => '12:00']);
+        $otroDia = $this->crearActividad(['fecha' => '2026-10-11']);
+
+        Carbon::setTestNow('2026-10-10 10:00:00');
+
+        DB::enableQueryLog();
+        $respuesta = $this->getJson('/api/actividades')->assertOk();
+        $actualizaciones = collect(DB::getQueryLog())
+            ->filter(fn (array $consulta) => str_starts_with(strtolower($consulta['query']), 'update'));
+        DB::disableQueryLog();
+
+        // Siempre 3 UPDATE (uno por estado), sin importar cuántas actividades haya.
+        $this->assertCount(3, $actualizaciones);
+
+        $estados = collect($respuesta->json('data'))->pluck('estado.nombre', 'id_actividad');
+        $this->assertSame(EstadoActividad::FINALIZADA, $estados[$terminada['id_actividad']]);
+        $this->assertSame(EstadoActividad::EN_PROGRESO, $estados[$enCurso['id_actividad']]);
+        $this->assertSame(EstadoActividad::PROXIMAMENTE, $estados[$siguiente['id_actividad']]);
+        $this->assertSame(EstadoActividad::PROXIMAMENTE, $estados[$otroDia['id_actividad']]);
     }
 
     public function test_no_permite_elegir_estado_manualmente(): void
@@ -365,6 +391,49 @@ class ActividadTest extends TestCase
             ->assertOk();
 
         $this->assertDatabaseMissing('actividad', ['id_actividad' => $actividad['id_actividad']]);
+    }
+
+    public function test_lista_agrupaciones_aprobadas_del_evento(): void
+    {
+        $encargado = $this->agrupacion->encargado;
+        $pendiente = Agrupacion::create([
+            'ced_encargado' => $encargado->cedula,
+            'nombre' => 'Coro Juvenil',
+            'lugar_procedencia' => 'Liberia',
+            'cantidad_integrantes' => 15,
+        ]);
+        $deOtroEvento = Agrupacion::create([
+            'ced_encargado' => $encargado->cedula,
+            'nombre' => 'Banda Municipal',
+            'lugar_procedencia' => 'Nicoya',
+            'cantidad_integrantes' => 30,
+        ]);
+
+        // Dos solicitudes aprobadas de la misma agrupación no la duplican.
+        $this->aprobarAgrupacionEnEvento($this->evento);
+        $this->aprobarAgrupacionEnEvento($this->evento);
+
+        $estado = fn (string $nombre) => Estado::where('nom_estado', $nombre)->firstOrFail()->id;
+        SolicitudAgrupacion::create([
+            'id_agrupacion' => $pendiente->id,
+            'id_evento' => $this->evento->id_evento,
+            'fecha_solicitud' => now(),
+            'id_estado' => $estado('pendiente'),
+        ]);
+        SolicitudAgrupacion::create([
+            'id_agrupacion' => $deOtroEvento->id,
+            'id_evento' => $this->otroEvento->id_evento,
+            'fecha_solicitud' => now(),
+            'id_estado' => $estado('aprobada'),
+        ]);
+
+        $this->getJson("/api/eventos/{$this->evento->id_evento}/agrupaciones-aprobadas")
+            ->assertOk()
+            ->assertExactJson([
+                'data' => [
+                    ['id' => $this->agrupacion->id, 'nombre' => 'Grupo de Baile'],
+                ],
+            ]);
     }
 
     public function test_lista_estados_de_actividad(): void

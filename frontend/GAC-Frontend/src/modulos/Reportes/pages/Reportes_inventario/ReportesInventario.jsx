@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Utensils, Armchair, School, Bus, Boxes, Printer } from 'lucide-react';
+import { Loader2, Utensils, Armchair, School, Bus, Boxes } from 'lucide-react';
 import { obtenerReporteInventario } from '../../services/reporteService';
 import TarjetaEstadistica from '../../components/Reportes_agrupaciones/TarjetaEstadistica';
+import BotonImprimir from '../../components/BotonImprimir';
 
 const TARJETAS = {
     alimentacion: { icon: Utensils, variant: 'warning' },
@@ -31,16 +32,7 @@ export default function ReportesInventario() {
         <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
                 <h2 className="text-lg font-semibold text-foreground">Reportes de Inventario</h2>
-                {!loading && !error && (
-                    <button
-                        type="button"
-                        onClick={() => window.print()}
-                        className="print:hidden flex items-center gap-2 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-hover transition-colors cursor-pointer"
-                    >
-                        <Printer size={16} />
-                        Imprimir
-                    </button>
-                )}
+                {!loading && !error && <BotonImprimir />}
             </div>
 
             {error && (

@@ -1,8 +1,11 @@
 import api from '../../../services/axios';
 
-export const obtenerReporteAgrupaciones = async () => {
+// Sin `idEvento` devuelve el resumen de todas las solicitudes.
+export const obtenerReporteAgrupaciones = async (idEvento) => {
     try {
-        const response = await api.get('/reportes/agrupaciones');
+        const response = await api.get('/reportes/agrupaciones', {
+            params: { id_evento: idEvento || undefined },
+        });
         return { success: true, data: response.data.data };
     } catch (error) {
         const mensaje = error.response?.data?.message || 'No se pudo cargar el reporte.';

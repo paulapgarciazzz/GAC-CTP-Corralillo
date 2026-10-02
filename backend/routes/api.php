@@ -223,6 +223,11 @@ Route::get(
 );
 
 Route::get(
+    'eventos/{evento}/agrupaciones-aprobadas',
+    [ActividadController::class, 'agrupacionesAprobadas']
+);
+
+Route::get(
     'estados-actividad',
     [ActividadController::class, 'estados']
 );

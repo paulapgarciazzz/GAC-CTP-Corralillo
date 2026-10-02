@@ -1,28 +1,35 @@
-import { useMemo, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Search, CalendarPlus, Pencil, Trash2 } from 'lucide-react';
+import { CalendarPlus, ChevronDown, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
 import { CATEGORY_COLORS } from '../lib/categorias';
+import { useFiltroEventos } from '../hooks/useFiltroEventos';
+import FiltrosEventos from './FiltrosEventos';
+import TablaActividades from './TablaActividades';
 
-export default function TablaEventos({ events, cargando, onCreateClick, onEdit, onDelete }) {
-    const [busqueda, setBusqueda] = useState('');
-    const [fechaDesde, setFechaDesde] = useState('');
-    const [fechaHasta, setFechaHasta] = useState('');
+export default function TablaEventos({
+    events,
+    cargando,
+    onCreateClick,
+    onEdit,
+    onDelete,
+    actividadesDeEvento,
+    onAddActividad,
+    onEditActividad,
+    onDeleteActividad,
+}) {
+    const filtro = useFiltroEventos(events);
+    const { eventosFiltrados } = filtro;
+    const [expandidos, setExpandidos] = useState(() => new Set());
 
-    const eventosFiltrados = useMemo(() => {
-        const desde = fechaDesde ? new Date(`${fechaDesde}T00:00:00`) : null;
-        const hasta = fechaHasta ? new Date(`${fechaHasta}T23:59:59`) : null;
-        const texto = busqueda.trim().toLowerCase();
-
-        return events
-            .filter((evento) => {
-                if (texto && !evento.title.toLowerCase().includes(texto)) return false;
-                if (desde && evento.end < desde) return false;
-                if (hasta && evento.start > hasta) return false;
-                return true;
-            })
-            .sort((a, b) => a.start - b.start);
-    }, [events, busqueda, fechaDesde, fechaHasta]);
+    const alternarExpandido = (id) => {
+        setExpandidos((prev) => {
+            const siguiente = new Set(prev);
+            if (siguiente.has(id)) siguiente.delete(id);
+            else siguiente.add(id);
+            return siguiente;
+        });
+    };
 
     const handleDelete = (evento) => {
         if (window.confirm(`¿Eliminar el evento "${evento.title}"?`)) {
@@ -44,44 +51,7 @@ export default function TablaEventos({ events, cargando, onCreateClick, onEdit, 
                 </button>
             </div>
 
-            <div className="bg-surface border border-border rounded-xl p-3 sm:p-4 flex flex-col gap-3 lg:flex-row lg:items-end">
-                <div className="relative min-w-0 flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-faint" />
-                    <input
-                        type="text"
-                        value={busqueda}
-                        onChange={(e) => setBusqueda(e.target.value)}
-                        placeholder="Buscar evento por nombre..."
-                        className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                </div>
-                <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-3">
-                    <div className="space-y-1 min-w-0">
-                        <label htmlFor="eventos-filtro-desde" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block whitespace-nowrap">
-                            Desde
-                        </label>
-                        <input
-                            id="eventos-filtro-desde"
-                            type="date"
-                            value={fechaDesde}
-                            onChange={(e) => setFechaDesde(e.target.value)}
-                            className="w-full sm:w-40 px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                    </div>
-                    <div className="space-y-1 min-w-0">
-                        <label htmlFor="eventos-filtro-hasta" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block whitespace-nowrap">
-                            Hasta
-                        </label>
-                        <input
-                            id="eventos-filtro-hasta"
-                            type="date"
-                            value={fechaHasta}
-                            onChange={(e) => setFechaHasta(e.target.value)}
-                            className="w-full sm:w-40 px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                    </div>
-                </div>
-            </div>
+            <FiltrosEventos filtro={filtro} />
 
             {eventosFiltrados.length === 0 ? (
                 <div className="flex items-center justify-center py-12 border border-border rounded-xl bg-surface">
@@ -105,12 +75,32 @@ export default function TablaEventos({ events, cargando, onCreateClick, onEdit, 
                         <tbody className="divide-y divide-border">
                             {eventosFiltrados.map((evento) => {
                                 const colors = CATEGORY_COLORS[evento.category] || CATEGORY_COLORS.info;
+                                const actividades = actividadesDeEvento(evento.id);
+                                const tieneActividades = actividades.length > 0;
+                                const expandido = tieneActividades && expandidos.has(evento.id);
                                 return (
-                                    <tr key={evento.id} className="hover:bg-background/60 transition-colors">
+                                    <Fragment key={evento.id}>
+                                    <tr className="hover:bg-background/60 transition-colors">
                                         <td className="px-4 py-4">
-                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ${colors.bg} ${colors.text}`}>
-                                                {evento.title}
-                                            </span>
+                                            <div className="flex items-center gap-1.5">
+                                                {tieneActividades ? (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => alternarExpandido(evento.id)}
+                                                        aria-expanded={expandido}
+                                                        aria-label={`${expandido ? 'Ocultar' : 'Mostrar'} actividades de ${evento.title}`}
+                                                        title={`${actividades.length} ${actividades.length === 1 ? 'actividad' : 'actividades'}`}
+                                                        className="shrink-0 rounded-md p-0.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
+                                                    >
+                                                        {expandido ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                                                    </button>
+                                                ) : (
+                                                    <span className="w-5 shrink-0" aria-hidden="true" />
+                                                )}
+                                                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ${colors.bg} ${colors.text}`}>
+                                                    {evento.title}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="px-4 py-4 text-foreground-soft whitespace-nowrap">
                                             {format(evento.start, "d MMM yyyy", { locale: es })}
@@ -126,6 +116,15 @@ export default function TablaEventos({ events, cargando, onCreateClick, onEdit, 
                                         </td>
                                         <td className="px-4 py-4">
                                             <div className="flex justify-end gap-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onAddActividad(evento)}
+                                                    aria-label={`Agregar actividad a ${evento.title}`}
+                                                    title="Agregar actividad"
+                                                    className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
+                                                >
+                                                    <Plus size={16} />
+                                                </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => onEdit(evento)}
@@ -147,6 +146,19 @@ export default function TablaEventos({ events, cargando, onCreateClick, onEdit, 
                                             </div>
                                         </td>
                                     </tr>
+                                    {expandido && (
+                                        <tr>
+                                            <td colSpan={6} className="p-0">
+                                                <TablaActividades
+                                                    actividades={actividades}
+                                                    embebida
+                                                    onEdit={(actividad) => onEditActividad(evento, actividad)}
+                                                    onDelete={onDeleteActividad}
+                                                />
+                                            </td>
+                                        </tr>
+                                    )}
+                                    </Fragment>
                                 );
                             })}
                         </tbody>
