@@ -13,3 +13,10 @@ export const formatearFecha = (fechaIso) =>
 export const formatearRangoEvento = (evento) => (isSameDay(evento.start, evento.end)
     ? format(evento.start, "d 'de' MMMM yyyy", { locale: es })
     : `${format(evento.start, 'd MMM yyyy', { locale: es })} – ${format(evento.end, 'd MMM yyyy', { locale: es })}`);
+
+/**
+ * Horario de un evento del calendario: '08:00 – 12:30' o 'Todo el día'.
+ */
+export const formatearHorarioEvento = (evento) => (evento.allDay
+    ? 'Todo el día'
+    : `${format(evento.start, 'HH:mm')} – ${format(evento.end, 'HH:mm')}`);

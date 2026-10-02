@@ -10,6 +10,16 @@ export const obtenerActividades = async () => {
     }
 };
 
+// El backend las devuelve ordenadas por fecha y hora de inicio.
+export const obtenerActividadesDeEvento = async (idEvento) => {
+    try {
+        const response = await api.get(`/eventos/${encodeURIComponent(idEvento)}/actividades`);
+        return { success: true, data: response.data.data };
+    } catch (error) {
+        return manejarError(error, 'No se pudieron cargar las actividades del evento.');
+    }
+};
+
 export const crearActividad = async (actividad) => {
     try {
         const response = await api.post('/actividades', actividad);
