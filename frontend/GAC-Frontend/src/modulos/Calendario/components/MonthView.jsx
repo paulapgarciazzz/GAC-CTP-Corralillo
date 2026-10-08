@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { X } from 'lucide-react';
+import { es } from 'date-fns/locale';
 import {
     startOfMonth,
     endOfMonth,
@@ -22,6 +25,8 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
     const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
     const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
     const days = eachDayOfInterval({ start: gridStart, end: gridEnd });
+
+    const [diaMovil, setDiaMovil] = useState(null);
 
     const eventsForDay = (day) => events.filter((event) => ocurreEnDia(event, day));
 
@@ -65,7 +70,12 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
                                 {format(day, 'd')}
                             </button>
                             {dayEvents.length > 0 && (
-                                <div className="flex flex-wrap items-center gap-1 sm:hidden">
+                                <button
+                                    type="button"
+                                    onClick={() => setDiaMovil(day)}
+                                    aria-label={`Ver eventos del ${format(day, "d 'de' MMMM", { locale: es })}`}
+                                    className="flex min-h-[20px] w-full flex-wrap items-center gap-1 rounded-md p-0.5 transition-colors hover:bg-primary/10 sm:hidden"
+                                >
                                     {dayEvents.slice(0, 4).map((event) => (
                                         <EventChip key={event.id} event={event} variant="dot" />
                                     ))}
@@ -74,7 +84,7 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
                                             +{dayEvents.length - 4}
                                         </span>
                                     )}
-                                </div>
+                                </button>
                             )}
                             <div className="hidden flex-1 flex-col gap-1 overflow-hidden sm:flex">
                                 {visibleEvents.map((event) => (
@@ -94,6 +104,45 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
                     );
                 })}
             </div>
+            {diaMovil && (
+                <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4 sm:hidden" onClick={() => setDiaMovil(null)}>
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={`Eventos del ${format(diaMovil, "d 'de' MMMM", { locale: es })}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="max-h-[70vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-surface p-4 shadow-2xl"
+                    >
+                        <div className="mb-3 flex items-center justify-between">
+                            <p className="text-sm font-semibold capitalize text-foreground">
+                                {format(diaMovil, "EEEE d 'de' MMMM", { locale: es })}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => setDiaMovil(null)}
+                                aria-label="Cerrar"
+                                className="text-foreground-faint transition-colors hover:text-foreground"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            {eventsForDay(diaMovil).map((event) => (
+                                <EventChip
+                                    key={event.id}
+                                    event={event}
+                                    variant="pill"
+                                    onClick={(ev) => {
+                                        setDiaMovil(null);
+                                        onEventClick?.(ev);
+                                    }}
+                                    continuation={!isSameDay(event.start, diaMovil)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

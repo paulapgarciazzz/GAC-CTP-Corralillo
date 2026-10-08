@@ -4,7 +4,8 @@ import { actualizarSolicitud } from '../services/solicitudService';
 import { obtenerConfigIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono, parsearNumeroTelefono } from '../../../utils/telefono';
 import CampoArchivoAdjunto from '../../../components/CampoArchivoAdjunto';
-import SelectEvento from './SelectEvento';
+import SelectorHora from '../../../components/SelectorHora';
+import SelectEvento, { MENSAJE_EVENTO_REQUERIDO } from './SelectEvento';
 
 export default function ModalEditarSolicitud({ open, solicitud, onClose, onActualizado }) {
     if (!open || !solicitud) return null;
@@ -43,6 +44,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [errorEvento, setErrorEvento] = useState('');
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -56,6 +58,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        if (name === 'id_evento') setErrorEvento('');
         setValores((prev) => ({ ...prev, [name]: value }));
     };
 
@@ -77,6 +80,12 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (!valores.id_evento) {
+            setErrorEvento(MENSAJE_EVENTO_REQUERIDO);
+            return;
+        }
+
         setLoading(true);
 
         const payload = {
@@ -96,7 +105,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                 cantidad_integrantes: valores.cantidad_integrantes,
             },
             solicitud: {
-                id_evento: valores.id_evento || null,
+                id_evento: valores.id_evento,
                 fecha_solicitada: valores.fecha_solicitada,
                 hora_solicitada: valores.hora_solicitada,
                 comentarios: valores.comentarios,
@@ -218,7 +227,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                     <fieldset className="space-y-4">
                         <legend className="text-lg font-semibold text-primary">Datos de la solicitud</legend>
                         <div className="grid sm:grid-cols-2 gap-4">
-                            <SelectEvento value={valores.id_evento} onChange={handleChange} idIncluido={solicitud.id_evento} />
+                            <SelectEvento value={valores.id_evento} onChange={handleChange} idIncluido={solicitud.id_evento} error={errorEvento} />
                             <div className="space-y-1">
                                 <label htmlFor="fecha_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label>
                                 <input id="fecha_solicitada" name="fecha_solicitada" type="date" value={valores.fecha_solicitada} onChange={handleChange} required
@@ -226,8 +235,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                             </div>
                             <div className="space-y-1">
                                 <label htmlFor="hora_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Hora deseada de participación</label>
-                                <input id="hora_solicitada" name="hora_solicitada" type="time" value={valores.hora_solicitada} onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                <SelectorHora id="hora_solicitada" name="hora_solicitada" value={valores.hora_solicitada} onChange={handleChange} />
                             </div>
                             <div className="space-y-1 sm:col-span-2">
                                 <label htmlFor="comentarios" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Comentarios</label>

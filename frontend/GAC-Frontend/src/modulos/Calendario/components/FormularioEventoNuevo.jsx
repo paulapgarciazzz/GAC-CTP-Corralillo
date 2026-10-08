@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { Check } from 'lucide-react';
+import SelectorHora from '../../../components/SelectorHora';
 import { CATEGORY_COLORS } from '../lib/categorias';
 import { BOTON_PELIGRO_CLASS, INPUT_CLASS, LABEL_CLASS } from '../lib/formulario';
 import { AlertaError, BotonesFormulario } from './Formulario';
@@ -131,8 +132,14 @@ export default function FormularioEventoNuevo({ evento, onSubmit, onCancel, onDe
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
-                <Campo label="Hora de inicio" name="horaInicio" type="time" value={form.horaInicio} onChange={handleChange} />
-                <Campo label="Hora de fin" name="horaFin" type="time" value={form.horaFin} onChange={handleChange} />
+                <div className="space-y-1">
+                    <label htmlFor="evento-horaInicio" className={LABEL_CLASS}>Hora de inicio</label>
+                    <SelectorHora id="evento-horaInicio" name="horaInicio" value={form.horaInicio} onChange={handleChange} required />
+                </div>
+                <div className="space-y-1">
+                    <label htmlFor="evento-horaFin" className={LABEL_CLASS}>Hora de fin</label>
+                    <SelectorHora id="evento-horaFin" name="horaFin" value={form.horaFin} onChange={handleChange} required />
+                </div>
             </div>
 
             <div className="space-y-2">

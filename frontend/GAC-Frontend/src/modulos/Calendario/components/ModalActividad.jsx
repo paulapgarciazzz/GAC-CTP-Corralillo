@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
+import SelectorHora from '../../../components/SelectorHora';
 import ModalBase from './ModalBase';
 import { AlertaError, BotonesFormulario, CampoFormulario } from './Formulario';
 import { INPUT_CLASS } from '../lib/formulario';
@@ -122,10 +123,10 @@ function FormularioActividad({ evento, actividad, onClose, onGuardar }) {
 
                 <div className="grid sm:grid-cols-2 gap-4">
                     <CampoFormulario id="actividad-hora-inicio" label="Hora de inicio" error={errores.hora_inicio?.[0]}>
-                        <input id="actividad-hora-inicio" name="hora_inicio" type="time" value={valores.hora_inicio} onChange={handleChange} required className={INPUT_CLASS} />
+                        <SelectorHora id="actividad-hora-inicio" name="hora_inicio" value={valores.hora_inicio} onChange={handleChange} required />
                     </CampoFormulario>
                     <CampoFormulario id="actividad-hora-fin" label="Hora de finalización" error={errores.hora_finalizacion?.[0]}>
-                        <input id="actividad-hora-fin" name="hora_finalizacion" type="time" value={valores.hora_finalizacion} onChange={handleChange} required className={INPUT_CLASS} />
+                        <SelectorHora id="actividad-hora-fin" name="hora_finalizacion" value={valores.hora_finalizacion} onChange={handleChange} required />
                     </CampoFormulario>
                 </div>
 

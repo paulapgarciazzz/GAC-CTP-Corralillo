@@ -35,7 +35,7 @@ class StoreSolicitudCompletaRequest extends FormRequest
             'solicitud' => ['required', 'array'],
             'solicitud.fecha_solicitada' => ['required', 'date'],
             'solicitud.hora_solicitada' => ['required', 'date_format:H:i'],
-            'solicitud.id_evento' => ['nullable', 'integer', 'exists:evento,id_evento'],
+            'solicitud.id_evento' => ['required', 'integer', 'exists:evento,id_evento'],
             'solicitud.comentarios' => ['nullable', 'string', 'max:5000'],
             'solicitud.fecha_asignada' => ['prohibited'],
             'solicitud.hora_asignada' => ['prohibited'],
@@ -48,6 +48,7 @@ class StoreSolicitudCompletaRequest extends FormRequest
             'encargado.cedula.unique' => 'Esta cédula ya está registrada. Si ya ha participado anteriormente, seleccione la opción \'Sí, ya he participado\'.',
             'encargado.email.unique' => 'Este correo electrónico ya está registrado.',
             'encargado.numero_tel.unique' => 'Este número de teléfono ya está registrado.',
+            'solicitud.id_evento.required' => 'Debe seleccionar el evento en el que desea participar.',
         ];
     }
 }
