@@ -4,6 +4,7 @@ import { actualizarSolicitud } from '../services/solicitudService';
 import { obtenerConfigIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono, parsearNumeroTelefono } from '../../../utils/telefono';
 import CampoArchivoAdjunto from '../../../components/CampoArchivoAdjunto';
+import SelectorHora from '../../../components/SelectorHora';
 import SelectEvento from './SelectEvento';
 
 export default function ModalEditarSolicitud({ open, solicitud, onClose, onActualizado }) {
@@ -226,8 +227,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                             </div>
                             <div className="space-y-1">
                                 <label htmlFor="hora_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Hora deseada de participación</label>
-                                <input id="hora_solicitada" name="hora_solicitada" type="time" value={valores.hora_solicitada} onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                <SelectorHora id="hora_solicitada" name="hora_solicitada" value={valores.hora_solicitada} onChange={handleChange} />
                             </div>
                             <div className="space-y-1 sm:col-span-2">
                                 <label htmlFor="comentarios" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Comentarios</label>

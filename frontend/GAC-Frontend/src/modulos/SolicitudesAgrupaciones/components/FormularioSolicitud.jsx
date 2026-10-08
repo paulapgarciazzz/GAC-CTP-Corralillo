@@ -4,6 +4,7 @@ import { crearSolicitud } from '../services/solicitudService';
 import { TIPOS_IDENTIFICACION, obtenerConfigIdentificacion, formatearValorIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono } from '../../../utils/telefono';
 import { obtenerFechaLocalISO } from '../../../utils/fecha';
+import SelectorHora from '../../../components/SelectorHora';
 import SelectEvento from './SelectEvento';
 
 const valoresIniciales = {
@@ -279,8 +280,7 @@ export default function FormularioSolicitud({ onSuccess }) {
                     </div>
                     <div className="space-y-1">
                         <label htmlFor="hora_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Hora deseada de participación</label>
-                        <input id="hora_solicitada" name="hora_solicitada" type="time" value={valores.hora_solicitada} onChange={handleChange} required
-                            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <SelectorHora id="hora_solicitada" name="hora_solicitada" value={valores.hora_solicitada} onChange={handleChange} required />
                     </div>
                     <div className="space-y-1 sm:col-span-2">
                         <label htmlFor="comentarios" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Comentarios (en caso de requerir algun beneficio)</label>
