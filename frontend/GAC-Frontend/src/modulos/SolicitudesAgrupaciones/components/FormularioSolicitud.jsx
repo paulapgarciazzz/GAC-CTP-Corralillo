@@ -5,7 +5,7 @@ import { TIPOS_IDENTIFICACION, obtenerConfigIdentificacion, formatearValorIdenti
 import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono } from '../../../utils/telefono';
 import { obtenerFechaLocalISO } from '../../../utils/fecha';
 import SelectorHora from '../../../components/SelectorHora';
-import SelectEvento from './SelectEvento';
+import SelectEvento, { MENSAJE_EVENTO_REQUERIDO } from './SelectEvento';
 
 const valoresIniciales = {
     // Encargado
@@ -113,6 +113,12 @@ export default function FormularioSolicitud({ onSuccess }) {
         e.preventDefault();
         setError('');
         setErrores({});
+
+        if (!valores.id_evento) {
+            setErrores({ id_evento: MENSAJE_EVENTO_REQUERIDO });
+            return;
+        }
+
         setLoading(true);
 
         const payload = {
@@ -137,7 +143,7 @@ export default function FormularioSolicitud({ onSuccess }) {
                 resena: valores.resena,
             },
             solicitud: {
-                id_evento: valores.id_evento || null,
+                id_evento: valores.id_evento,
                 fecha_solicitada: valores.fecha_solicitada,
                 hora_solicitada: valores.hora_solicitada,
                 comentarios: valores.comentarios,
@@ -272,7 +278,7 @@ export default function FormularioSolicitud({ onSuccess }) {
             <fieldset className="space-y-4">
                 <legend className="text-lg font-semibold text-primary">Datos de la solicitud</legend>
                 <div className="grid sm:grid-cols-2 gap-4">
-                    <SelectEvento value={valores.id_evento} onChange={handleChange} />
+                    <SelectEvento value={valores.id_evento} onChange={handleChange} error={errores.id_evento} />
                     <div className="space-y-1">
                         <label htmlFor="fecha_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label>
                         <input id="fecha_solicitada" name="fecha_solicitada" type="date" min={hoy} value={valores.fecha_solicitada} onChange={handleChange} required

@@ -78,7 +78,7 @@ class UpdateSolicitudAgrupacionRequest extends FormRequest
             ],
             'solicitud.id_evento' => [
                 'sometimes',
-                'nullable',
+                'required',
                 'integer',
                 'exists:evento,id_evento',
             ],
@@ -108,6 +108,13 @@ class UpdateSolicitudAgrupacionRequest extends FormRequest
                 'string',
                 'max:5000',
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'solicitud.id_evento.required' => 'Debe seleccionar el evento en el que desea participar.',
         ];
     }
 }

@@ -27,10 +27,17 @@ class StoreSolicitudEncargadoExistenteRequest extends FormRequest
             'solicitud' => ['required', 'array'],
             'solicitud.fecha_solicitada' => ['required', 'date'],
             'solicitud.hora_solicitada' => ['required', 'date_format:H:i'],
-            'solicitud.id_evento' => ['nullable', 'integer', 'exists:evento,id_evento'],
+            'solicitud.id_evento' => ['required', 'integer', 'exists:evento,id_evento'],
             'solicitud.comentarios' => ['nullable', 'string', 'max:5000'],
             'solicitud.fecha_asignada' => ['prohibited'],
             'solicitud.hora_asignada' => ['prohibited'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'solicitud.id_evento.required' => 'Debe seleccionar el evento en el que desea participar.',
         ];
     }
 }

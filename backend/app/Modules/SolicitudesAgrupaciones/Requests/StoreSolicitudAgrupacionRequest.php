@@ -21,7 +21,7 @@ class StoreSolicitudAgrupacionRequest extends FormRequest
             ],
 
             'id_evento' => [
-                'nullable',
+                'required',
                 'integer',
                 'exists:evento,id_evento',
             ],
@@ -69,6 +69,13 @@ class StoreSolicitudAgrupacionRequest extends FormRequest
                 'nullable',
                 'date_format:H:i',
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'id_evento.required' => 'Debe seleccionar el evento en el que desea participar.',
         ];
     }
 }

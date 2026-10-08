@@ -16,6 +16,15 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     private const PNG_1X1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
 
+    private Evento $evento;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->evento = $this->crearEvento('Evento base');
+    }
+
     private function crearEstadoPendiente(): void
     {
         $this->assertDatabaseHas('estado', ['nom_estado' => 'pendiente']);
@@ -53,6 +62,7 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
             'encargado' => $this->baseEncargado(),
             'agrupacion' => $this->baseAgrupacion('123456789'),
             'solicitud' => [
+                'id_evento' => $this->evento->id_evento,
                 'fecha_solicitada' => '2026-09-20',
                 'hora_solicitada' => '10:30',
                 'comentarios' => 'Solicitud de participación.',
@@ -289,12 +299,14 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
         $this->postJson('/api/solicitudes-agrupaciones', [
             'id_agrupacion' => $agrupacion->id,
+            'id_evento' => $this->evento->id_evento,
             'fecha_solicitud' => '2026-09-08',
             'comentarios' => 'Primera solicitud',
         ])->assertCreated();
 
         $this->postJson('/api/solicitudes-agrupaciones', [
             'id_agrupacion' => $agrupacion->id,
+            'id_evento' => $this->evento->id_evento,
             'fecha_solicitud' => '2026-09-09',
             'comentarios' => 'Segunda solicitud',
         ])->assertCreated();
@@ -363,6 +375,7 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
             'cedula' => $encargado->cedula,
             'agrupacion' => $this->baseAgrupacion($encargado->cedula),
             'solicitud' => [
+                'id_evento' => $this->evento->id_evento,
                 'fecha_solicitada' => '2026-09-20',
                 'hora_solicitada' => '10:30',
             ],
@@ -449,12 +462,37 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
         $this->assertDatabaseHas('solicitud_agrupacion', ['id_evento' => $evento->id_evento]);
     }
 
-    public function test_una_solicitud_nueva_sin_evento_sigue_siendo_valida(): void
+    public function test_una_solicitud_nueva_sin_evento_es_rechazada(): void
     {
-        $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta())
-            ->assertCreated();
+        $payload = $this->baseSolicitudCompleta();
+        unset($payload['solicitud']['id_evento']);
 
-        $this->assertDatabaseHas('solicitud_agrupacion', ['id_evento' => null]);
+        $this->postJson('/api/solicitudes-agrupaciones/nueva', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'solicitud.id_evento' => 'Debe seleccionar el evento en el que desea participar.',
+            ]);
+
+        $this->assertDatabaseMissing('encargado', ['cedula' => '123456789']);
+        $this->assertDatabaseCount('solicitud_agrupacion', 0);
+    }
+
+    public function test_encargado_existente_sin_evento_es_rechazado(): void
+    {
+        $encargado = Encargado::create($this->baseEncargado());
+
+        $this->postJson('/api/solicitudes-agrupaciones/encargado-existente', [
+            'cedula' => $encargado->cedula,
+            'agrupacion' => $this->baseAgrupacion($encargado->cedula),
+            'solicitud' => [
+                'id_evento' => null,
+                'fecha_solicitada' => '2026-09-20',
+                'hora_solicitada' => '10:30',
+            ],
+        ])->assertStatus(422)->assertJsonValidationErrors('solicitud.id_evento');
+
+        $this->assertDatabaseCount('agrupacion', 0);
+        $this->assertDatabaseCount('solicitud_agrupacion', 0);
     }
 
     public function test_una_solicitud_con_evento_inexistente_es_rechazada(): void
@@ -484,7 +522,7 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
         $this->assertDatabaseHas('solicitud_agrupacion', ['id_evento' => $evento->id_evento]);
     }
 
-    public function test_actualizar_una_solicitud_cambia_y_limpia_el_evento(): void
+    public function test_actualizar_una_solicitud_cambia_el_evento_pero_no_lo_limpia(): void
     {
         $evento = $this->crearEvento();
         $encargado = Encargado::create($this->baseEncargado());
@@ -503,9 +541,9 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
         $this->putJson("/api/solicitudes-agrupaciones/{$solicitud->id}", [
             'solicitud' => ['id_evento' => null],
-        ])->assertOk();
+        ])->assertStatus(422)->assertJsonValidationErrors('solicitud.id_evento');
 
-        $this->assertDatabaseHas('solicitud_agrupacion', ['id' => $solicitud->id, 'id_evento' => null]);
+        $this->assertDatabaseHas('solicitud_agrupacion', ['id' => $solicitud->id, 'id_evento' => $evento->id_evento]);
     }
 
     public function test_no_se_puede_eliminar_un_evento_con_solicitudes(): void

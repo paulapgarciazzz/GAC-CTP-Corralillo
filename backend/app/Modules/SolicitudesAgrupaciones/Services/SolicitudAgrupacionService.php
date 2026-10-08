@@ -48,7 +48,7 @@ class SolicitudAgrupacionService
 
             $solicitud = SolicitudAgrupacion::create([
                 'id_agrupacion' => $datos['id_agrupacion'],
-                'id_evento' => $datos['id_evento'] ?? null,
+                'id_evento' => $datos['id_evento'],
                 'fecha_solicitud' => $datos['fecha_solicitud'] ?? now(),
                 'fecha_solicitada' => $datos['fecha_solicitada'] ?? null,
                 'hora_solicitada' => $datos['hora_solicitada'] ?? null,
@@ -104,7 +104,7 @@ class SolicitudAgrupacionService
 
         return SolicitudAgrupacion::create([
             'id_agrupacion' => $idAgrupacion,
-            'id_evento' => $datos['id_evento'] ?? null,
+            'id_evento' => $datos['id_evento'],
             'fecha_solicitud' => now(),
             'fecha_solicitada' => $datos['fecha_solicitada'],
             'hora_solicitada' => $datos['hora_solicitada'],
