@@ -43,7 +43,7 @@ const Navbar = ({isDark, onToggleTheme}) => {
                     </div>
                     <ul className="hidden lg:flex ml-14 space-x-12">
                         <li><Link to="/" className="hover:text-accent transition-colors">Inicio</Link></li>
-                        <li><a href="#" className="hover:text-accent transition-colors">Calendario</a></li>
+                        <li><a href="#calendario" className="hover:text-accent transition-colors">Calendario</a></li>
                         <li><a href="#conocenos" className="hover:text-accent transition-colors">Conocenos</a></li>
                         <li><a href="#ubicacion" className="hover:text-accent transition-colors">Ubicación</a></li>
                     </ul>
@@ -109,7 +109,7 @@ const Navbar = ({isDark, onToggleTheme}) => {
                     <div className="lg:hidden mt-4 pb-2 -mx-4 px-4 rounded-b-2xl bg-surface text-foreground shadow-lg">
                         <ul className="flex flex-col space-y-4 pt-4">
                             <li><Link to="/" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Inicio</Link></li>
-                            <li><a href="#" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Calendario</a></li>
+                            <li><a href="#calendario" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Calendario</a></li>
                             <li><a href="#conocenos" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Conocenos</a></li>
                             <li><a href="#ubicacion" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Ubicación</a></li>
                         </ul>
