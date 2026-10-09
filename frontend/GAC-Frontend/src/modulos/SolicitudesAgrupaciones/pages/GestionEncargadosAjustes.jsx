@@ -64,18 +64,25 @@ export default function GestionEncargadosAjustes() {
     const [eliminando, setEliminando] = useState(false);
     const [errorEliminacion, setErrorEliminacion] = useState('');
 
-    const cargarEncargados = async () => {
-        setLoading(true);
-        setError('');
-        const resultado = await obtenerEncargados();
+    const aplicarResultado = (resultado) => {
         if (resultado.success) setEncargados(Array.isArray(resultado.data) ? resultado.data : []);
         else setError(resultado.error);
         setLoading(false);
     };
 
     useEffect(() => {
-        cargarEncargados();
+        let activo = true;
+        obtenerEncargados().then((resultado) => {
+            if (activo) aplicarResultado(resultado);
+        });
+        return () => { activo = false; };
     }, []);
+
+    const reintentar = async () => {
+        setLoading(true);
+        setError('');
+        aplicarResultado(await obtenerEncargados());
+    };
 
     const abrirConfirmacion = (encargado) => {
         setErrorEliminacion('');
@@ -111,7 +118,7 @@ export default function GestionEncargadosAjustes() {
                 <p className="mt-1 text-sm text-foreground-soft">Administra los encargados registrados y sus datos asociados.</p>
             </div>
             {mensajeExito && <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">{mensajeExito}</div>}
-            {error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><span>{error}</span><button type="button" onClick={cargarEncargados} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer"><RefreshCw size={14} />Reintentar</button></div>}
+            {error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><span>{error}</span><button type="button" onClick={reintentar} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer"><RefreshCw size={14} />Reintentar</button></div>}
             {loading ? (
                 <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft"><Loader2 className="animate-spin text-primary" size={24} />Cargando encargados...</div>
             ) : encargados.length === 0 ? (

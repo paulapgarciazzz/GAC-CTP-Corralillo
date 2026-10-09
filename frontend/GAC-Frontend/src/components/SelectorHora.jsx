@@ -14,6 +14,9 @@ const CONTENEDOR_CLASS = 'relative flex w-full items-center border border-border
 
 const PARTE_CLASS = 'py-2 bg-transparent text-foreground cursor-pointer rounded-md focus:outline-none focus-visible:bg-primary/10 disabled:opacity-60 disabled:cursor-not-allowed';
 
+// El <select> es transparente, así que la lista nativa no hereda el tema: las opciones necesitan sus propios colores.
+const OPCION_CLASS = 'bg-surface text-foreground';
+
 // Debe coincidir con `max-h-48` de la lista (12rem): unas 6 opciones visibles.
 const ALTO_LISTA = 192;
 
@@ -217,9 +220,9 @@ export default function SelectorHora({ id, name, value, onChange, required = fal
             <ListaDesplegable etiqueta="Minutos" value={partes.minuto} opciones={MINUTOS} onChange={(minuto) => cambiarParte('minuto', minuto)} disabled={sinHora} className="px-2" />
             <span className="h-6 w-px shrink-0 bg-border" aria-hidden="true" />
             <select aria-label="a. m. o p. m." value={partes.periodo} onChange={(e) => cambiarParte('periodo', e.target.value)} disabled={sinHora} className={`shrink-0 px-2 ${PARTE_CLASS}`}>
-                {sinHora && <option value="">--</option>}
+                {sinHora && <option value="" className={OPCION_CLASS}>--</option>}
                 {PERIODOS.map((periodo) => (
-                    <option key={periodo.value} value={periodo.value}>{periodo.label}</option>
+                    <option key={periodo.value} value={periodo.value} className={OPCION_CLASS}>{periodo.label}</option>
                 ))}
             </select>
         </div>
