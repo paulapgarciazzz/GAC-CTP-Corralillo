@@ -37,6 +37,9 @@
 }
 
 :root[data-theme="dark"]{
+  /* Los controles nativos (listas de <select>, íconos de fecha, scrollbars) se dibujan en oscuro. */
+  color-scheme: dark;
+
   --color-primary: #45ac75;
   --color-primary-hover: #6bc596;
   --color-accent: #7ecdda;

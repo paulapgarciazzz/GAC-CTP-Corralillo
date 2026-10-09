@@ -84,10 +84,7 @@ export default function GestionAgrupacionesAjustes() {
     const [eliminando, setEliminando] = useState(false);
     const [errorEliminacion, setErrorEliminacion] = useState('');
 
-    const cargarAgrupaciones = async () => {
-        setLoading(true);
-        setError('');
-        const resultado = await obtenerAgrupacionesAdministrativas();
+    const aplicarResultado = (resultado) => {
         if (resultado.success) {
             setAgrupaciones(Array.isArray(resultado.data) ? resultado.data : []);
         } else {
@@ -97,8 +94,18 @@ export default function GestionAgrupacionesAjustes() {
     };
 
     useEffect(() => {
-        cargarAgrupaciones();
+        let activo = true;
+        obtenerAgrupacionesAdministrativas().then((resultado) => {
+            if (activo) aplicarResultado(resultado);
+        });
+        return () => { activo = false; };
     }, []);
+
+    const reintentar = async () => {
+        setLoading(true);
+        setError('');
+        aplicarResultado(await obtenerAgrupacionesAdministrativas());
+    };
 
     const abrirConfirmacion = (agrupacion) => {
         setErrorEliminacion('');
@@ -137,7 +144,7 @@ export default function GestionAgrupacionesAjustes() {
             </div>
 
             {mensajeExito && <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">{mensajeExito}</div>}
-            {error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><span>{error}</span><button type="button" onClick={cargarAgrupaciones} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer"><RefreshCw size={14} />Reintentar</button></div>}
+            {error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><span>{error}</span><button type="button" onClick={reintentar} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer"><RefreshCw size={14} />Reintentar</button></div>}
 
             {loading ? (
                 <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft"><Loader2 className="animate-spin text-primary" size={24} />Cargando agrupaciones...</div>

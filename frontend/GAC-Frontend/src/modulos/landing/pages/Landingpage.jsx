@@ -1,6 +1,7 @@
 import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
 import EventoDestacado from '../components/EventoDestacado'
+import CalendarioEventos from '../components/calendario/CalendarioEventos'
 import Contador from '../components/Contador'
 import VisionMision from '../components/VisionMision'
 import Ubicacion from '../components/Ubicacion'
@@ -14,6 +15,7 @@ const Landingpage = () => {
             <Navbar isDark={isDark} onToggleTheme={toggleTheme} />
             <Hero />
             <EventoDestacado />
+            <CalendarioEventos />
             <Contador />
             <VisionMision />
             <Ubicacion />
