@@ -177,30 +177,51 @@ class ActividadService
 
         $evento = Evento::query()->findOrFail($datos['id_evento']);
         $fecha = $datos['fecha'];
+        $fechaInicio = $evento->fecha_inicio->format('Y-m-d');
+        $fechaFin = $evento->fecha_fin->format('Y-m-d');
 
-        if (
-            $fecha < $evento->fecha_inicio->format('Y-m-d')
-            || $fecha > $evento->fecha_fin->format('Y-m-d')
-        ) {
+        if ($fecha < $fechaInicio || $fecha > $fechaFin) {
             throw ValidationException::withMessages([
                 'fecha' => 'La fecha de la actividad debe estar dentro de las fechas del evento.',
             ]);
         }
 
-        if (! empty($datos['id_ubicacion'])) {
-            $hayChoque = Actividad::query()
-                ->where('id_ubicacion', $datos['id_ubicacion'])
-                ->where('fecha', $fecha)
-                ->where('hora_inicio', '<', $fin)
-                ->where('hora_finalizacion', '>', $inicio)
-                ->when($ignorarId, fn ($query) => $query->where('id_actividad', '!=', $ignorarId))
-                ->exists();
+        // Si el evento tiene horario, el primer día empieza a su hora de inicio y el último termina a su hora de fin.
+        if (! $evento->todo_el_dia && $evento->hora_inicio) {
+            $horaInicioEvento = substr($evento->hora_inicio, 0, 5);
+            $horaFinEvento = $evento->hora_fin ? substr($evento->hora_fin, 0, 5) : null;
 
-            if ($hayChoque) {
+            if ($fecha === $fechaInicio && $inicio < $horaInicioEvento) {
                 throw ValidationException::withMessages([
-                    'id_ubicacion' => 'La ubicación ya tiene otra actividad en ese horario.',
+                    'hora_inicio' => "La actividad no puede empezar antes del inicio del evento ({$horaInicioEvento}).",
                 ]);
             }
+
+            if ($fecha === $fechaFin && $horaFinEvento && $fin > $horaFinEvento) {
+                throw ValidationException::withMessages([
+                    'hora_finalizacion' => "La actividad no puede terminar después del fin del evento ({$horaFinEvento}).",
+                ]);
+            }
+        }
+
+        // Dos actividades no pueden traslaparse en la misma fecha, sin importar la ubicación.
+        // Los horarios contiguos (una termina cuando la otra empieza) sí se permiten.
+        $choque = Actividad::query()
+            ->where('fecha', $fecha)
+            ->where('hora_inicio', '<', $fin)
+            ->where('hora_finalizacion', '>', $inicio)
+            ->when($ignorarId, fn ($query) => $query->where('id_actividad', '!=', $ignorarId))
+            ->first(['titulo', 'hora_inicio', 'hora_finalizacion']);
+
+        if ($choque) {
+            throw ValidationException::withMessages([
+                'hora_inicio' => sprintf(
+                    'El horario choca con la actividad "%s" (%s – %s).',
+                    $choque->titulo,
+                    substr($choque->hora_inicio, 0, 5),
+                    substr($choque->hora_finalizacion, 0, 5)
+                ),
+            ]);
         }
 
         if (

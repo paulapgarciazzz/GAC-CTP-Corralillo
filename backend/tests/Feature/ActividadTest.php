@@ -218,15 +218,54 @@ class ActividadTest extends TestCase
         $this->assertDatabaseCount('actividad', 0);
     }
 
-    public function test_valida_choque_de_horario_en_la_misma_ubicacion(): void
+    public function test_valida_horas_dentro_del_horario_del_evento(): void
     {
-        $this->crearActividad();
+        // El evento va del 10 a las 08:00 al 12 a las 14:00.
+        $this->evento->update(['hora_inicio' => '08:00', 'hora_fin' => '14:00']);
 
         $this->postJson('/api/actividades', $this->datosActividad([
-            'hora_inicio' => '10:30',
-            'hora_finalizacion' => '11:30',
+            'hora_inicio' => '07:30',
+            'hora_finalizacion' => '09:00',
         ]))->assertStatus(422)
-            ->assertJsonValidationErrors(['id_ubicacion']);
+            ->assertJsonValidationErrors(['hora_inicio']);
+
+        $this->postJson('/api/actividades', $this->datosActividad([
+            'fecha' => '2026-10-12',
+            'hora_inicio' => '13:30',
+            'hora_finalizacion' => '14:30',
+        ]))->assertStatus(422)
+            ->assertJsonValidationErrors(['hora_finalizacion']);
+
+        // Los límites exactos son válidos y los días intermedios no tienen restricción.
+        $this->crearActividad(['hora_inicio' => '08:00', 'hora_finalizacion' => '09:00']);
+        $this->crearActividad(['fecha' => '2026-10-12', 'hora_inicio' => '13:00', 'hora_finalizacion' => '14:00']);
+        $this->crearActividad(['fecha' => '2026-10-11', 'hora_inicio' => '06:00', 'hora_finalizacion' => '20:00']);
+
+        // Un evento de todo el día no limita las horas.
+        $this->evento->update(['todo_el_dia' => true]);
+        $this->crearActividad(['hora_inicio' => '06:00', 'hora_finalizacion' => '07:00']);
+
+        $this->assertDatabaseCount('actividad', 4);
+    }
+
+    public function test_valida_choque_de_horario_en_la_misma_fecha(): void
+    {
+        $this->crearActividad();
+        $otraUbicacion = Ubicacion::create(['nombre' => 'Tarima Secundaria', 'capacidad' => 100]);
+
+        // Choca sin importar la ubicación, y también si el rango contiene al existente.
+        $choques = [
+            ['hora_inicio' => '10:30', 'hora_finalizacion' => '11:30'],
+            ['hora_inicio' => '10:30', 'hora_finalizacion' => '11:30', 'id_ubicacion' => $otraUbicacion->id_ubicacion],
+            ['hora_inicio' => '10:30', 'hora_finalizacion' => '11:30', 'id_ubicacion' => null],
+            ['hora_inicio' => '09:00', 'hora_finalizacion' => '12:00'],
+        ];
+
+        foreach ($choques as $cambios) {
+            $this->postJson('/api/actividades', $this->datosActividad($cambios))
+                ->assertStatus(422)
+                ->assertJsonValidationErrors(['hora_inicio']);
+        }
 
         // Horarios contiguos no chocan.
         $this->crearActividad([
@@ -234,11 +273,10 @@ class ActividadTest extends TestCase
             'hora_finalizacion' => '12:00',
         ]);
 
-        // Otra fecha u otra ubicación no chocan.
+        // Otra fecha no choca.
         $this->crearActividad(['fecha' => '2026-10-11']);
-        $this->crearActividad(['id_ubicacion' => null]);
 
-        $this->assertDatabaseCount('actividad', 4);
+        $this->assertDatabaseCount('actividad', 3);
     }
 
     public function test_valida_que_la_agrupacion_este_aprobada_en_el_evento(): void
@@ -282,7 +320,7 @@ class ActividadTest extends TestCase
         $this->patchJson("/api/actividades/{$otra['id_actividad']}", [
             'hora_inicio' => '10:30',
         ])->assertStatus(422)
-            ->assertJsonValidationErrors(['id_ubicacion']);
+            ->assertJsonValidationErrors(['hora_inicio']);
 
         $this->patchJson("/api/actividades/{$otra['id_actividad']}", [
             'hora_finalizacion' => '11:30',
@@ -371,12 +409,12 @@ class ActividadTest extends TestCase
         ])->assertStatus(422)
             ->assertJsonValidationErrors(['fecha']);
 
-        // Mismo evento, misma fecha y ubicación: choca con la original.
+        // Mismo evento, misma fecha y horario: choca con la original.
         $this->postJson("/api/actividades/{$original['id_actividad']}/duplicar", [
             'id_evento' => $this->evento->id_evento,
             'fecha' => '2026-10-10',
         ])->assertStatus(422)
-            ->assertJsonValidationErrors(['id_ubicacion']);
+            ->assertJsonValidationErrors(['hora_inicio']);
 
         $this->postJson("/api/actividades/{$original['id_actividad']}/duplicar", [])
             ->assertStatus(422)
