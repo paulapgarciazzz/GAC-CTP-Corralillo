@@ -163,6 +163,9 @@ function FormularioActividad({ evento, actividad, onClose, onGuardar }) {
                     {!cargandoOpciones && agrupaciones.length === 0 && (
                         <p className="text-xs text-foreground-faint">No hay agrupaciones con solicitud aprobada para este evento.</p>
                     )}
+                    {valores.id_agrupacion && (
+                        <p className="text-xs text-foreground-faint">El horario de esta actividad se asignará a la solicitud de la agrupación.</p>
+                    )}
                 </CampoFormulario>
 
                 <AlertaError mensaje={error} />

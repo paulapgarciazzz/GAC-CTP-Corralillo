@@ -10,6 +10,7 @@ use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class ActividadService
@@ -74,9 +75,13 @@ class ActividadService
             $datos['hora_finalizacion']
         );
 
-        return Actividad::create($datos)
-            ->refresh()
-            ->load(self::RELACIONES);
+        return DB::transaction(function () use ($datos) {
+            $actividad = Actividad::create($datos);
+
+            $this->sincronizarHorarioAsignado($actividad->id_evento, $actividad->id_agrupacion);
+
+            return $actividad->refresh()->load(self::RELACIONES);
+        });
     }
 
     /**
@@ -94,9 +99,19 @@ class ActividadService
             $completos['hora_finalizacion']
         );
 
-        $actividad->update($datos);
+        return DB::transaction(function () use ($actividad, $datos) {
+            $agrupacionAnterior = $actividad->id_agrupacion;
 
-        return $actividad->refresh()->load(self::RELACIONES);
+            $actividad->update($datos);
+
+            $this->sincronizarHorarioAsignado(
+                $actividad->id_evento,
+                $agrupacionAnterior,
+                $actividad->id_agrupacion
+            );
+
+            return $actividad->refresh()->load(self::RELACIONES);
+        });
     }
 
     /**
@@ -135,7 +150,11 @@ class ActividadService
      */
     public function eliminar(Actividad $actividad): void
     {
-        $actividad->delete();
+        DB::transaction(function () use ($actividad) {
+            $actividad->delete();
+
+            $this->sincronizarHorarioAsignado($actividad->id_evento, $actividad->id_agrupacion);
+        });
     }
 
     /**
@@ -249,6 +268,30 @@ class ActividadService
             ->whereHas('estado', function ($query) {
                 $query->where('nom_estado', 'aprobada');
             });
+    }
+
+    /**
+     * Asigna a la solicitud aprobada de cada agrupación la fecha y hora de su
+     * primera actividad en el evento (o NULL si ya no tiene actividades).
+     */
+    private function sincronizarHorarioAsignado(int $idEvento, ?int ...$idsAgrupacion): void
+    {
+        foreach (array_unique(array_filter($idsAgrupacion)) as $idAgrupacion) {
+            $primera = Actividad::query()
+                ->where('id_evento', $idEvento)
+                ->where('id_agrupacion', $idAgrupacion)
+                ->orderBy('fecha')
+                ->orderBy('hora_inicio')
+                ->first(['fecha', 'hora_inicio']);
+
+            $this->filtrarSolicitudesAprobadas(
+                SolicitudAgrupacion::query()->where('id_agrupacion', $idAgrupacion),
+                $idEvento
+            )->update([
+                'fecha_asignada' => $primera?->fecha->format('Y-m-d'),
+                'hora_asignada' => $primera?->hora_inicio,
+            ]);
+        }
     }
 
     /**
