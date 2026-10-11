@@ -3,6 +3,7 @@
 namespace App\Modules\SolicitudesAgrupaciones\Requests;
 
 use App\Modules\SolicitudesAgrupaciones\Rules\ArchivoAdjuntoValido;
+use App\Modules\SolicitudesAgrupaciones\Rules\FotoValida;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSolicitudEncargadoExistenteRequest extends FormRequest
@@ -23,6 +24,7 @@ class StoreSolicitudEncargadoExistenteRequest extends FormRequest
             'agrupacion.cantidad_integrantes' => ['required_with:agrupacion', 'integer', 'min:1'],
             'agrupacion.resena' => ['nullable', 'string', 'max:5000'],
             'agrupacion.archivo_adjunto' => ['required_with:agrupacion', 'string', new ArchivoAdjuntoValido()],
+            'agrupacion.foto_url' => ['nullable', 'string', new FotoValida()],
 
             'solicitud' => ['required', 'array'],
             'solicitud.fecha_solicitada' => ['required', 'date'],

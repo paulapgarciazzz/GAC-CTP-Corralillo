@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Upload, Users, X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { actualizarAgrupacion } from '../services/agrupacionService';
 import { obtenerConfigIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono, parsearNumeroTelefono } from '../../../utils/telefono';
 import CampoArchivoAdjunto from '../../../components/CampoArchivoAdjunto';
+import CampoFotoAgrupacion from '../../../components/CampoFotoAgrupacion';
 
 export default function ModalEditarAgrupacion({ open, agrupacion, onClose, onActualizado }) {
     if (!open || !agrupacion) return null;
@@ -38,23 +39,6 @@ function FormularioEdicion({ agrupacion, onClose, onActualizado }) {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-
-    const handleFotoChange = (e) => {
-        const archivo = e.target.files?.[0];
-        if (!archivo) return;
-
-        if (!archivo.type.startsWith('image/')) {
-            setError('El archivo seleccionado debe ser una imagen.');
-            return;
-        }
-
-        setError('');
-        const reader = new FileReader();
-        reader.onload = () => {
-            setValores((prev) => ({ ...prev, foto_url: reader.result }));
-        };
-        reader.readAsDataURL(archivo);
-    };
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -145,23 +129,13 @@ function FormularioEdicion({ agrupacion, onClose, onActualizado }) {
                 </h3>
 
                 <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-                    <div className="flex flex-col items-center gap-3">
-                        <div className="w-24 h-24 rounded-full bg-primary/10 border border-border overflow-hidden flex items-center justify-center">
-                            {valores.foto_url ? (
-                                <img src={valores.foto_url} alt={valores.nombre} className="w-full h-full object-cover" />
-                            ) : (
-                                <Users size={32} className="text-primary/40" />
-                            )}
-                        </div>
-                        <label
-                            htmlFor="foto"
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border border-primary text-primary hover:bg-primary/10 transition-colors cursor-pointer"
-                        >
-                            <Upload size={14} />
-                            Cambiar foto
-                        </label>
-                        <input id="foto" name="foto" type="file" accept="image/*" onChange={handleFotoChange} className="hidden" />
-                    </div>
+                    <CampoFotoAgrupacion
+                        id="foto"
+                        fotoUrl={valores.foto_url}
+                        alt={valores.nombre}
+                        onChange={(foto_url) => setValores((prev) => ({ ...prev, foto_url }))}
+                        onError={setError}
+                    />
 
                     <fieldset className="space-y-4">
                         <legend className="text-lg font-semibold text-primary">Datos del encargado</legend>

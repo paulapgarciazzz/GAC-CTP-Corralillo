@@ -4,6 +4,7 @@ import { crearSolicitud } from '../services/solicitudService';
 import { TIPOS_IDENTIFICACION, obtenerConfigIdentificacion, formatearValorIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono } from '../../../utils/telefono';
 import SelectorHora from '../../../components/SelectorHora';
+import CampoFotoAgrupacion from '../../../components/CampoFotoAgrupacion';
 import SelectEvento, { MENSAJE_EVENTO_REQUERIDO } from './SelectEvento';
 import { useEventos, useRangoEvento } from '../hooks/useEventos';
 
@@ -21,6 +22,7 @@ const valoresIniciales = {
     nombre: '',
     lugar_procedencia: '',
     cantidad_integrantes: '',
+    foto_url: null,
     archivo_adjunto: null,
     archivo_adjunto_nombre: '',
     resena: '',
@@ -139,6 +141,7 @@ export default function FormularioSolicitud({ onSuccess }) {
                 nombre: valores.nombre,
                 lugar_procedencia: valores.lugar_procedencia,
                 cantidad_integrantes: valores.cantidad_integrantes,
+                foto_url: valores.foto_url,
                 archivo_adjunto: valores.archivo_adjunto,
                 resena: valores.resena,
             },
@@ -239,6 +242,12 @@ export default function FormularioSolicitud({ onSuccess }) {
             <fieldset className="space-y-4">
                 <legend className="text-lg font-semibold text-primary">Datos de la agrupación</legend>
                 <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="sm:col-span-2">
+                        <CampoFotoAgrupacion fotoUrl={valores.foto_url} alt={valores.nombre || undefined}
+                            onChange={(foto_url) => setValores((prev) => ({ ...prev, foto_url }))}
+                            onError={(mensaje) => setErrores((prev) => ({ ...prev, 'agrupacion.foto_url': mensaje }))}
+                            error={errores['agrupacion.foto_url']} />
+                    </div>
                     <div className="space-y-1">
                         <label htmlFor="nombre" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Nombre de la agrupación</label>
                         <input id="nombre" name="nombre" type="text" value={valores.nombre} onChange={handleChange} required

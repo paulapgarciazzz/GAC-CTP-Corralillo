@@ -441,6 +441,52 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
         $this->assertDatabaseMissing('encargado', ['cedula' => '123456789']);
     }
 
+    public function test_una_solicitud_nueva_guarda_la_foto_de_la_agrupacion(): void
+    {
+        $foto = 'data:image/png;base64,' . self::PNG_1X1;
+
+        $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta([
+            'agrupacion' => ['foto_url' => $foto],
+        ]))->assertCreated();
+
+        $this->assertDatabaseHas('agrupacion', ['ced_encargado' => '123456789', 'foto_url' => $foto]);
+    }
+
+    public function test_una_solicitud_nueva_sin_foto_es_aceptada(): void
+    {
+        $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta())
+            ->assertCreated();
+
+        $this->assertDatabaseHas('agrupacion', ['ced_encargado' => '123456789', 'foto_url' => null]);
+    }
+
+    public function test_una_solicitud_nueva_con_foto_que_no_es_imagen_es_rechazada(): void
+    {
+        $this->postJson('/api/solicitudes-agrupaciones/nueva', $this->baseSolicitudCompleta([
+            'agrupacion' => ['foto_url' => 'data:application/pdf;base64,' . base64_encode("%PDF-1.4\n%%EOF")],
+        ]))->assertStatus(422)->assertJsonValidationErrors('agrupacion.foto_url');
+
+        $this->assertDatabaseCount('agrupacion', 0);
+    }
+
+    public function test_encargado_existente_con_agrupacion_nueva_guarda_la_foto(): void
+    {
+        $encargado = Encargado::create($this->baseEncargado());
+        $foto = 'data:image/png;base64,' . self::PNG_1X1;
+
+        $this->postJson('/api/solicitudes-agrupaciones/encargado-existente', [
+            'cedula' => $encargado->cedula,
+            'agrupacion' => $this->baseAgrupacion($encargado->cedula, ['foto_url' => $foto]),
+            'solicitud' => [
+                'fecha_solicitada' => '2026-09-20',
+                'hora_solicitada' => '10:30',
+                'id_evento' => $this->evento->id_evento,
+            ],
+        ])->assertCreated();
+
+        $this->assertDatabaseHas('agrupacion', ['ced_encargado' => $encargado->cedula, 'foto_url' => $foto]);
+    }
+
     private function crearEvento(string $nombre = 'Festival'): Evento
     {
         return Evento::create([
