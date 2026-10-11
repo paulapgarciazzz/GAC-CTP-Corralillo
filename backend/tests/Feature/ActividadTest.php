@@ -74,9 +74,9 @@ class ActividadTest extends TestCase
         parent::tearDown();
     }
 
-    private function aprobarAgrupacionEnEvento(Evento $evento, string $estado = 'aprobada'): void
+    private function aprobarAgrupacionEnEvento(Evento $evento, string $estado = 'aprobada'): SolicitudAgrupacion
     {
-        SolicitudAgrupacion::create([
+        return SolicitudAgrupacion::create([
             'id_agrupacion' => $this->agrupacion->id,
             'id_evento' => $evento->id_evento,
             'fecha_solicitud' => now(),
@@ -218,15 +218,54 @@ class ActividadTest extends TestCase
         $this->assertDatabaseCount('actividad', 0);
     }
 
-    public function test_valida_choque_de_horario_en_la_misma_ubicacion(): void
+    public function test_valida_horas_dentro_del_horario_del_evento(): void
     {
-        $this->crearActividad();
+        // El evento va del 10 a las 08:00 al 12 a las 14:00.
+        $this->evento->update(['hora_inicio' => '08:00', 'hora_fin' => '14:00']);
 
         $this->postJson('/api/actividades', $this->datosActividad([
-            'hora_inicio' => '10:30',
-            'hora_finalizacion' => '11:30',
+            'hora_inicio' => '07:30',
+            'hora_finalizacion' => '09:00',
         ]))->assertStatus(422)
-            ->assertJsonValidationErrors(['id_ubicacion']);
+            ->assertJsonValidationErrors(['hora_inicio']);
+
+        $this->postJson('/api/actividades', $this->datosActividad([
+            'fecha' => '2026-10-12',
+            'hora_inicio' => '13:30',
+            'hora_finalizacion' => '14:30',
+        ]))->assertStatus(422)
+            ->assertJsonValidationErrors(['hora_finalizacion']);
+
+        // Los límites exactos son válidos y los días intermedios no tienen restricción.
+        $this->crearActividad(['hora_inicio' => '08:00', 'hora_finalizacion' => '09:00']);
+        $this->crearActividad(['fecha' => '2026-10-12', 'hora_inicio' => '13:00', 'hora_finalizacion' => '14:00']);
+        $this->crearActividad(['fecha' => '2026-10-11', 'hora_inicio' => '06:00', 'hora_finalizacion' => '20:00']);
+
+        // Un evento de todo el día no limita las horas.
+        $this->evento->update(['todo_el_dia' => true]);
+        $this->crearActividad(['hora_inicio' => '06:00', 'hora_finalizacion' => '07:00']);
+
+        $this->assertDatabaseCount('actividad', 4);
+    }
+
+    public function test_valida_choque_de_horario_en_la_misma_fecha(): void
+    {
+        $this->crearActividad();
+        $otraUbicacion = Ubicacion::create(['nombre' => 'Tarima Secundaria', 'capacidad' => 100]);
+
+        // Choca sin importar la ubicación, y también si el rango contiene al existente.
+        $choques = [
+            ['hora_inicio' => '10:30', 'hora_finalizacion' => '11:30'],
+            ['hora_inicio' => '10:30', 'hora_finalizacion' => '11:30', 'id_ubicacion' => $otraUbicacion->id_ubicacion],
+            ['hora_inicio' => '10:30', 'hora_finalizacion' => '11:30', 'id_ubicacion' => null],
+            ['hora_inicio' => '09:00', 'hora_finalizacion' => '12:00'],
+        ];
+
+        foreach ($choques as $cambios) {
+            $this->postJson('/api/actividades', $this->datosActividad($cambios))
+                ->assertStatus(422)
+                ->assertJsonValidationErrors(['hora_inicio']);
+        }
 
         // Horarios contiguos no chocan.
         $this->crearActividad([
@@ -234,11 +273,10 @@ class ActividadTest extends TestCase
             'hora_finalizacion' => '12:00',
         ]);
 
-        // Otra fecha u otra ubicación no chocan.
+        // Otra fecha no choca.
         $this->crearActividad(['fecha' => '2026-10-11']);
-        $this->crearActividad(['id_ubicacion' => null]);
 
-        $this->assertDatabaseCount('actividad', 4);
+        $this->assertDatabaseCount('actividad', 3);
     }
 
     public function test_valida_que_la_agrupacion_este_aprobada_en_el_evento(): void
@@ -282,7 +320,7 @@ class ActividadTest extends TestCase
         $this->patchJson("/api/actividades/{$otra['id_actividad']}", [
             'hora_inicio' => '10:30',
         ])->assertStatus(422)
-            ->assertJsonValidationErrors(['id_ubicacion']);
+            ->assertJsonValidationErrors(['hora_inicio']);
 
         $this->patchJson("/api/actividades/{$otra['id_actividad']}", [
             'hora_finalizacion' => '11:30',
@@ -371,12 +409,12 @@ class ActividadTest extends TestCase
         ])->assertStatus(422)
             ->assertJsonValidationErrors(['fecha']);
 
-        // Mismo evento, misma fecha y ubicación: choca con la original.
+        // Mismo evento, misma fecha y horario: choca con la original.
         $this->postJson("/api/actividades/{$original['id_actividad']}/duplicar", [
             'id_evento' => $this->evento->id_evento,
             'fecha' => '2026-10-10',
         ])->assertStatus(422)
-            ->assertJsonValidationErrors(['id_ubicacion']);
+            ->assertJsonValidationErrors(['hora_inicio']);
 
         $this->postJson("/api/actividades/{$original['id_actividad']}/duplicar", [])
             ->assertStatus(422)
@@ -434,6 +472,106 @@ class ActividadTest extends TestCase
                     ['id' => $this->agrupacion->id, 'nombre' => 'Grupo de Baile'],
                 ],
             ]);
+    }
+
+    private function assertHorarioAsignado(SolicitudAgrupacion $solicitud, ?string $fecha, ?string $hora): void
+    {
+        $solicitud->refresh();
+
+        $this->assertSame($fecha, $solicitud->fecha_asignada?->format('Y-m-d'));
+        $this->assertSame($hora, $solicitud->hora_asignada ? substr($solicitud->hora_asignada, 0, 5) : null);
+    }
+
+    public function test_crear_actividad_asigna_su_horario_a_la_solicitud(): void
+    {
+        $solicitud = $this->aprobarAgrupacionEnEvento($this->evento);
+
+        $this->crearActividad([
+            'id_agrupacion' => $this->agrupacion->id,
+            'fecha' => '2026-10-11',
+            'hora_inicio' => '08:00',
+            'hora_finalizacion' => '08:30',
+        ]);
+
+        $this->assertHorarioAsignado($solicitud, '2026-10-11', '08:00');
+    }
+
+    public function test_horario_asignado_es_el_de_la_primera_actividad(): void
+    {
+        $solicitud = $this->aprobarAgrupacionEnEvento($this->evento);
+
+        $this->crearActividad(['id_agrupacion' => $this->agrupacion->id, 'fecha' => '2026-10-11']);
+        $this->crearActividad([
+            'id_agrupacion' => $this->agrupacion->id,
+            'hora_inicio' => '14:00',
+            'hora_finalizacion' => '15:00',
+        ]);
+
+        $this->assertHorarioAsignado($solicitud, '2026-10-10', '14:00');
+    }
+
+    public function test_editar_actividad_recalcula_el_horario_asignado(): void
+    {
+        $solicitud = $this->aprobarAgrupacionEnEvento($this->evento);
+        $actividad = $this->crearActividad(['id_agrupacion' => $this->agrupacion->id]);
+
+        $this->patchJson("/api/actividades/{$actividad['id_actividad']}", [
+            'hora_inicio' => '09:00',
+            'hora_finalizacion' => '09:30',
+        ])->assertOk();
+
+        $this->assertHorarioAsignado($solicitud, '2026-10-10', '09:00');
+
+        $this->patchJson("/api/actividades/{$actividad['id_actividad']}", [
+            'id_agrupacion' => null,
+        ])->assertOk();
+
+        $this->assertHorarioAsignado($solicitud, null, null);
+    }
+
+    public function test_cambiar_agrupacion_mueve_el_horario_asignado(): void
+    {
+        $anterior = $this->aprobarAgrupacionEnEvento($this->evento);
+        $actividad = $this->crearActividad(['id_agrupacion' => $this->agrupacion->id]);
+
+        $nueva = Agrupacion::create([
+            'ced_encargado' => $this->agrupacion->ced_encargado,
+            'nombre' => 'Coro Juvenil',
+            'lugar_procedencia' => 'Liberia',
+            'cantidad_integrantes' => 15,
+        ]);
+        $solicitudNueva = SolicitudAgrupacion::create([
+            'id_agrupacion' => $nueva->id,
+            'id_evento' => $this->evento->id_evento,
+            'fecha_solicitud' => now(),
+            'id_estado' => Estado::where('nom_estado', 'aprobada')->firstOrFail()->id,
+        ]);
+
+        $this->patchJson("/api/actividades/{$actividad['id_actividad']}", [
+            'id_agrupacion' => $nueva->id,
+        ])->assertOk();
+
+        $this->assertHorarioAsignado($anterior, null, null);
+        $this->assertHorarioAsignado($solicitudNueva, '2026-10-10', '10:00');
+    }
+
+    public function test_eliminar_actividad_libera_el_horario_asignado(): void
+    {
+        $solicitud = $this->aprobarAgrupacionEnEvento($this->evento);
+        $actividad = $this->crearActividad(['id_agrupacion' => $this->agrupacion->id]);
+
+        $this->deleteJson("/api/actividades/{$actividad['id_actividad']}")->assertOk();
+
+        $this->assertHorarioAsignado($solicitud, null, null);
+    }
+
+    public function test_actividad_sin_agrupacion_no_modifica_solicitudes(): void
+    {
+        $solicitud = $this->aprobarAgrupacionEnEvento($this->evento);
+
+        $this->crearActividad();
+
+        $this->assertHorarioAsignado($solicitud, null, null);
     }
 
     public function test_lista_estados_de_actividad(): void

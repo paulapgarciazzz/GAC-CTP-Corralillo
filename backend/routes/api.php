@@ -16,7 +16,6 @@ use App\Modules\Beneficios\Controllers\AlimentacionController;
 use App\Modules\Beneficios\Controllers\AsignacionBeneficiosController;
 use App\Modules\Beneficios\Controllers\AulaController;
 use App\Modules\Beneficios\Controllers\BeneficiosReportController;
-use App\Modules\Beneficios\Controllers\InventarioReportController;
 use App\Modules\Beneficios\Controllers\MobiliarioController;
 use App\Modules\Beneficios\Controllers\RutaController;
 use App\Modules\Beneficios\Controllers\TransporteController;
@@ -158,11 +157,6 @@ Route::prefix('reportes')->group(function () {
     Route::get(
         '/beneficios',
         [BeneficiosReportController::class, 'index']
-    );
-
-    Route::get(
-        '/inventario',
-        [InventarioReportController::class, 'index']
     );
 });
 

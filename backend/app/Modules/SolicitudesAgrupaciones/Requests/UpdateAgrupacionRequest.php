@@ -3,6 +3,7 @@
 namespace App\Modules\SolicitudesAgrupaciones\Requests;
 
 use App\Modules\SolicitudesAgrupaciones\Rules\ArchivoAdjuntoValido;
+use App\Modules\SolicitudesAgrupaciones\Rules\FotoValida;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateAgrupacionRequest extends FormRequest
@@ -51,6 +52,7 @@ class UpdateAgrupacionRequest extends FormRequest
                 'sometimes',
                 'nullable',
                 'string',
+                new FotoValida(),
             ],
         ];
     }

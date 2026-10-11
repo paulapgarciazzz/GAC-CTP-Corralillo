@@ -10,6 +10,7 @@ use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class ActividadService
@@ -74,9 +75,13 @@ class ActividadService
             $datos['hora_finalizacion']
         );
 
-        return Actividad::create($datos)
-            ->refresh()
-            ->load(self::RELACIONES);
+        return DB::transaction(function () use ($datos) {
+            $actividad = Actividad::create($datos);
+
+            $this->sincronizarHorarioAsignado($actividad->id_evento, $actividad->id_agrupacion);
+
+            return $actividad->refresh()->load(self::RELACIONES);
+        });
     }
 
     /**
@@ -94,9 +99,19 @@ class ActividadService
             $completos['hora_finalizacion']
         );
 
-        $actividad->update($datos);
+        return DB::transaction(function () use ($actividad, $datos) {
+            $agrupacionAnterior = $actividad->id_agrupacion;
 
-        return $actividad->refresh()->load(self::RELACIONES);
+            $actividad->update($datos);
+
+            $this->sincronizarHorarioAsignado(
+                $actividad->id_evento,
+                $agrupacionAnterior,
+                $actividad->id_agrupacion
+            );
+
+            return $actividad->refresh()->load(self::RELACIONES);
+        });
     }
 
     /**
@@ -135,7 +150,11 @@ class ActividadService
      */
     public function eliminar(Actividad $actividad): void
     {
-        $actividad->delete();
+        DB::transaction(function () use ($actividad) {
+            $actividad->delete();
+
+            $this->sincronizarHorarioAsignado($actividad->id_evento, $actividad->id_agrupacion);
+        });
     }
 
     /**
@@ -177,30 +196,51 @@ class ActividadService
 
         $evento = Evento::query()->findOrFail($datos['id_evento']);
         $fecha = $datos['fecha'];
+        $fechaInicio = $evento->fecha_inicio->format('Y-m-d');
+        $fechaFin = $evento->fecha_fin->format('Y-m-d');
 
-        if (
-            $fecha < $evento->fecha_inicio->format('Y-m-d')
-            || $fecha > $evento->fecha_fin->format('Y-m-d')
-        ) {
+        if ($fecha < $fechaInicio || $fecha > $fechaFin) {
             throw ValidationException::withMessages([
                 'fecha' => 'La fecha de la actividad debe estar dentro de las fechas del evento.',
             ]);
         }
 
-        if (! empty($datos['id_ubicacion'])) {
-            $hayChoque = Actividad::query()
-                ->where('id_ubicacion', $datos['id_ubicacion'])
-                ->where('fecha', $fecha)
-                ->where('hora_inicio', '<', $fin)
-                ->where('hora_finalizacion', '>', $inicio)
-                ->when($ignorarId, fn ($query) => $query->where('id_actividad', '!=', $ignorarId))
-                ->exists();
+        // Si el evento tiene horario, el primer día empieza a su hora de inicio y el último termina a su hora de fin.
+        if (! $evento->todo_el_dia && $evento->hora_inicio) {
+            $horaInicioEvento = substr($evento->hora_inicio, 0, 5);
+            $horaFinEvento = $evento->hora_fin ? substr($evento->hora_fin, 0, 5) : null;
 
-            if ($hayChoque) {
+            if ($fecha === $fechaInicio && $inicio < $horaInicioEvento) {
                 throw ValidationException::withMessages([
-                    'id_ubicacion' => 'La ubicación ya tiene otra actividad en ese horario.',
+                    'hora_inicio' => "La actividad no puede empezar antes del inicio del evento ({$horaInicioEvento}).",
                 ]);
             }
+
+            if ($fecha === $fechaFin && $horaFinEvento && $fin > $horaFinEvento) {
+                throw ValidationException::withMessages([
+                    'hora_finalizacion' => "La actividad no puede terminar después del fin del evento ({$horaFinEvento}).",
+                ]);
+            }
+        }
+
+        // Dos actividades no pueden traslaparse en la misma fecha, sin importar la ubicación.
+        // Los horarios contiguos (una termina cuando la otra empieza) sí se permiten.
+        $choque = Actividad::query()
+            ->where('fecha', $fecha)
+            ->where('hora_inicio', '<', $fin)
+            ->where('hora_finalizacion', '>', $inicio)
+            ->when($ignorarId, fn ($query) => $query->where('id_actividad', '!=', $ignorarId))
+            ->first(['titulo', 'hora_inicio', 'hora_finalizacion']);
+
+        if ($choque) {
+            throw ValidationException::withMessages([
+                'hora_inicio' => sprintf(
+                    'El horario choca con la actividad "%s" (%s – %s).',
+                    $choque->titulo,
+                    substr($choque->hora_inicio, 0, 5),
+                    substr($choque->hora_finalizacion, 0, 5)
+                ),
+            ]);
         }
 
         if (
@@ -228,6 +268,30 @@ class ActividadService
             ->whereHas('estado', function ($query) {
                 $query->where('nom_estado', 'aprobada');
             });
+    }
+
+    /**
+     * Asigna a la solicitud aprobada de cada agrupación la fecha y hora de su
+     * primera actividad en el evento (o NULL si ya no tiene actividades).
+     */
+    private function sincronizarHorarioAsignado(int $idEvento, ?int ...$idsAgrupacion): void
+    {
+        foreach (array_unique(array_filter($idsAgrupacion)) as $idAgrupacion) {
+            $primera = Actividad::query()
+                ->where('id_evento', $idEvento)
+                ->where('id_agrupacion', $idAgrupacion)
+                ->orderBy('fecha')
+                ->orderBy('hora_inicio')
+                ->first(['fecha', 'hora_inicio']);
+
+            $this->filtrarSolicitudesAprobadas(
+                SolicitudAgrupacion::query()->where('id_agrupacion', $idAgrupacion),
+                $idEvento
+            )->update([
+                'fecha_asignada' => $primera?->fecha->format('Y-m-d'),
+                'hora_asignada' => $primera?->hora_inicio,
+            ]);
+        }
     }
 
     /**

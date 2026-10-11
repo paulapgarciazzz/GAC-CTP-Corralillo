@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { format } from 'date-fns';
 import SelectorHora from '../../../components/SelectorHora';
+import { sumarMinutos } from '../../../utils/hora';
 import ModalBase from './ModalBase';
 import { AlertaError, BotonesFormulario, CampoFormulario } from './Formulario';
 import { INPUT_CLASS } from '../lib/formulario';
@@ -24,8 +24,7 @@ export default function ModalActividad({ open, evento, actividad, onClose, onGua
 
 function FormularioActividad({ evento, actividad, onClose, onGuardar }) {
     const esEdicion = Boolean(actividad);
-    const fechaMin = format(evento.start, 'yyyy-MM-dd');
-    const fechaMax = format(evento.end, 'yyyy-MM-dd');
+    const { fechaInicio: fechaMin, fechaFin: fechaMax } = evento;
 
     const [valores, setValores] = useState({
         titulo: actividad?.titulo ?? '',
@@ -63,6 +62,12 @@ function FormularioActividad({ evento, actividad, onClose, onGuardar }) {
     const opcionesAgrupacion = actividad?.agrupacion && !agrupaciones.some((a) => a.id === actividad.agrupacion.id)
         ? [...agrupaciones, { ...actividad.agrupacion, noAprobada: true }]
         : agrupaciones;
+
+    // El evento empieza a su hora el primer día y termina a su hora el último; los días intermedios no tienen límite.
+    // `hasta` de SelectorHora es exclusivo: la actividad debe empezar antes de que termine el día (o el evento)
+    // y su hora de finalización puede ser igual a la del final del evento.
+    const horaMinima = valores.fecha === fechaMin && evento.horaInicio ? evento.horaInicio : '00:00';
+    const horaMaxima = valores.fecha === fechaMax && evento.horaFin ? evento.horaFin : null;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -123,10 +128,12 @@ function FormularioActividad({ evento, actividad, onClose, onGuardar }) {
 
                 <div className="grid sm:grid-cols-2 gap-4">
                     <CampoFormulario id="actividad-hora-inicio" label="Hora de inicio" error={errores.hora_inicio?.[0]}>
-                        <SelectorHora id="actividad-hora-inicio" name="hora_inicio" value={valores.hora_inicio} onChange={handleChange} required />
+                        <SelectorHora id="actividad-hora-inicio" name="hora_inicio" value={valores.hora_inicio} onChange={handleChange} required
+                            desde={horaMinima} hasta={horaMaxima ?? '23:59'} />
                     </CampoFormulario>
                     <CampoFormulario id="actividad-hora-fin" label="Hora de finalización" error={errores.hora_finalizacion?.[0]}>
-                        <SelectorHora id="actividad-hora-fin" name="hora_finalizacion" value={valores.hora_finalizacion} onChange={handleChange} required />
+                        <SelectorHora id="actividad-hora-fin" name="hora_finalizacion" value={valores.hora_finalizacion} onChange={handleChange} required
+                            desde={sumarMinutos(valores.hora_inicio || horaMinima, 1)} hasta={horaMaxima && sumarMinutos(horaMaxima, 1)} />
                     </CampoFormulario>
                 </div>
 
@@ -155,6 +162,9 @@ function FormularioActividad({ evento, actividad, onClose, onGuardar }) {
                     </select>
                     {!cargandoOpciones && agrupaciones.length === 0 && (
                         <p className="text-xs text-foreground-faint">No hay agrupaciones con solicitud aprobada para este evento.</p>
+                    )}
+                    {valores.id_agrupacion && (
+                        <p className="text-xs text-foreground-faint">El horario de esta actividad se asignará a la solicitud de la agrupación.</p>
                     )}
                 </CampoFormulario>
 

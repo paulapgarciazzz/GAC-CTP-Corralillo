@@ -3,9 +3,10 @@ import { Loader2 } from 'lucide-react';
 import { crearSolicitud } from '../services/solicitudService';
 import { TIPOS_IDENTIFICACION, obtenerConfigIdentificacion, formatearValorIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono } from '../../../utils/telefono';
-import { obtenerFechaLocalISO } from '../../../utils/fecha';
 import SelectorHora from '../../../components/SelectorHora';
+import CampoFotoAgrupacion from '../../../components/CampoFotoAgrupacion';
 import SelectEvento, { MENSAJE_EVENTO_REQUERIDO } from './SelectEvento';
+import { useEventos, useRangoEvento } from '../hooks/useEventos';
 
 const valoresIniciales = {
     // Encargado
@@ -21,6 +22,7 @@ const valoresIniciales = {
     nombre: '',
     lugar_procedencia: '',
     cantidad_integrantes: '',
+    foto_url: null,
     archivo_adjunto: null,
     archivo_adjunto_nombre: '',
     resena: '',
@@ -30,8 +32,6 @@ const valoresIniciales = {
     hora_solicitada: '',
     comentarios: '',
 };
-
-const hoy = obtenerFechaLocalISO();
 
 const CAMPOS_SOLO_LETRAS = ['primer_nombre', 'apellido', 'nombre', 'lugar_procedencia'];
 const REGEX_NO_LETRA = /[^A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]/;
@@ -44,6 +44,8 @@ export default function FormularioSolicitud({ onSuccess }) {
     const [errores, setErrores] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const { eventos, cargando: cargandoEventos } = useEventos();
+    const rango = useRangoEvento(eventos, valores.id_evento, setValores);
 
     const configIdentificacion = obtenerConfigIdentificacion(valores.tipo_identificacion);
 
@@ -139,6 +141,7 @@ export default function FormularioSolicitud({ onSuccess }) {
                 nombre: valores.nombre,
                 lugar_procedencia: valores.lugar_procedencia,
                 cantidad_integrantes: valores.cantidad_integrantes,
+                foto_url: valores.foto_url,
                 archivo_adjunto: valores.archivo_adjunto,
                 resena: valores.resena,
             },
@@ -239,6 +242,12 @@ export default function FormularioSolicitud({ onSuccess }) {
             <fieldset className="space-y-4">
                 <legend className="text-lg font-semibold text-primary">Datos de la agrupación</legend>
                 <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="sm:col-span-2">
+                        <CampoFotoAgrupacion fotoUrl={valores.foto_url} alt={valores.nombre || undefined}
+                            onChange={(foto_url) => setValores((prev) => ({ ...prev, foto_url }))}
+                            onError={(mensaje) => setErrores((prev) => ({ ...prev, 'agrupacion.foto_url': mensaje }))}
+                            error={errores['agrupacion.foto_url']} />
+                    </div>
                     <div className="space-y-1">
                         <label htmlFor="nombre" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Nombre de la agrupación</label>
                         <input id="nombre" name="nombre" type="text" value={valores.nombre} onChange={handleChange} required
@@ -278,15 +287,16 @@ export default function FormularioSolicitud({ onSuccess }) {
             <fieldset className="space-y-4">
                 <legend className="text-lg font-semibold text-primary">Datos de la solicitud</legend>
                 <div className="grid sm:grid-cols-2 gap-4">
-                    <SelectEvento value={valores.id_evento} onChange={handleChange} error={errores.id_evento} />
+                    <SelectEvento eventos={eventos} cargando={cargandoEventos} value={valores.id_evento} onChange={handleChange} error={errores.id_evento} />
                     <div className="space-y-1">
                         <label htmlFor="fecha_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label>
-                        <input id="fecha_solicitada" name="fecha_solicitada" type="date" min={hoy} value={valores.fecha_solicitada} onChange={handleChange} required
-                            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input id="fecha_solicitada" name="fecha_solicitada" type="date" min={rango?.fechaMin} max={rango?.fechaMax} disabled={!rango} value={valores.fecha_solicitada} onChange={handleChange} required
+                            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed" />
                     </div>
                     <div className="space-y-1">
                         <label htmlFor="hora_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Hora deseada de participación</label>
-                        <SelectorHora id="hora_solicitada" name="hora_solicitada" value={valores.hora_solicitada} onChange={handleChange} required />
+                        <SelectorHora id="hora_solicitada" name="hora_solicitada" value={valores.hora_solicitada} onChange={handleChange} required
+                            desde={rango?.horaDesde} hasta={rango?.horaHasta} disabled={!rango} />
                     </div>
                     <div className="space-y-1 sm:col-span-2">
                         <label htmlFor="comentarios" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Comentarios (en caso de requerir algun beneficio)</label>

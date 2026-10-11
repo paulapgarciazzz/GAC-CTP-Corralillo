@@ -6,7 +6,6 @@ import { getRouteApi } from '@tanstack/react-router';
 import GestionSolicitudes from '../../SolicitudesAgrupaciones/pages/GestionSolicitudes';
 import GestionAgrupaciones from '../../Agrupaciones/pages/GestionAgrupaciones';
 import ReportesAgrupaciones from '../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones';
-import ReportesInventario from '../../Reportes/pages/Reportes_inventario/ReportesInventario';
 import ReportesActividades from '../../Reportes/pages/Reportes_actividades/ReportesActividades';
 import GestionAgrupacionesAjustes from '../../Agrupaciones/pages/GestionAgrupacionesAjustes';
 import GestionEncargadosAjustes from '../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes';
@@ -25,7 +24,6 @@ const VISTAS_VALIDAS = [
     'Gestion de Agrupaciones',
     'Reportes de Solicitudes',
     'Reportes de Actividades',
-    'Reportes de Inventario',
     'Gestion de beneficios',
     'Asignar beneficios',
     'Ver beneficios asignados',
@@ -101,7 +99,6 @@ const Dashboard =()=>{
                     {selectedView === 'Gestion de Agrupaciones' && <GestionAgrupaciones />}
                     {selectedView === 'Reportes de Solicitudes' && <ReportesAgrupaciones />}
                     {selectedView === 'Reportes de Actividades' && <ReportesActividades />}
-                    {selectedView === 'Reportes de Inventario' && <ReportesInventario />}
                     {selectedView === 'Gestion de beneficios' && <GestionBeneficios />}
                     {selectedView === 'Asignar beneficios' && <AsignarBeneficios />}
                     {selectedView === 'Ver beneficios asignados' && <VerBeneficiosAsignados />}

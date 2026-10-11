@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { crearFiltroHora } from '../utils/hora';
 
 // La opción vacía ('--') permite borrar la hora.
 const HORAS = ['', ...Array.from({ length: 12 }, (_, i) => String(i + 1))];
@@ -37,17 +38,29 @@ function separarHora(valor) {
     };
 }
 
+// Hora de 12 h y periodo → hora de 24 h.
+const a24 = (hora, periodo) => (Number(hora) % 12) + (periodo === 'PM' ? 12 : 0);
+
 // Partes en formato de 12 h → "HH:mm" (24 h).
 function unirHora({ hora, minuto, periodo }) {
-    const horas = (Number(hora) % 12) + (periodo === 'PM' ? 12 : 0);
-    return `${String(horas).padStart(2, '0')}:${minuto}`;
+    return `${String(a24(hora, periodo)).padStart(2, '0')}:${minuto}`;
+}
+
+// Con un rango (`filtro`), solo se ofrecen las opciones que forman una hora permitida.
+function minutosPermitidos(filtro, horas24) {
+    return filtro ? MINUTOS.filter((minuto) => filtro(horas24 * 60 + Number(minuto))) : MINUTOS;
+}
+
+function periodosPermitidos(filtro, hora) {
+    return filtro ? PERIODOS.filter(({ value }) => minutosPermitidos(filtro, a24(hora, value)).length > 0) : PERIODOS;
 }
 
 /**
  * Lista desplegable corta (con scroll) para la hora y los minutos; el <select> nativo no permite limitar su alto.
  * Se posiciona con `fixed` para que no la recorte el scroll de los modales, y se cierra si la página se desplaza.
+ * `disponibles` (Set opcional): las opciones que no estén en él se muestran tenues y no se pueden elegir.
  */
-function ListaDesplegable({ id, etiqueta, value, opciones, onChange, disabled = false, className = '' }) {
+function ListaDesplegable({ id, etiqueta, value, opciones, disponibles, onChange, disabled = false, className = '' }) {
     const [posicion, setPosicion] = useState(null);
     const botonRef = useRef(null);
     const listaRef = useRef(null);
@@ -96,7 +109,10 @@ function ListaDesplegable({ id, etiqueta, value, opciones, onChange, disabled = 
         }
     };
 
+    const estaDisponible = (opcion) => !disponibles || disponibles.has(opcion);
+
     const elegir = (opcion) => {
+        if (!estaDisponible(opcion)) return;
         onChange(opcion);
         cerrar();
     };
@@ -162,18 +178,22 @@ function ListaDesplegable({ id, etiqueta, value, opciones, onChange, disabled = 
                 >
                     {opciones.map((opcion) => {
                         const seleccionada = opcion === value;
+                        const disponible = estaDisponible(opcion);
                         return (
                             <li
                                 key={opcion}
                                 role="option"
                                 aria-selected={seleccionada}
+                                aria-disabled={!disponible}
                                 tabIndex={-1}
                                 onClick={() => elegir(opcion)}
                                 onKeyDown={(e) => handleOpcionKeyDown(e, opcion)}
-                                className={`px-3 py-1 cursor-pointer focus:outline-none ${
+                                className={`px-3 py-1 focus:outline-none ${
                                     seleccionada
-                                        ? 'bg-primary text-white font-semibold'
-                                        : 'text-foreground hover:bg-primary/10 focus:bg-primary/10'
+                                        ? 'cursor-pointer bg-primary text-white font-semibold'
+                                        : disponible
+                                            ? 'cursor-pointer text-foreground hover:bg-primary/10 focus:bg-primary/10'
+                                            : 'cursor-not-allowed text-foreground opacity-40 focus:bg-primary/10'
                                 }`}
                             >
                                 {opcion || '--'}
@@ -190,16 +210,35 @@ function ListaDesplegable({ id, etiqueta, value, opciones, onChange, disabled = 
  * Selector de hora: hora (1-12), minutos (00-59) y a. m./p. m.
  * Recibe y emite la hora como "HH:mm" (24 h) y llama a `onChange` con `{ target: { name, value } }`,
  * igual que un input nativo, para reutilizar los `handleChange` de los formularios.
+ * `desde` y `hasta` ("HH:mm", opcionales) limitan las opciones; `hasta` es exclusivo y, si es menor o igual
+ * que `desde`, el rango cruza la medianoche.
  */
-export default function SelectorHora({ id, name, value, onChange, required = false }) {
+export default function SelectorHora({ id, name, value, onChange, required = false, desde, hasta, disabled = false }) {
     const partes = separarHora(value);
     const sinHora = !partes.hora;
 
+    const filtro = useMemo(() => crearFiltroHora(desde, hasta), [desde, hasta]);
+    // Con rango se muestran todas las opciones, pero solo las que forman una hora permitida están disponibles.
+    const horasDisponibles = useMemo(
+        () => filtro && new Set(HORAS.filter((hora) => !hora || periodosPermitidos(filtro, hora).length > 0)),
+        [filtro]
+    );
+    const minutosDisponibles = filtro && !sinHora
+        ? new Set(minutosPermitidos(filtro, a24(partes.hora, partes.periodo)))
+        : undefined;
+    const periodosDisponibles = sinHora ? PERIODOS : periodosPermitidos(filtro, partes.hora);
+
     const cambiarParte = (parte, valorParte) => {
         const siguiente = { ...partes, [parte]: valorParte };
-        const nuevoValor = siguiente.hora
-            ? unirHora({ hora: siguiente.hora, minuto: siguiente.minuto || '00', periodo: siguiente.periodo || 'AM' })
-            : '';
+        let nuevoValor = '';
+        if (siguiente.hora) {
+            // Conserva el periodo y los minutos si siguen permitidos; si no, toma el primero disponible.
+            const periodosHora = periodosPermitidos(filtro, siguiente.hora).map(({ value }) => value);
+            const periodo = periodosHora.includes(siguiente.periodo) ? siguiente.periodo : periodosHora[0];
+            const minutosHora = minutosPermitidos(filtro, a24(siguiente.hora, periodo));
+            const minuto = minutosHora.includes(siguiente.minuto) ? siguiente.minuto : minutosHora[0];
+            nuevoValor = unirHora({ hora: siguiente.hora, minuto, periodo });
+        }
         onChange({ target: { name, value: nuevoValor } });
     };
 
@@ -215,14 +254,14 @@ export default function SelectorHora({ id, name, value, onChange, required = fal
                 onChange={() => {}}
                 className="sr-only"
             />
-            <ListaDesplegable id={id} etiqueta="Hora" value={partes.hora} opciones={HORAS} onChange={(hora) => cambiarParte('hora', hora)} className="pl-4 pr-2" />
+            <ListaDesplegable id={id} etiqueta="Hora" value={partes.hora} opciones={HORAS} disponibles={horasDisponibles} onChange={(hora) => cambiarParte('hora', hora)} disabled={disabled} className="pl-4 pr-2" />
             <span className="text-foreground-soft font-semibold" aria-hidden="true">:</span>
-            <ListaDesplegable etiqueta="Minutos" value={partes.minuto} opciones={MINUTOS} onChange={(minuto) => cambiarParte('minuto', minuto)} disabled={sinHora} className="px-2" />
+            <ListaDesplegable etiqueta="Minutos" value={partes.minuto} opciones={MINUTOS} disponibles={minutosDisponibles} onChange={(minuto) => cambiarParte('minuto', minuto)} disabled={disabled || sinHora} className="px-2" />
             <span className="h-6 w-px shrink-0 bg-border" aria-hidden="true" />
-            <select aria-label="a. m. o p. m." value={partes.periodo} onChange={(e) => cambiarParte('periodo', e.target.value)} disabled={sinHora} className={`shrink-0 px-2 ${PARTE_CLASS}`}>
+            <select aria-label="a. m. o p. m." value={partes.periodo} onChange={(e) => cambiarParte('periodo', e.target.value)} disabled={disabled || sinHora} className={`shrink-0 px-2 ${PARTE_CLASS}`}>
                 {sinHora && <option value="" className={OPCION_CLASS}>--</option>}
                 {PERIODOS.map((periodo) => (
-                    <option key={periodo.value} value={periodo.value} className={OPCION_CLASS}>{periodo.label}</option>
+                    <option key={periodo.value} value={periodo.value} disabled={!periodosDisponibles.includes(periodo)} className={OPCION_CLASS}>{periodo.label}</option>
                 ))}
             </select>
         </div>

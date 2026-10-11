@@ -13,6 +13,9 @@ const desdeApi = (evento) => {
         category: evento.categoria || 'info',
         allDay,
         fechaInicio: evento.fecha_inicio,
+        fechaFin: evento.fecha_fin,
+        horaInicio: allDay ? null : evento.hora_inicio,
+        horaFin: allDay ? null : evento.hora_fin,
         activo: evento.estado !== false,
     };
 };
