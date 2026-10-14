@@ -1,0 +1,280 @@
+<?php
+
+namespace App\Modules\SolicitudesAgrupaciones\Services;
+
+use App\Modules\SolicitudesAgrupaciones\Models\Estado;
+use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
+use App\Modules\SolicitudesAgrupaciones\Services\AgrupacionService;
+use App\Modules\SolicitudesAgrupaciones\Services\EncargadoService;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Mail\SolicitudAprobadaNotification;
+use App\Mail\SolicitudDetalleNotification;
+use App\Mail\SolicitudRechazadaNotification;
+use Illuminate\Support\Facades\Log;
+
+class SolicitudAgrupacionService
+{
+    public function listar(): Collection
+    {
+        return SolicitudAgrupacion::with([
+            'agrupacion.encargado',
+            'evento',
+            'estado',
+            'auditorias',
+        ])->get();
+    }
+
+    public function buscarPorId(int $id): SolicitudAgrupacion
+    {
+        return SolicitudAgrupacion::with([
+            'agrupacion.encargado',
+            'agrupacion.participaciones',
+            'evento',
+            'estado',
+            'auditorias',
+        ])->findOrFail($id);
+    }
+
+    public function crear(array $datos): SolicitudAgrupacion
+    {
+        return DB::transaction(function () use ($datos) {
+            $estadoPendiente = Estado::where(
+                'nom_estado',
+                'pendiente'
+            )->firstOrFail();
+
+            $solicitud = SolicitudAgrupacion::create([
+                'id_agrupacion' => $datos['id_agrupacion'],
+                'id_evento' => $datos['id_evento'],
+                'fecha_solicitud' => $datos['fecha_solicitud'] ?? now(),
+                'fecha_solicitada' => $datos['fecha_solicitada'] ?? null,
+                'hora_solicitada' => $datos['hora_solicitada'] ?? null,
+                'id_estado' => $estadoPendiente->id,
+                'comentarios' => $datos['comentarios'] ?? null,
+                'fecha_asignada' => null,
+                'hora_asignada' => null,
+            ]);
+
+            return $solicitud->load([
+                'agrupacion.encargado',
+                'evento',
+                'estado',
+            ]);
+        });
+    }
+
+    public function crearConEncargadoNuevo(array $datos): SolicitudAgrupacion
+    {
+        return DB::transaction(function () use ($datos) {
+            $encargado = app(EncargadoService::class)->crear($datos['encargado']);
+            $agrupacion = app(AgrupacionService::class)->crear([
+                'ced_encargado' => $encargado->cedula,
+                ...$datos['agrupacion'],
+            ]);
+
+            return $this->crearSolicitudPendiente($agrupacion->id, $datos['solicitud']);
+        });
+    }
+
+    public function crearParaEncargadoExistente(array $datos): SolicitudAgrupacion
+    {
+        return DB::transaction(function () use ($datos) {
+            $idAgrupacion = $datos['id_agrupacion'] ?? null;
+
+            if ($idAgrupacion === null) {
+                $agrupacion = app(AgrupacionService::class)->crear([
+                    'ced_encargado' => $datos['cedula'],
+                    ...$datos['agrupacion'],
+                ]);
+                $idAgrupacion = $agrupacion->id;
+            }
+
+            return $this->crearSolicitudPendiente($idAgrupacion, $datos['solicitud']);
+        });
+    }
+
+    private function crearSolicitudPendiente(
+        int $idAgrupacion,
+        array $datos
+    ): SolicitudAgrupacion {
+        $estadoPendiente = Estado::where('nom_estado', 'pendiente')->firstOrFail();
+
+        return SolicitudAgrupacion::create([
+            'id_agrupacion' => $idAgrupacion,
+            'id_evento' => $datos['id_evento'],
+            'fecha_solicitud' => now(),
+            'fecha_solicitada' => $datos['fecha_solicitada'],
+            'hora_solicitada' => $datos['hora_solicitada'],
+            'id_estado' => $estadoPendiente->id,
+            'comentarios' => $datos['comentarios'] ?? null,
+        ])->load(['agrupacion.encargado', 'evento', 'estado']);
+    }
+
+    public function aprobar(
+        int $id,
+        array $datos
+    ): SolicitudAgrupacion {
+        $solicitud = DB::transaction(function () use ($id, $datos) {
+            $solicitud = SolicitudAgrupacion::with('estado')
+            ->lockForUpdate()
+                ->findOrFail($id);
+
+            if ($solicitud->estado->nom_estado !== 'pendiente') {
+                throw new HttpException(
+                    422,
+                    'Solo se pueden aprobar solicitudes pendientes.'
+                );
+            }
+
+            $estadoAprobado = Estado::where(
+                'nom_estado',
+                'aprobada'
+            )->firstOrFail();
+
+            $solicitud->update([
+                'id_estado' => $estadoAprobado->id,
+                'fecha_asignada' => $datos['fecha_asignada'] ?? $solicitud->fecha_asignada,
+                'hora_asignada' => $datos['hora_asignada'] ?? $solicitud->hora_asignada,
+            ]);
+
+            return $solicitud->fresh([
+                'agrupacion.encargado',
+                'estado',
+                'auditorias',
+            ]);
+        });
+
+        $this->notificarResultado($solicitud, 'aprobada');
+
+        return $solicitud;
+    }
+
+    public function rechazar(int $id): SolicitudAgrupacion
+    {
+        $solicitud = DB::transaction(function () use ($id) {
+            $solicitud = SolicitudAgrupacion::with('estado')
+            ->lockForUpdate()
+                ->findOrFail($id);
+
+            if ($solicitud->estado->nom_estado !== 'pendiente') {
+                throw new HttpException(
+                    422,
+                    'Solo se pueden rechazar solicitudes pendientes.'
+                );
+            }
+
+            $estadoRechazado = Estado::where(
+                'nom_estado',
+                'rechazada'
+            )->firstOrFail();
+
+            $solicitud->update([
+                'id_estado' => $estadoRechazado->id,
+                'fecha_asignada' => null,
+                'hora_asignada' => null,
+            ]);
+
+            return $solicitud->fresh([
+                'agrupacion.encargado',
+                'estado',
+                'auditorias',
+            ]);
+        });
+
+        $this->notificarResultado($solicitud, 'rechazada');
+
+        return $solicitud;
+    }
+
+    public function actualizar(int $id, array $datos): SolicitudAgrupacion
+    {
+        return DB::transaction(function () use ($id, $datos) {
+            $solicitud = SolicitudAgrupacion::with('agrupacion.encargado')
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            if (!empty($datos['encargado'])) {
+                $solicitud->agrupacion->encargado->update($datos['encargado']);
+            }
+
+            if (!empty($datos['agrupacion'])) {
+                $solicitud->agrupacion->update($datos['agrupacion']);
+            }
+
+            if (!empty($datos['solicitud'])) {
+                $solicitud->update($datos['solicitud']);
+            }
+
+            return $solicitud->fresh([
+                'agrupacion.encargado',
+                'evento',
+                'estado',
+                'auditorias',
+            ]);
+        });
+    }
+
+    public function enviarDetalles(int $id): SolicitudAgrupacion
+    {
+        $solicitud = $this->buscarPorId($id);
+
+        try {
+            Mail::to($solicitud->agrupacion->encargado->email)->send(
+                new SolicitudDetalleNotification($solicitud)
+            );
+        } catch (\Exception $e) {
+            Log::error('Error al enviar detalles de la solicitud', [
+                'solicitud_id' => $solicitud->id,
+                'encargado_email' => $solicitud->agrupacion->encargado->email ?? 'unknown',
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new HttpException(
+                500,
+                'No se pudo enviar el correo con los detalles de la solicitud.'
+            );
+        }
+
+        return $solicitud;
+    }
+
+    public function eliminar(int $id): void
+    {
+        DB::transaction(function () use ($id) {
+            $solicitud = SolicitudAgrupacion::findOrFail($id);
+            $solicitud->auditorias()->delete();
+            $solicitud->delete();
+        });
+    }
+
+    private function notificarResultado(
+        SolicitudAgrupacion $solicitud,
+        string $resultado
+    ): void {
+        try {
+            $encargado = $solicitud->agrupacion->encargado;
+
+            if ($resultado === 'aprobada') {
+                Mail::to($encargado->email)->send(
+                    new SolicitudAprobadaNotification($solicitud)
+                );
+            } elseif ($resultado === 'rechazada') {
+                Mail::to($encargado->email)->send(
+                    new SolicitudRechazadaNotification($solicitud)
+                );
+            }
+        } catch (\Exception $e) {
+            // Log the error but don't fail the transaction
+            // The solicitud state has already been persisted
+            Log::error('Error al enviar notificación de solicitud', [
+                'solicitud_id' => $solicitud->id,
+                'resultado' => $resultado,
+                'encargado_email' => $solicitud->agrupacion->encargado->email ?? 'unknown',
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+}

@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Modules\Beneficios\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreMobiliarioRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'nombre' => [
+                'required',
+                'string',
+                'max:100',
+                'unique:mobiliario,nombre',
+            ],
+            'cantidad_disponible' => [
+                'nullable',
+                'integer',
+                'min:0',
+            ],
+            'encargado' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
+        ];
+    }
+}

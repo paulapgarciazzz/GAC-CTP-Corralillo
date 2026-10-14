@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Modules\SolicitudesAgrupaciones\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreSolicitudAgrupacionRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'id_agrupacion' => [
+                'required',
+                'integer',
+                'exists:agrupacion,id',
+            ],
+
+            'id_evento' => [
+                'required',
+                'integer',
+                'exists:evento,id_evento',
+            ],
+
+            'fecha_solicitud' => [
+                'nullable',
+                'date',
+            ],
+
+            'fecha_solicitada' => [
+                'required_without:fecha_solicitud',
+                'nullable',
+                'date',
+            ],
+
+            'hora_solicitada' => [
+                'nullable',
+                'date_format:H:i',
+            ],
+
+            'comentarios' => [
+                'nullable',
+                'string',
+                'max:5000',
+            ],
+
+            'id_estado' => [
+                'prohibited',
+            ],
+
+            'estado' => [
+                'prohibited',
+            ],
+
+            'nom_estado' => [
+                'prohibited',
+            ],
+
+            'fecha_asignada' => [
+                'nullable',
+                'date',
+            ],
+
+            'hora_asignada' => [
+                'nullable',
+                'date_format:H:i',
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'id_evento.required' => 'Debe seleccionar el evento en el que desea participar.',
+        ];
+    }
+}

@@ -1,0 +1,121 @@
+### Crear solicitud
+POST http://webserver/api/solicitudes-agrupaciones
+Content-Type: application/json
+Accept: application/json
+
+{
+    "id_agrupacion": 1,
+    "fecha_solicitud": "2026-09-10",
+    "comentarios": "Solicitud de prueba desde la API."
+}
+
+### Intentar manipular campos internos
+POST http://webserver/api/solicitudes-agrupaciones
+Content-Type: application/json
+Accept: application/json
+
+{
+    "id_agrupacion": 1,
+    "fecha_solicitud": "2026-09-11",
+    "comentarios": "Intento de manipulación.",
+    "id_estado": 2,
+    "fecha_asignada": "2026-09-11",
+    "hora_asignada": "08:00"
+}
+
+### Aprobar solicitud 2
+PATCH http://webserver/api/solicitudes-agrupaciones/2/aprobar
+Content-Type: application/json
+Accept: application/json
+
+{
+    "fecha_asignada": "2026-09-10",
+    "hora_asignada": "10:30"
+}
+
+### Consultar solicitud 2
+GET http://webserver/api/solicitudes-agrupaciones/2
+Accept: application/json
+
+### Crear solicitud para probar rechazo
+POST http://webserver/api/solicitudes-agrupaciones
+Content-Type: application/json
+Accept: application/json
+
+{
+    "id_agrupacion": 1,
+    "fecha_solicitud": "2026-09-20",
+    "comentarios": "Solicitud para probar rechazo."
+}
+
+### Rechazar solicitud 3
+PATCH http://webserver/api/solicitudes-agrupaciones/3/rechazar
+Accept: application/json
+
+
+### Intentar aprobar una solicitud rechazada
+PATCH http://webserver/api/solicitudes-agrupaciones/3/aprobar
+Content-Type: application/json
+Accept: application/json
+
+{
+    "fecha_asignada": "2026-09-20",
+    "hora_asignada": "11:00"
+}
+
+### Intentar rechazar una solicitud ya aprobada
+PATCH http://webserver/api/solicitudes-agrupaciones/2/rechazar
+Accept: application/json
+
+### Crear encargado de prueba 2
+POST http://webserver/api/encargados
+Content-Type: application/json
+Accept: application/json
+
+{
+    "cedula": "TEST-002",
+    "primer_nombre": "Ana",
+    "apellido": "Prueba",
+    "email": "ana.prueba@example.com",
+    "numero_tel": "87777777"
+}
+
+### Crear agrupación nueva
+POST http://webserver/api/agrupaciones
+Content-Type: application/json
+Accept: application/json
+
+{
+    "ced_encargado": "TEST-002",
+    "nombre": "Grupo Cultural de Prueba",
+    "lugar_procedencia": "Carrillo",
+    "cantidad_integrantes": 18,
+    "resena": "Agrupación creada para probar el backend."
+}
+### Consultar agrupación 2
+GET http://webserver/api/agrupaciones/2
+Accept: application/json
+
+### Actualizar agrupación 2
+PATCH http://webserver/api/agrupaciones/2
+Content-Type: application/json
+Accept: application/json
+
+{
+    "cantidad_integrantes": 22,
+    "resena": "Reseña actualizada desde la API."
+}
+
+### Agregar participación a agrupación 2
+POST http://webserver/api/agrupaciones/2/participaciones
+Content-Type: application/json
+Accept: application/json
+
+{
+    "lugar": "CTP Carrillo",
+    "fecha": "2005-05-02"
+}
+
+### Consultar agrupación 2 después de actualizar
+GET http://webserver/api/agrupaciones/2
+Accept: application/json
