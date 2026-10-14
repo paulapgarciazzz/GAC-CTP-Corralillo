@@ -22,12 +22,17 @@ Para probar el envío real con Resend, cambia localmente estas variables en
 ```dotenv
 MAIL_MAILER=resend
 RESEND_API_KEY=SU_CLAVE_LOCAL
-MAIL_FROM_ADDRESS=onboarding@resend.dev
+MAIL_FROM_ADDRESS=sistema@notificaciones.festivaldelatortilla.com
 MAIL_FROM_NAME="CTP Corralillo"
 ```
 
+El subdominio `notificaciones.festivaldelatortilla.com` ya está verificado en
+Resend (vía Cloudflare). La API Key debe estar limitada a ese subdominio
+("Sending access"), nunca usar una clave con permisos más amplios.
+
 No agregues la clave al repositorio ni la compartas. El archivo `.env` está
-ignorado por Git y cada PC debe tener su propia configuración.
+ignorado por Git y cada PC (o el servidor institucional) debe tener su propia
+clave, generada independientemente desde el panel de Resend.
 
 Desde la carpeta `backend`, ejecuta:
 
@@ -55,9 +60,11 @@ docker compose exec app php artisan about
 El servicio `app` monta la carpeta `backend`, por lo que Laravel lee el
 `backend/.env` local dentro del contenedor.
 
-`onboarding@resend.dev` es un remitente destinado únicamente a pruebas. Para
-producción debes verificar un dominio en Resend y usar una dirección autorizada
-de ese dominio en `MAIL_FROM_ADDRESS`.
+`MAIL_FROM_ADDRESS` debe ser siempre una dirección bajo un dominio/subdominio
+verificado en Resend. Actualmente el subdominio verificado es
+`notificaciones.festivaldelatortilla.com`; usar un remitente fuera de ese
+subdominio (como el genérico `onboarding@resend.dev` de pruebas) hará que
+Resend rechace el envío si la API Key está limitada a ese subdominio.
 
 ## Pruebas con MariaDB
 
