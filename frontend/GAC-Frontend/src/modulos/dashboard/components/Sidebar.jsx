@@ -12,22 +12,26 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         {name: "Solicitudes", icon: FileUser, active:false,
             children: [
                 {name: "Bandeja de Solicitudes", icon: BookUser},
-                {name: "Gestion de Agrupaciones", icon: PersonStanding},
+                {name: "Gestión de Agrupaciones", icon: PersonStanding},
             ]
         },
         {name: "Beneficios", icon: ShelvingUnit, active:false,
             children: [
-                {name: "Gestion de beneficios", icon: SquareLibrary},
+                {name: "Gestión de beneficios", icon: SquareLibrary},
                 {name: "Asignar beneficios", icon: CirclePile},
                 {name: "Ver beneficios asignados", icon: ClipboardList},
-                {name: "Reportes de beneficios", icon: FileBarChart2},
+                
             ]
         },
-        {name: "Calendario", icon: CalendarDays, active:false},
+        {name: "Calendario", icon: CalendarDays, active:false,
+            children: [
+                {name: "Gestión del calendario", icon: CalendarDays},
+                {name: "Gestión de ubicaciones", icon: MapPin},
+            ]
+        },
         {name: "Gestion de Usuarios", icon: UserCog, active:false,
             children: [
                 {name: "Lista de Usuarios", icon: Users},
-                {name: "Agregar Usuario", icon: UserPlus},
                 {name: "Roles y Permisos", icon: Shield},
             ]
         },
@@ -36,13 +40,15 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
                 {name: "Reportes de Solicitudes", icon: FileUser},
                 {name: "Reportes de Actividades", icon: Boxes},
                 {name: "Reportes de Asistencia", icon: UserRoundArrowLeft},
+                {name: "Reportes de beneficios", icon: FileBarChart2},
             ]
         },
         {name: "Ajustes", icon: Settings, active:false,
             children: [
                 {name: "Gestión de agrupaciones", icon: PersonStanding},
                 {name: "Gestión de encargados", icon: Users},
-                {name: "Gestión de ubicaciones", icon: MapPin},
+                
+                
             ]
         },
         

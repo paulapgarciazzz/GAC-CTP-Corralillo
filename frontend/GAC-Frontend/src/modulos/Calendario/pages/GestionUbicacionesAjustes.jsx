@@ -82,7 +82,7 @@ export default function GestionUbicacionesAjustes() {
         <div className="space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div>
-                    <p className="text-sm text-foreground-faint">Ajustes</p>
+                    
                     <h1 className="text-2xl font-bold text-primary">Gestión de ubicaciones</h1>
                     <p className="mt-1 text-sm text-foreground-soft">Administra los lugares donde se realizan las actividades de los eventos.</p>
                 </div>
