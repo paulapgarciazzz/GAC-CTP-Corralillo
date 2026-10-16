@@ -21,17 +21,17 @@ const routeApi = getRouteApi('/dashboard');
 
 const VISTAS_VALIDAS = [
     'Bandeja de Solicitudes',
-    'Gestion de Agrupaciones',
+    'Gestión de Agrupaciones',
     'Reportes de Solicitudes',
     'Reportes de Actividades',
-    'Gestion de beneficios',
+    'Gestión de beneficios',
     'Asignar beneficios',
     'Ver beneficios asignados',
     'Reportes de beneficios',
     'Gestión de agrupaciones',
     'Gestión de encargados',
     'Gestión de ubicaciones',
-    'Calendario',
+    'Gestión del calendario',
 ];
 
 const Dashboard =()=>{
@@ -96,17 +96,17 @@ const Dashboard =()=>{
                         </section>
                     )}
                     {selectedView === 'Bandeja de Solicitudes' && <GestionSolicitudes />}
-                    {selectedView === 'Gestion de Agrupaciones' && <GestionAgrupaciones />}
+                    {selectedView === 'Gestión de Agrupaciones' && <GestionAgrupaciones />}
                     {selectedView === 'Reportes de Solicitudes' && <ReportesAgrupaciones />}
                     {selectedView === 'Reportes de Actividades' && <ReportesActividades />}
-                    {selectedView === 'Gestion de beneficios' && <GestionBeneficios />}
+                    {selectedView === 'Gestión de beneficios' && <GestionBeneficios />}
                     {selectedView === 'Asignar beneficios' && <AsignarBeneficios />}
                     {selectedView === 'Ver beneficios asignados' && <VerBeneficiosAsignados />}
                     {selectedView === 'Reportes de beneficios' && <ReportesBeneficios />}
                     {selectedView === 'Gestión de agrupaciones' && <GestionAgrupacionesAjustes />}
                     {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
                     {selectedView === 'Gestión de ubicaciones' && <GestionUbicacionesAjustes />}
-                    {selectedView === 'Calendario' && <Calendario />}
+                    {selectedView === 'Gestión del calendario' && <Calendario />}
                 </main>
             </div>
 
