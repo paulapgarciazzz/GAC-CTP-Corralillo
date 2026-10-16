@@ -56,7 +56,8 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // skipAuthRedirect: la petición maneja su propio 401 (verificación de sesión, login fallido).
+        if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !originalRequest.skipAuthRedirect) {
             originalRequest._retry = true;
             // Token expirado - redirigir a login
             localStorage.removeItem('access_token')
