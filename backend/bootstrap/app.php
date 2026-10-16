@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
+        // Permite exigir uno de varios permisos: permission:solicitudes.ver|beneficios.ver
+        $middleware->alias([
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+        ]);
         $middleware->validateCsrfTokens(except: [
             'api/encargados',
             'api/encargados/*',

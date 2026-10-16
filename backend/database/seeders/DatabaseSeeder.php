@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             EstadoSeeder::class,
             AlimentacionSeeder::class,
             EstadoActividadSeeder::class,
+            PermisosSeeder::class,
         ]);
     }
 }
