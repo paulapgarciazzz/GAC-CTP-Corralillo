@@ -34,7 +34,11 @@ const loginRoute = createRoute({
 const dashboardRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/dashboard',
-    component: Dashboard,
+    component: () => (
+        <AccessGuard>
+            <Dashboard />
+        </AccessGuard>
+    ),
     validateSearch: (search) => ({
         view: typeof search.view === 'string' ? search.view : undefined,
         categoria: typeof search.categoria === 'string' ? search.categoria : undefined,
