@@ -3,6 +3,7 @@ import { Loader2, RefreshCw } from 'lucide-react';
 import FiltrosSolicitudesAprobadas from '../components/FiltrosSolicitudesAprobadas';
 import ListaSolicitudesAprobadas from '../components/ListaSolicitudesAprobadas';
 import ModalAsignacionBeneficios from '../components/ModalAsignacionBeneficios';
+import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 import { actualizarAsignacion, crearAsignacion, obtenerAsignaciones, obtenerSolicitudesAprobadas } from '../services/asignacionBeneficiosService';
 
 const FILTROS_INICIALES = { agrupacion: '', cedula: '', fecha: '', estadoAsignacion: 'todas' };
@@ -17,6 +18,9 @@ export default function AsignarBeneficios() {
     const [modal, setModal] = useState({ abierto: false, solicitud: null });
     const [guardando, setGuardando] = useState(false);
     const [errorModal, setErrorModal] = useState('');
+    const { puedeCrear, puedeEditar } = usePermisosModulo('beneficios');
+    // Asignar por primera vez es crear; cambiar una asignación existente es editar.
+    const puedeSeleccionar = (solicitud) => (solicitud.asignacion ? puedeEditar : puedeCrear);
 
     const cargarDatos = async () => {
         setLoading(true);
@@ -160,6 +164,7 @@ export default function AsignarBeneficios() {
                 <ListaSolicitudesAprobadas
                     solicitudes={solicitudesFiltradas}
                     onSeleccionar={abrirAsignacion}
+                    puedeSeleccionar={puedeSeleccionar}
                     hayFiltrosActivos={hayFiltrosActivos}
                 />
             )}

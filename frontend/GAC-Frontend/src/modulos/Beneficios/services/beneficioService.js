@@ -29,6 +29,15 @@ export const BENEFICIO_CONFIG = {
     },
 };
 
+/** Texto que identifica a un beneficio en tarjetas y confirmaciones. */
+export const nombreBeneficio = (categoria, beneficio) => (categoria === 'transporte'
+    ? beneficio.matricula
+    : beneficio.nombre ?? beneficio.nombre_ruta ?? beneficio.tiempo_comida);
+
+/** "Eliminar aula", "Eliminar ruta", etc. */
+export const textoEliminarBeneficio = (categoria) =>
+    `Eliminar ${BENEFICIO_CONFIG[categoria].label.toLowerCase().replace(/s$/, '')}`;
+
 const extraerErrores = (error) => error.response?.data?.errors ?? {};
 
 const mensajePorEstado = (status, fallback) => {
