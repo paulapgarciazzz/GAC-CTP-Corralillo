@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import { X } from 'lucide-react';
-import { useCerrarConEscape } from '../hooks/useCerrarConEscape';
+import { useCerrarConEscape } from '../../../hooks/useCerrarConEscape';
 
 /**
  * Estructura común de los modales del calendario: fondo, caja, botón cerrar y título.

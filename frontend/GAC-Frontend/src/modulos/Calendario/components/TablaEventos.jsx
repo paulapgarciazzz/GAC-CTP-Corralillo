@@ -7,6 +7,10 @@ import { useFiltroEventos } from '../hooks/useFiltroEventos';
 import FiltrosEventos from './FiltrosEventos';
 import TablaActividades from './TablaActividades';
 
+/**
+ * Los handlers de acciones son opcionales: cada botón (y la columna Acciones)
+ * solo aparece si recibió su handler, según los permisos del usuario.
+ */
 export default function TablaEventos({
     events,
     cargando,
@@ -21,6 +25,8 @@ export default function TablaEventos({
     const filtro = useFiltroEventos(events);
     const { eventosFiltrados } = filtro;
     const [expandidos, setExpandidos] = useState(() => new Set());
+    const hayAcciones = Boolean(onAddActividad || onEdit || onDelete);
+    const totalColumnas = hayAcciones ? 6 : 5;
 
     const alternarExpandido = (id) => {
         setExpandidos((prev) => {
@@ -31,24 +37,20 @@ export default function TablaEventos({
         });
     };
 
-    const handleDelete = (evento) => {
-        if (window.confirm(`¿Eliminar el evento "${evento.title}"?`)) {
-            onDelete(evento.id);
-        }
-    };
-
     return (
         <div className="mx-auto w-full max-w-5xl space-y-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h3 className="text-lg font-semibold text-foreground">Eventos</h3>
-                <button
-                    type="button"
-                    onClick={onCreateClick}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md transition duration-300 hover:bg-primary-hover hover:shadow-lg cursor-pointer"
-                >
-                    <CalendarPlus size={16} />
-                    Crear evento
-                </button>
+                {onCreateClick && (
+                    <button
+                        type="button"
+                        onClick={onCreateClick}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md transition duration-300 hover:bg-primary-hover hover:shadow-lg cursor-pointer"
+                    >
+                        <CalendarPlus size={16} />
+                        Crear evento
+                    </button>
+                )}
             </div>
 
             <FiltrosEventos filtro={filtro} />
@@ -69,7 +71,7 @@ export default function TablaEventos({
                                 <th className="px-4 py-3 font-semibold">Hora inicio</th>
                                 <th className="px-4 py-3 font-semibold">Fecha fin</th>
                                 <th className="px-4 py-3 font-semibold">Hora fin</th>
-                                <th className="px-4 py-3 font-semibold text-right">Acciones</th>
+                                {hayAcciones && <th className="px-4 py-3 font-semibold text-right">Acciones</th>}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
@@ -114,45 +116,53 @@ export default function TablaEventos({
                                         <td className="px-4 py-4 text-foreground-faint whitespace-nowrap">
                                             {evento.allDay ? 'Todo el día' : format(evento.end, 'HH:mm')}
                                         </td>
-                                        <td className="px-4 py-4">
-                                            <div className="flex justify-end gap-1">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onAddActividad(evento)}
-                                                    aria-label={`Agregar actividad a ${evento.title}`}
-                                                    title="Agregar actividad"
-                                                    className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
-                                                >
-                                                    <Plus size={16} />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onEdit(evento)}
-                                                    aria-label={`Editar ${evento.title}`}
-                                                    title="Editar"
-                                                    className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
-                                                >
-                                                    <Pencil size={16} />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleDelete(evento)}
-                                                    aria-label={`Eliminar ${evento.title}`}
-                                                    title="Eliminar"
-                                                    className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-danger-soft hover:text-danger cursor-pointer"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
+                                        {hayAcciones && (
+                                            <td className="px-4 py-4">
+                                                <div className="flex justify-end gap-1">
+                                                    {onAddActividad && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => onAddActividad(evento)}
+                                                            aria-label={`Agregar actividad a ${evento.title}`}
+                                                            title="Agregar actividad"
+                                                            className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
+                                                        >
+                                                            <Plus size={16} />
+                                                        </button>
+                                                    )}
+                                                    {onEdit && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => onEdit(evento)}
+                                                            aria-label={`Editar ${evento.title}`}
+                                                            title="Editar"
+                                                            className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
+                                                        >
+                                                            <Pencil size={16} />
+                                                        </button>
+                                                    )}
+                                                    {onDelete && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => onDelete(evento)}
+                                                            aria-label={`Eliminar ${evento.title}`}
+                                                            title="Eliminar"
+                                                            className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-danger-soft hover:text-danger cursor-pointer"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                     {expandido && (
                                         <tr>
-                                            <td colSpan={6} className="p-0">
+                                            <td colSpan={totalColumnas} className="p-0">
                                                 <TablaActividades
                                                     actividades={actividades}
                                                     embebida
-                                                    onEdit={(actividad) => onEditActividad(evento, actividad)}
+                                                    onEdit={onEditActividad ? (actividad) => onEditActividad(evento, actividad) : undefined}
                                                     onDelete={onDeleteActividad}
                                                 />
                                             </td>
