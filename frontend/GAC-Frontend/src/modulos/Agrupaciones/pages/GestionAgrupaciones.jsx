@@ -4,8 +4,10 @@ import { obtenerAgrupacionesAprobadas } from '../services/agrupacionService';
 import TarjetaAgrupacion from '../components/TarjetaAgrupacion';
 import ModalEditarAgrupacion from '../components/ModalEditarAgrupacion';
 import ModalDetalleAgrupacion from '../components/ModalDetalleAgrupacion';
+import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 
 export default function GestionAgrupaciones() {
+    const { puedeEditar } = usePermisosModulo('solicitudes');
     const [agrupaciones, setAgrupaciones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -76,7 +78,7 @@ export default function GestionAgrupaciones() {
                             key={agrupacion.id}
                             agrupacion={agrupacion}
                             onVerDetalle={setAgrupacionDetalle}
-                            onEditar={setAgrupacionEditar}
+                            onEditar={puedeEditar ? setAgrupacionEditar : undefined}
                         />
                     ))}
                 </div>

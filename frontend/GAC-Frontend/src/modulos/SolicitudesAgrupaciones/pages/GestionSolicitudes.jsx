@@ -4,8 +4,12 @@ import { obtenerSolicitudes, actualizarEstadoSolicitud, eliminarSolicitud, envia
 import ListaSolicitudes from '../components/ListaSolicitudes';
 import DetalleSolicitud from '../components/DetalleSolicitud';
 import ModalEditarSolicitud from '../components/ModalEditarSolicitud';
+import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
+import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
+import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 
 export default function GestionSolicitudes() {
+    const { puedeEditar, puedeEliminar } = usePermisosModulo('solicitudes');
     const [solicitudes, setSolicitudes] = useState([]);
     const [selectedId, setSelectedId] = useState(null);
     const [solicitudEditando, setSolicitudEditando] = useState(null);
@@ -46,15 +50,13 @@ export default function GestionSolicitudes() {
         }
     };
 
-    const handleEliminar = async (id) => {
-        const result = await eliminarSolicitud(id);
-        if (result.success) {
-            setSolicitudes((prev) => prev.filter((s) => s.id !== id));
-            setSelectedId((prev) => (prev === id ? null : prev));
-        } else {
-            setError(result.error);
-        }
-    };
+    const eliminacion = useConfirmarEliminacion(
+        (solicitud) => eliminarSolicitud(solicitud.id),
+        (solicitud) => {
+            setSolicitudes((prev) => prev.filter((s) => s.id !== solicitud.id));
+            setSelectedId((prev) => (prev === solicitud.id ? null : prev));
+        },
+    );
 
     const solicitudSeleccionada = solicitudes.find((s) => s.id === selectedId) ?? null;
     const eventosConSolicitudes = [
@@ -117,11 +119,11 @@ export default function GestionSolicitudes() {
                             solicitudes={solicitudesFiltradas}
                             selectedId={selectedId}
                             onSelect={setSelectedId}
-                            onAceptar={(id) => cambiarEstado(id, 'aprobada')}
-                            onRechazar={(id) => cambiarEstado(id, 'rechazada')}
-                            onEditar={setSolicitudEditando}
-                            onEnviarDetalles={handleEnviarDetalles}
-                            onEliminar={handleEliminar}
+                            onAceptar={puedeEditar ? (id) => cambiarEstado(id, 'aprobada') : undefined}
+                            onRechazar={puedeEditar ? (id) => cambiarEstado(id, 'rechazada') : undefined}
+                            onEditar={puedeEditar ? setSolicitudEditando : undefined}
+                            onEnviarDetalles={puedeEditar ? handleEnviarDetalles : undefined}
+                            onEliminar={puedeEliminar ? eliminacion.abrir : undefined}
                             hayBusqueda={busqueda.trim().length > 0 || filtroEvento !== 'todos'}
                         />
                     </div>
@@ -139,6 +141,16 @@ export default function GestionSolicitudes() {
                 onActualizado={(actualizada) => {
                     setSolicitudes((prev) => prev.map((s) => (s.id === actualizada.id ? actualizada : s)));
                 }}
+            />
+            <ModalConfirmarEliminacion
+                open={Boolean(eliminacion.elemento)}
+                titulo="Eliminar solicitud"
+                nombre={eliminacion.elemento && `la solicitud de ${eliminacion.elemento.agrupacion.nombre}`}
+                textoBoton="Eliminar solicitud"
+                loading={eliminacion.eliminando}
+                error={eliminacion.error}
+                onClose={eliminacion.cerrar}
+                onConfirm={eliminacion.confirmar}
             />
         </div>
     );

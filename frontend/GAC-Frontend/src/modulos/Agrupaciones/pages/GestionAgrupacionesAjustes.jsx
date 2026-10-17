@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Loader2, RefreshCw, Trash2, X } from 'lucide-react';
+import { Loader2, RefreshCw, Trash2 } from 'lucide-react';
+import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
+import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
+import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 import { eliminarAgrupacion, obtenerAgrupacionesAdministrativas } from '../services/agrupacionService';
 
 function cantidadSolicitudes(agrupacion) {
@@ -16,61 +19,19 @@ function nombreEncargado(agrupacion) {
     return [encargado.primer_nombre, encargado.apellido].filter(Boolean).join(' ') || 'Sin encargado';
 }
 
-function ConfirmarEliminacion({ agrupacion, loading, error, onClose, onConfirm }) {
-    if (!agrupacion) return null;
-
+function DetalleEliminacion({ agrupacion }) {
     const solicitudes = cantidadSolicitudes(agrupacion);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={loading ? undefined : onClose}>
-            <div
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="titulo-confirmar-eliminacion-agrupacion"
-                onClick={(event) => event.stopPropagation()}
-                className="w-full max-w-md bg-surface rounded-2xl shadow-2xl p-6 relative"
-            >
-                <button
-                    type="button"
-                    onClick={onClose}
-                    disabled={loading}
-                    aria-label="Cerrar"
-                    className="absolute top-4 right-4 text-foreground-faint hover:text-foreground disabled:opacity-50 transition-colors cursor-pointer"
-                >
-                    <X size={20} />
-                </button>
-                <div className="flex items-start gap-3 pr-8">
-                    <div className="p-2 rounded-full bg-danger-soft text-danger shrink-0">
-                        <AlertTriangle size={20} />
-                    </div>
-                    <div>
-                        <h2 id="titulo-confirmar-eliminacion-agrupacion" className="text-lg font-bold text-foreground">Eliminar agrupación</h2>
-                        <p className="mt-3 text-sm text-foreground-soft">¿Seguro que deseas eliminar la agrupación <strong className="text-foreground">'{agrupacion.nombre}'</strong>?</p>
-                    </div>
-                </div>
-
-                <div className="mt-4 p-3 rounded-lg bg-background border border-border text-sm text-foreground-soft space-y-1">
-                    {solicitudes === 0 ? (
-                        <p>Esta agrupación no tiene solicitudes asociadas.</p>
-                    ) : (
-                        <>
-                            <p>Esta agrupación tiene <strong className="text-foreground">{textoSolicitudes(solicitudes)}</strong> asociadas.</p>
-                            <p>Al eliminarla también se eliminarán las solicitudes y registros relacionados.</p>
-                            <p className="font-medium text-danger">Esta acción no se puede deshacer.</p>
-                        </>
-                    )}
-                </div>
-
-                {error && <div role="alert" className="mt-4 p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">{error}</div>}
-
-                <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
-                    <button type="button" onClick={onClose} disabled={loading} className="px-4 py-2 border border-border text-foreground-soft hover:bg-background disabled:opacity-50 rounded-lg font-medium transition-colors cursor-pointer">Cancelar</button>
-                    <button type="button" onClick={onConfirm} disabled={loading} className="px-4 py-2 bg-danger hover:bg-danger/90 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors cursor-pointer flex items-center justify-center gap-2">
-                        {loading && <Loader2 size={16} className="animate-spin" />}
-                        {loading ? 'Eliminando...' : 'Eliminar agrupación'}
-                    </button>
-                </div>
-            </div>
+        <div className="p-3 rounded-lg bg-background border border-border text-sm text-foreground-soft space-y-1">
+            {solicitudes === 0 ? (
+                <p>Esta agrupación no tiene solicitudes asociadas.</p>
+            ) : (
+                <>
+                    <p>Esta agrupación tiene <strong className="text-foreground">{textoSolicitudes(solicitudes)}</strong> asociadas.</p>
+                    <p>Al eliminarla también se eliminarán las solicitudes y registros relacionados.</p>
+                </>
+            )}
         </div>
     );
 }
@@ -80,9 +41,7 @@ export default function GestionAgrupacionesAjustes() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [mensajeExito, setMensajeExito] = useState('');
-    const [agrupacionAEliminar, setAgrupacionAEliminar] = useState(null);
-    const [eliminando, setEliminando] = useState(false);
-    const [errorEliminacion, setErrorEliminacion] = useState('');
+    const { puedeEliminar } = usePermisosModulo('solicitudes');
 
     const aplicarResultado = (resultado) => {
         if (resultado.success) {
@@ -107,33 +66,13 @@ export default function GestionAgrupacionesAjustes() {
         aplicarResultado(await obtenerAgrupacionesAdministrativas());
     };
 
-    const abrirConfirmacion = (agrupacion) => {
-        setErrorEliminacion('');
-        setAgrupacionAEliminar(agrupacion);
-    };
-
-    const cerrarConfirmacion = () => {
-        if (eliminando) return;
-        setAgrupacionAEliminar(null);
-        setErrorEliminacion('');
-    };
-
-    const confirmarEliminacion = async () => {
-        if (!agrupacionAEliminar || eliminando) return;
-        setEliminando(true);
-        setErrorEliminacion('');
-        const resultado = await eliminarAgrupacion(agrupacionAEliminar.id);
-        setEliminando(false);
-
-        if (!resultado.success) {
-            setErrorEliminacion(resultado.error);
-            return;
-        }
-
-        setAgrupaciones((prev) => prev.filter((agrupacion) => agrupacion.id !== agrupacionAEliminar.id));
-        setAgrupacionAEliminar(null);
-        setMensajeExito('Agrupación eliminada correctamente.');
-    };
+    const eliminacion = useConfirmarEliminacion(
+        (agrupacion) => eliminarAgrupacion(agrupacion.id),
+        (eliminada) => {
+            setAgrupaciones((prev) => prev.filter((agrupacion) => agrupacion.id !== eliminada.id));
+            setMensajeExito('Agrupación eliminada correctamente.');
+        },
+    );
 
     return (
         <div className="space-y-5">
@@ -160,7 +99,7 @@ export default function GestionAgrupacionesAjustes() {
                                 <th className="px-4 py-3 font-semibold">Lugar</th>
                                 <th className="px-4 py-3 font-semibold">Integrantes</th>
                                 <th className="px-4 py-3 font-semibold">Solicitudes</th>
-                                <th className="px-4 py-3 font-semibold text-right">Acción</th>
+                                {puedeEliminar && <th className="px-4 py-3 font-semibold text-right">Acción</th>}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
@@ -173,7 +112,7 @@ export default function GestionAgrupacionesAjustes() {
                                         <td className="px-4 py-4 text-foreground-soft">{agrupacion.lugar_procedencia || '—'}</td>
                                         <td className="px-4 py-4 text-foreground-soft">{agrupacion.cantidad_integrantes ?? '—'}</td>
                                         <td className="px-4 py-4 text-foreground-soft">{textoSolicitudes(solicitudes)}</td>
-                                        <td className="px-4 py-4 text-right"><button type="button" onClick={() => abrirConfirmacion(agrupacion)} aria-label={`Eliminar ${agrupacion.nombre}`} className="inline-flex items-center gap-2 px-3 py-2 border border-danger text-danger hover:bg-danger-soft rounded-lg font-medium transition-colors cursor-pointer"><Trash2 size={15} />Eliminar</button></td>
+                                        {puedeEliminar && <td className="px-4 py-4 text-right"><button type="button" onClick={() => eliminacion.abrir(agrupacion)} aria-label={`Eliminar ${agrupacion.nombre}`} className="inline-flex items-center gap-2 px-3 py-2 border border-danger text-danger hover:bg-danger-soft rounded-lg font-medium transition-colors cursor-pointer"><Trash2 size={15} />Eliminar</button></td>}
                                     </tr>
                                 );
                             })}
@@ -182,7 +121,17 @@ export default function GestionAgrupacionesAjustes() {
                 </div>
             )}
 
-            <ConfirmarEliminacion agrupacion={agrupacionAEliminar} loading={eliminando} error={errorEliminacion} onClose={cerrarConfirmacion} onConfirm={confirmarEliminacion} />
+            <ModalConfirmarEliminacion
+                open={Boolean(eliminacion.elemento)}
+                titulo="Eliminar agrupación"
+                nombre={eliminacion.elemento && `la agrupación ${eliminacion.elemento.nombre || 'sin nombre'}`}
+                advertencia={eliminacion.elemento && <DetalleEliminacion agrupacion={eliminacion.elemento} />}
+                textoBoton="Eliminar agrupación"
+                loading={eliminacion.eliminando}
+                error={eliminacion.error}
+                onClose={eliminacion.cerrar}
+                onConfirm={eliminacion.confirmar}
+            />
         </div>
     );
 }

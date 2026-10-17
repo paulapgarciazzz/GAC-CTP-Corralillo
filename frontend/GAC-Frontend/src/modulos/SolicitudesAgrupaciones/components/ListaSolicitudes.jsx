@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { MoreVertical, Pencil, Trash2, MailPlus, Loader2 } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
-import { formatearFecha } from '../../../utils/fecha';
 
+/**
+ * Los handlers de acciones son opcionales: cada botón solo aparece si recibió
+ * su handler (según los permisos del usuario). `onEliminar(solicitud)` abre la
+ * confirmación en la página.
+ */
 export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, onAceptar, onRechazar, onEditar, onEnviarDetalles, onEliminar, hayBusqueda }) {
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
     const [enviandoId, setEnviandoId] = useState(null);
@@ -31,9 +35,7 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
 
     const handleEliminar = (solicitud) => {
         setMenuAbiertoId(null);
-        if (window.confirm(`¿Eliminar la solicitud de "${solicitud.agrupacion.nombre}"? Esta acción no se puede deshacer.`)) {
-            onEliminar(solicitud.id);
-        }
+        onEliminar(solicitud);
     };
 
     return (
@@ -41,6 +43,16 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
             {solicitudes.map((solicitud) => {
                 const seleccionada = solicitud.id === selectedId;
                 const menuAbierto = menuAbiertoId === solicitud.id;
+                const decidible = solicitud.estado === 'pendiente' && onAceptar && onRechazar;
+                // Una solicitud rechazada no se edita ni se le envían detalles.
+                const editable = solicitud.estado !== 'rechazada';
+                const opcionesMenu = {
+                    editar: editable && Boolean(onEditar),
+                    enviar: editable && Boolean(onEnviarDetalles),
+                    eliminar: Boolean(onEliminar),
+                };
+                const hayMenu = Object.values(opcionesMenu).some(Boolean);
+
                 return (
                     <li key={solicitud.id}>
                         <div
@@ -61,7 +73,7 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                             </div>
 
                             <div className="flex items-center gap-2 shrink-0">
-                                {solicitud.estado === 'pendiente' ? (
+                                {decidible ? (
                                     <>
                                         <button
                                             type="button"
@@ -82,25 +94,25 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                     <EstadoBadge estado={solicitud.estado} />
                                 )}
 
-                                <div className="relative">
-                                    <button
-                                        type="button"
-                                        onClick={(e) => { e.stopPropagation(); setMenuAbiertoId(menuAbierto ? null : solicitud.id); }}
-                                        aria-label="Más opciones"
-                                        className="p-1.5 rounded-lg text-foreground-faint hover:bg-primary/10 hover:text-foreground transition-colors cursor-pointer"
-                                    >
-                                        <MoreVertical size={16} />
-                                    </button>
+                                {hayMenu && (
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); setMenuAbiertoId(menuAbierto ? null : solicitud.id); }}
+                                            aria-label="Más opciones"
+                                            className="p-1.5 rounded-lg text-foreground-faint hover:bg-primary/10 hover:text-foreground transition-colors cursor-pointer"
+                                        >
+                                            <MoreVertical size={16} />
+                                        </button>
 
-                                    {menuAbierto && (
-                                        <>
-                                            <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setMenuAbiertoId(null); }} />
-                                            <div
-                                                onClick={(e) => e.stopPropagation()}
-                                                className="absolute right-0 mt-1 w-40 bg-surface rounded-lg shadow-lg border border-border z-20 p-1"
-                                            >
-                                                {solicitud.estado !== 'rechazada' && (
-                                                    <>
+                                        {menuAbierto && (
+                                            <>
+                                                <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setMenuAbiertoId(null); }} />
+                                                <div
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="absolute right-0 mt-1 w-40 bg-surface rounded-lg shadow-lg border border-border z-20 p-1"
+                                                >
+                                                    {opcionesMenu.editar && (
                                                         <button
                                                             type="button"
                                                             onClick={() => handleEditar(solicitud)}
@@ -109,6 +121,8 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                                             <Pencil size={14} />
                                                             Editar
                                                         </button>
+                                                    )}
+                                                    {opcionesMenu.enviar && (
                                                         <button
                                                             type="button"
                                                             onClick={() => handleEnviarDetalles(solicitud)}
@@ -122,20 +136,22 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                                             )}
                                                             Enviar detalles
                                                         </button>
-                                                    </>
-                                                )}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleEliminar(solicitud)}
-                                                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-danger hover:bg-danger-soft rounded-lg transition-colors cursor-pointer"
-                                                >
-                                                    <Trash2 size={14} />
-                                                    Eliminar
-                                                </button>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
+                                                    )}
+                                                    {opcionesMenu.eliminar && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleEliminar(solicitud)}
+                                                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-danger hover:bg-danger-soft rounded-lg transition-colors cursor-pointer"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                            Eliminar
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </li>
