@@ -1,38 +1,54 @@
 import Topbar from '../components/Topbar';
 import Sidebar from '../components/Sidebar';
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { useEffect } from 'react';
 import { getRouteApi } from '@tanstack/react-router';
-import GestionSolicitudes from '../../SolicitudesAgrupaciones/pages/GestionSolicitudes';
-import GestionAgrupaciones from '../../Agrupaciones/pages/GestionAgrupaciones';
-import ReportesAgrupaciones from '../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones';
-import ReportesActividades from '../../Reportes/pages/Reportes_actividades/ReportesActividades';
-import GestionAgrupacionesAjustes from '../../Agrupaciones/pages/GestionAgrupacionesAjustes';
-import GestionEncargadosAjustes from '../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes';
-import Calendario from '../../Calendario/pages/Calendario';
-import GestionUbicacionesAjustes from '../../Calendario/pages/GestionUbicacionesAjustes';
-import GestionBeneficios from '../../Beneficios/pages/GestionBeneficios';
-import AsignarBeneficios from '../../Beneficios/pages/AsignarBeneficios';
-import VerBeneficiosAsignados from '../../Beneficios/pages/VerBeneficiosAsignados';
-import ReportesBeneficios from '../../Beneficios/pages/ReportesBeneficios';
+import { Loader2, Lock } from 'lucide-react';
 import { useTheme } from '../../../hooks/useTheme';
+import { useAuth } from '../../../auth/hooks/useAuth';
 
 const routeApi = getRouteApi('/dashboard');
 
-const VISTAS_VALIDAS = [
-    'Bandeja de Solicitudes',
-    'Gestión de Agrupaciones',
-    'Reportes de Solicitudes',
-    'Reportes de Actividades',
-    'Gestión de beneficios',
-    'Asignar beneficios',
-    'Ver beneficios asignados',
-    'Reportes de beneficios',
-    'Gestión de agrupaciones',
-    'Gestión de encargados',
-    'Gestión de ubicaciones',
-    'Gestión del calendario',
-];
+/**
+ * Vistas del panel: nombre (igual al del Sidebar) → módulo de permisos y página.
+ * Cada página se descarga solo cuando se abre por primera vez (React.lazy).
+ */
+const VISTAS = {
+    'Bandeja de Solicitudes': { modulo: 'solicitudes', Pagina: lazy(() => import('../../SolicitudesAgrupaciones/pages/GestionSolicitudes')) },
+    'Gestión de Agrupaciones': { modulo: 'solicitudes', Pagina: lazy(() => import('../../Agrupaciones/pages/GestionAgrupaciones')) },
+    'Reportes de Solicitudes': { modulo: 'reportes', Pagina: lazy(() => import('../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones')) },
+    'Reportes de Actividades': { modulo: 'reportes', Pagina: lazy(() => import('../../Reportes/pages/Reportes_actividades/ReportesActividades')) },
+    'Gestión de beneficios': { modulo: 'beneficios', Pagina: lazy(() => import('../../Beneficios/pages/GestionBeneficios')) },
+    'Asignar beneficios': { modulo: 'beneficios', Pagina: lazy(() => import('../../Beneficios/pages/AsignarBeneficios')) },
+    'Ver beneficios asignados': { modulo: 'beneficios', Pagina: lazy(() => import('../../Beneficios/pages/VerBeneficiosAsignados')) },
+    'Reportes de beneficios': { modulo: 'reportes', Pagina: lazy(() => import('../../Beneficios/pages/ReportesBeneficios')) },
+    'Gestión de agrupaciones': { modulo: 'solicitudes', Pagina: lazy(() => import('../../Agrupaciones/pages/GestionAgrupacionesAjustes')) },
+    'Gestión de encargados': { modulo: 'solicitudes', Pagina: lazy(() => import('../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes')) },
+    'Gestión de ubicaciones': { modulo: 'calendario', Pagina: lazy(() => import('../../Calendario/pages/GestionUbicacionesAjustes')) },
+    'Gestión del calendario': { modulo: 'calendario', Pagina: lazy(() => import('../../Calendario/pages/Calendario')) },
+    'Lista de Usuarios': { modulo: 'usuarios', Pagina: lazy(() => import('../../Usuarios/pages/ListaUsuarios')) },
+    'Roles y Permisos': { modulo: 'usuarios', Pagina: lazy(() => import('../../Usuarios/pages/RolesPermisos')) },
+};
+
+function CargandoVista() {
+    return (
+        <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft">
+            <Loader2 className="animate-spin text-primary" size={24} />Cargando...
+        </div>
+    );
+}
+
+function SinAcceso() {
+    return (
+        <section className="min-h-[calc(100vh-12rem)] flex flex-col items-center justify-center text-center gap-3">
+            <span className="h-14 w-14 inline-flex items-center justify-center rounded-full bg-background border border-border text-foreground-faint">
+                <Lock size={26} />
+            </span>
+            <h1 className="text-xl font-semibold text-foreground">Sin acceso a este módulo</h1>
+            <p className="text-sm text-foreground-soft max-w-sm">Solicita a un administrador que te habilite el permiso en Roles y Permisos.</p>
+        </section>
+    );
+}
 
 const Dashboard =()=>{
     const { isDark, toggleTheme } = useTheme();
@@ -40,7 +56,9 @@ const Dashboard =()=>{
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
     const { view } = routeApi.useSearch();
     const navigate = routeApi.useNavigate();
-    const selectedView = view && VISTAS_VALIDAS.includes(view) ? view : null;
+    const { tieneModulo } = useAuth();
+    const selectedView = view && Object.hasOwn(VISTAS, view) ? view : null;
+    const vista = selectedView ? VISTAS[selectedView] : null;
     const setSelectedView = (nuevaVista) => {
         navigate({ search: (prev) => ({ ...prev, view: nuevaVista ?? undefined }) });
     };
@@ -95,18 +113,13 @@ const Dashboard =()=>{
                             <h1 className="text-2xl font-semibold text-foreground">Panel principal</h1>
                         </section>
                     )}
-                    {selectedView === 'Bandeja de Solicitudes' && <GestionSolicitudes />}
-                    {selectedView === 'Gestión de Agrupaciones' && <GestionAgrupaciones />}
-                    {selectedView === 'Reportes de Solicitudes' && <ReportesAgrupaciones />}
-                    {selectedView === 'Reportes de Actividades' && <ReportesActividades />}
-                    {selectedView === 'Gestión de beneficios' && <GestionBeneficios />}
-                    {selectedView === 'Asignar beneficios' && <AsignarBeneficios />}
-                    {selectedView === 'Ver beneficios asignados' && <VerBeneficiosAsignados />}
-                    {selectedView === 'Reportes de beneficios' && <ReportesBeneficios />}
-                    {selectedView === 'Gestión de agrupaciones' && <GestionAgrupacionesAjustes />}
-                    {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
-                    {selectedView === 'Gestión de ubicaciones' && <GestionUbicacionesAjustes />}
-                    {selectedView === 'Gestión del calendario' && <Calendario />}
+                    {vista && (tieneModulo(vista.modulo) ? (
+                        <Suspense fallback={<CargandoVista />}>
+                            <vista.Pagina key={selectedView} />
+                        </Suspense>
+                    ) : (
+                        <SinAcceso />
+                    ))}
                 </main>
             </div>
 
