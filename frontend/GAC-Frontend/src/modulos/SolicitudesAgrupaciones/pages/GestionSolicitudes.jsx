@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import Aviso from '../../../components/Aviso';
+import BarraBusqueda from '../../../components/BarraBusqueda';
 import { obtenerSolicitudes, actualizarEstadoSolicitud, eliminarSolicitud, enviarDetallesSolicitud } from '../services/solicitudService';
 import ListaSolicitudes from '../components/ListaSolicitudes';
 import DetalleSolicitud from '../components/DetalleSolicitud';
@@ -72,16 +74,13 @@ export default function GestionSolicitudes() {
         <div className="space-y-4">
 
             <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative w-full max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-faint" />
-                    <input
-                        type="text"
-                        value={busqueda}
-                        onChange={(e) => setBusqueda(e.target.value)}
-                        placeholder="Buscar agrupación por nombre..."
-                        className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                </div>
+                <BarraBusqueda
+                    valor={busqueda}
+                    onChange={setBusqueda}
+                    placeholder="Buscar agrupación por nombre..."
+                    tamano="sm"
+                    className="w-full max-w-sm"
+                />
                 <select
                     value={filtroEvento}
                     onChange={(e) => setFiltroEvento(e.target.value)}
@@ -96,17 +95,8 @@ export default function GestionSolicitudes() {
                 </select>
             </div>
 
-            {error && (
-                <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">
-                    {error}
-                </div>
-            )}
-
-            {mensajeExito && (
-                <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">
-                    {mensajeExito}
-                </div>
-            )}
+            <Aviso mensaje={error} />
+            <Aviso tipo="exito" mensaje={mensajeExito} />
 
             {loading ? (
                 <div className="flex items-center justify-center py-16">

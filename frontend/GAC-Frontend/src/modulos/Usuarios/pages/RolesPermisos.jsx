@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { Info, Loader2, RefreshCw, ShieldCheck, Users } from 'lucide-react';
+import { Info, Loader2, ShieldCheck, Users } from 'lucide-react';
 import { useAuth } from '../../../auth/hooks/useAuth';
-import BarraBusqueda from '../components/BarraBusqueda';
+import Aviso from '../../../components/Aviso';
+import BarraBusqueda from '../../../components/BarraBusqueda';
 import TarjetaPermisosUsuario from '../components/TarjetaPermisosUsuario';
 import { useListadoPaginado } from '../hooks/useListadoPaginado';
 import { obtenerUsuariosConPermisos } from '../services/usuarioService';
@@ -69,14 +70,7 @@ export default function RolesPermisos() {
 
             <BarraBusqueda valor={listado.textoBusqueda} onChange={listado.buscar} onLimpiar={listado.limpiarBusqueda} />
 
-            {error && (
-                <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <span>{error}</span>
-                    <button type="button" onClick={listado.recargar} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer">
-                        <RefreshCw size={14} />Reintentar
-                    </button>
-                </div>
-            )}
+            <Aviso mensaje={error} onReintentar={listado.recargar} />
 
             {cargandoInicial ? (
                 <div aria-busy="true" className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">

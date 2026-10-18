@@ -3,7 +3,7 @@ import { Inbox, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { obtenerReporteAgrupaciones } from '../../services/reporteService';
 import { useCargarReporte } from '../../hooks/useCargarReporte';
 import { useEventos } from '../../../SolicitudesAgrupaciones/hooks/useEventos';
-import { AlertaError } from '../../../Calendario/components/Formulario';
+import { AlertaError } from '../../../../components/Formulario';
 import TarjetaEstadistica from '../../components/Reportes_agrupaciones/TarjetaEstadistica';
 import BotonImprimir from '../../components/BotonImprimir';
 import IndicadorCarga from '../../components/IndicadorCarga';

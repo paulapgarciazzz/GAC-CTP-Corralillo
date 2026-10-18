@@ -3,8 +3,8 @@ import { format } from 'date-fns';
 import { Check } from 'lucide-react';
 import SelectorHora from '../../../components/SelectorHora';
 import { CATEGORY_COLORS } from '../lib/categorias';
-import { BOTON_PELIGRO_CLASS, INPUT_CLASS, LABEL_CLASS } from '../lib/formulario';
-import { AlertaError, BotonesFormulario } from './Formulario';
+import { BOTON_PELIGRO_CLASS, INPUT_CLASS, LABEL_CLASS } from '../../../utils/formulario';
+import { AlertaError, BotonesFormulario } from '../../../components/Formulario';
 
 const DARK_SOLID_BG = {
     info: 'dark:bg-info',

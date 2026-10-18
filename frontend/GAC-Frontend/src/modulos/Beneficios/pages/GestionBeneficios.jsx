@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { getRouteApi } from '@tanstack/react-router';
-import { Loader2, Plus, RefreshCw } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
+import Aviso from '../../../components/Aviso';
+import { EstadoCargando, EstadoVacio } from '../../../components/EstadoLista';
 import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
 import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 import ModalBeneficio from '../components/ModalBeneficio';
@@ -131,8 +133,8 @@ export default function GestionBeneficios() {
                 )}
             </div>
 
-            {mensajeExito && <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">{mensajeExito}</div>}
-            {error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><span>{error}</span><button type="button" onClick={cargarBeneficios} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer"><RefreshCw size={14} />Reintentar</button></div>}
+            <Aviso tipo="exito" mensaje={mensajeExito} />
+            <Aviso mensaje={error} onReintentar={cargarBeneficios} />
 
             <div className="bg-surface border border-border rounded-xl p-3 sm:p-4">
                 <p className="text-xs font-medium text-foreground-soft uppercase tracking-wider mb-3">Categoría</p>
@@ -147,9 +149,9 @@ export default function GestionBeneficios() {
             </div>
 
             {loading ? (
-                <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft"><Loader2 className="animate-spin text-primary" size={26} />Cargando beneficios...</div>
+                <EstadoCargando texto="Cargando beneficios..." />
             ) : beneficios.length === 0 ? (
-                <div className="flex items-center justify-center py-16 border border-border rounded-xl bg-surface"><p className="text-sm text-foreground-faint text-center">No hay registros en {config.label.toLowerCase()}.</p></div>
+                <EstadoVacio mensaje={`No hay registros en ${config.label.toLowerCase()}.`} />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {beneficios.map((beneficio) => (

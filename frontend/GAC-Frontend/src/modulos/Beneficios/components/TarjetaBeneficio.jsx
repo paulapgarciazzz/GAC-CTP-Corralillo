@@ -1,14 +1,6 @@
 import { Pencil, Trash2 } from 'lucide-react';
 import { BENEFICIO_CONFIG, nombreBeneficio } from '../services/beneficioService';
-
-function Dato({ label, value }) {
-    return (
-        <div>
-            <p className="text-[11px] uppercase tracking-wider text-foreground-faint">{label}</p>
-            <p className="text-sm text-foreground-soft truncate">{value || '—'}</p>
-        </div>
-    );
-}
+import Dato from '../../../components/Dato';
 
 // `onEditar` y `onEliminar` son opcionales: sin ellos no se muestra el botón.
 export default function TarjetaBeneficio({ categoria, beneficio, onEditar, onEliminar }) {

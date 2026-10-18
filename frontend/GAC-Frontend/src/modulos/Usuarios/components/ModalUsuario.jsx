@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import ModalBase from '../../Calendario/components/ModalBase';
-import { AlertaError, BotonesFormulario, CampoFormulario } from '../../Calendario/components/Formulario';
-import { INPUT_CLASS } from '../../Calendario/lib/formulario';
+import ModalBase from '../../../components/ModalBase';
+import { AlertaError, BotonesFormulario, CampoFormulario } from '../../../components/Formulario';
+import { INPUT_CLASS } from '../../../utils/formulario';
 import CampoPassword from './CampoPassword';
-import Switch from './Switch';
+import Switch from '../../../components/Switch';
 
 function FilaSwitch({ titulo, descripcion, checked, onChange, disabled, error }) {
     return (

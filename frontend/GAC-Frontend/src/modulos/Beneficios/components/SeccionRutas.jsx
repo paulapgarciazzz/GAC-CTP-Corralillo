@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Loader2, Plus } from 'lucide-react';
+import Aviso from '../../../components/Aviso';
 import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
 import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
 import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
@@ -102,7 +103,7 @@ export default function SeccionRutas() {
                 )}
             </div>
 
-            {error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">{error}</div>}
+            <Aviso mensaje={error} />
 
             {loading ? (
                 <div className="flex items-center justify-center gap-2 py-8 text-foreground-soft">

@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { Check, Loader2 } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
-import Switch from './Switch';
+import Switch from '../../../components/Switch';
 import { ACCION_POR_DEFECTO, ACCIONES, MODULOS, permiso } from '../constants/modulos';
 import { guardarPermisosUsuario } from '../services/usuarioService';
 

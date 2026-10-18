@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { obtenerEventos } from '../../../Calendario/services/eventoService';
-import { AlertaError } from '../../../Calendario/components/Formulario';
+import { AlertaError } from '../../../../components/Formulario';
 import { useFiltroEventos } from '../../../Calendario/hooks/useFiltroEventos';
 import { useCargarReporte } from '../../hooks/useCargarReporte';
 import IndicadorCarga from '../../components/IndicadorCarga';

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Loader2, X } from 'lucide-react';
+import Aviso from '../../../components/Aviso';
+import { EstadoCargando } from '../../../components/EstadoLista';
 import SeccionCategoriaAsignacion from './SeccionCategoriaAsignacion';
 import SeccionAlimentacionAsignacion from './SeccionAlimentacionAsignacion';
 import ResumenAsignacion from './ResumenAsignacion';
@@ -220,13 +222,11 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
                 </h2>
                 <p className="text-sm text-center text-foreground-soft mb-6">{solicitud?.agrupacion?.nombre}</p>
 
-                {errorCatalogos && <div role="alert" className="mb-4 p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">{errorCatalogos}</div>}
-                {error && <div role="alert" className="mb-4 p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">{error}</div>}
+                <Aviso mensaje={errorCatalogos} className="mb-4" />
+                <Aviso mensaje={error} className="mb-4" />
 
                 {cargandoCatalogos ? (
-                    <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft">
-                        <Loader2 className="animate-spin text-primary" size={26} />Cargando catálogos...
-                    </div>
+                    <EstadoCargando texto="Cargando catálogos..." />
                 ) : paso === 'formulario' ? (
                     <div className="space-y-5">
                         {CATEGORIAS.map((categoria) => (

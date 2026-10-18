@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { ImagePlus, MapPin, Trash2 } from 'lucide-react';
-import ModalBase from './ModalBase';
-import { AlertaError, BotonesFormulario, CampoFormulario } from './Formulario';
-import { INPUT_CLASS } from '../lib/formulario';
+import ModalBase from '../../../components/ModalBase';
+import { AlertaError, BotonesFormulario, CampoFormulario } from '../../../components/Formulario';
+import { INPUT_CLASS } from '../../../utils/formulario';
+import { leerComoDataURL } from '../../../utils/archivo';
+import { esImagen } from '../../../utils/imagen';
 
 export default function ModalUbicacion({ open, ubicacion, onClose, onGuardar }) {
     if (!open) return null;
@@ -39,17 +41,15 @@ function FormularioUbicacion({ ubicacion, onClose, onGuardar }) {
         e.target.value = '';
         if (!archivo) return;
 
-        if (!archivo.type.startsWith('image/')) {
+        if (!esImagen(archivo)) {
             setError('El archivo seleccionado debe ser una imagen.');
             return;
         }
 
         setError('');
-        const reader = new FileReader();
-        reader.onload = () => {
-            setValores((prev) => ({ ...prev, imagen: reader.result }));
-        };
-        reader.readAsDataURL(archivo);
+        leerComoDataURL(archivo)
+            .then((imagen) => setValores((prev) => ({ ...prev, imagen })))
+            .catch((err) => setError(err.message));
     };
 
     const quitarImagen = () => {

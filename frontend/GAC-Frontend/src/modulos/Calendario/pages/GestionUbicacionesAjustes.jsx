@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Plus, RefreshCw } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
+import Aviso from '../../../components/Aviso';
+import { EstadoCargando, EstadoVacio } from '../../../components/EstadoLista';
 import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
 import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 import ModalUbicacion from '../components/ModalUbicacion';
@@ -95,13 +97,13 @@ export default function GestionUbicacionesAjustes() {
                 )}
             </div>
 
-            {mensajeExito && <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">{mensajeExito}</div>}
-            {error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><span>{error}</span><button type="button" onClick={cargarUbicaciones} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer"><RefreshCw size={14} />Reintentar</button></div>}
+            <Aviso tipo="exito" mensaje={mensajeExito} />
+            <Aviso mensaje={error} onReintentar={cargarUbicaciones} />
 
             {loading ? (
-                <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft"><Loader2 className="animate-spin text-primary" size={24} />Cargando ubicaciones...</div>
+                <EstadoCargando texto="Cargando ubicaciones..." />
             ) : ubicaciones.length === 0 ? (
-                !error && <div className="flex items-center justify-center py-16 border border-border rounded-xl bg-surface"><p className="text-sm text-foreground-faint text-center">No hay ubicaciones registradas.</p></div>
+                !error && <EstadoVacio mensaje="No hay ubicaciones registradas." />
             ) : (
                 // 1 columna en celulares angostos; desde 400px ya caben 2 tarjetas sin que se salgan los botones.
                 <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">

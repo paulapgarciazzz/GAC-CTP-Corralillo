@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import SelectorHora from '../../../components/SelectorHora';
 import { sumarMinutos } from '../../../utils/hora';
-import ModalBase from './ModalBase';
-import { AlertaError, BotonesFormulario, CampoFormulario } from './Formulario';
-import { INPUT_CLASS } from '../lib/formulario';
+import ModalBase from '../../../components/ModalBase';
+import { AlertaError, BotonesFormulario, CampoFormulario } from '../../../components/Formulario';
+import { INPUT_CLASS } from '../../../utils/formulario';
 import { formatearRangoEvento } from '../lib/fechas';
 import { obtenerUbicaciones } from '../services/ubicacionService';
 import { obtenerAgrupacionesAprobadas } from '../services/actividadService';

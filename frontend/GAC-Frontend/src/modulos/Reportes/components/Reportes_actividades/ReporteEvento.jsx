@@ -2,7 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { obtenerActividadesDeEvento } from '../../../Calendario/services/actividadService';
 import { formatearRangoEvento, formatearHorarioEvento } from '../../../Calendario/lib/fechas';
 import TablaActividades from '../../../Calendario/components/TablaActividades';
-import { AlertaError } from '../../../Calendario/components/Formulario';
+import { AlertaError } from '../../../../components/Formulario';
 import { useCargarReporte } from '../../hooks/useCargarReporte';
 import BotonImprimir from '../BotonImprimir';
 import IndicadorCarga from '../IndicadorCarga';

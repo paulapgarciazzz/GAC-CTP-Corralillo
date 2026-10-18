@@ -1,5 +1,5 @@
 import FormularioEventoNuevo from './FormularioEventoNuevo';
-import ModalBase from './ModalBase';
+import ModalBase from '../../../components/ModalBase';
 
 /**
  * `onDelete(evento)` es opcional: sin él no se muestra el botón Eliminar.

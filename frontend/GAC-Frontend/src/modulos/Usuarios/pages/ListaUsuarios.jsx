@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Pencil, Plus, RefreshCw, Trash2, UserPlus, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2, UserPlus, Users } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
+import Aviso from '../../../components/Aviso';
+import BarraBusqueda from '../../../components/BarraBusqueda';
 import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
 import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
-import BarraBusqueda from '../components/BarraBusqueda';
 import { InsigniaEstado, InsigniaRol } from '../components/Insignias';
 import ModalUsuario from '../components/ModalUsuario';
 import { useListadoPaginado } from '../hooks/useListadoPaginado';
@@ -107,15 +108,8 @@ export default function ListaUsuarios() {
 
             <BarraBusqueda valor={listado.textoBusqueda} onChange={listado.buscar} onLimpiar={listado.limpiarBusqueda} />
 
-            {mensajeExito && <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">{mensajeExito}</div>}
-            {error && (
-                <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <span>{error}</span>
-                    <button type="button" onClick={listado.recargar} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer">
-                        <RefreshCw size={14} />Reintentar
-                    </button>
-                </div>
-            )}
+            <Aviso tipo="exito" mensaje={mensajeExito} />
+            <Aviso mensaje={error} onReintentar={listado.recargar} />
 
             <section aria-label="Usuarios" aria-busy={cargandoInicial} className="bg-surface border border-border rounded-xl overflow-hidden">
                 {cargandoInicial && usuarios.length === 0 ? (

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Loader2, RefreshCw, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
+import Aviso from '../../../components/Aviso';
+import { EstadoCargando, EstadoVacio } from '../../../components/EstadoLista';
 import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
 import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 import { eliminarEncargado, obtenerEncargados } from '../services/encargadoService';
@@ -79,12 +81,12 @@ export default function GestionEncargadosAjustes() {
                 <h1 className="text-2xl font-bold text-primary">Gestión de encargados</h1>
                 <p className="mt-1 text-sm text-foreground-soft">Administra los encargados registrados y sus datos asociados.</p>
             </div>
-            {mensajeExito && <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">{mensajeExito}</div>}
-            {error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><span>{error}</span><button type="button" onClick={reintentar} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer"><RefreshCw size={14} />Reintentar</button></div>}
+            <Aviso tipo="exito" mensaje={mensajeExito} />
+            <Aviso mensaje={error} onReintentar={reintentar} />
             {loading ? (
-                <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft"><Loader2 className="animate-spin text-primary" size={24} />Cargando encargados...</div>
+                <EstadoCargando texto="Cargando encargados..." />
             ) : encargados.length === 0 ? (
-                <div className="flex items-center justify-center py-16 border border-border rounded-xl bg-surface"><p className="text-sm text-foreground-faint text-center">No hay encargados registrados.</p></div>
+                <EstadoVacio mensaje="No hay encargados registrados." />
             ) : (
                 <div className="bg-surface border border-border rounded-xl overflow-x-auto">
                     <table className="w-full min-w-[980px] text-sm">

@@ -3,7 +3,8 @@ import Sidebar from '../components/Sidebar';
 import { lazy, Suspense, useState } from 'react'
 import { useEffect } from 'react';
 import { getRouteApi } from '@tanstack/react-router';
-import { Loader2, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
+import { EstadoCargando } from '../../../components/EstadoLista';
 import { useTheme } from '../../../hooks/useTheme';
 import { useAuth } from '../../../auth/hooks/useAuth';
 
@@ -30,13 +31,6 @@ const VISTAS = {
     'Roles y Permisos': { modulo: 'usuarios', Pagina: lazy(() => import('../../Usuarios/pages/RolesPermisos')) },
 };
 
-function CargandoVista() {
-    return (
-        <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft">
-            <Loader2 className="animate-spin text-primary" size={24} />Cargando...
-        </div>
-    );
-}
 
 function SinAcceso() {
     return (
@@ -114,7 +108,7 @@ const Dashboard =()=>{
                         </section>
                     )}
                     {vista && (tieneModulo(vista.modulo) ? (
-                        <Suspense fallback={<CargandoVista />}>
+                        <Suspense fallback={<EstadoCargando />}>
                             <vista.Pagina key={selectedView} />
                         </Suspense>
                     ) : (

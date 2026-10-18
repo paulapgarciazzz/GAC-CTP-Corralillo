@@ -7,6 +7,7 @@ import { formatearValorIdentificacion, obtenerConfigIdentificacion } from '../..
 import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono, parsearNumeroTelefono } from '../../../utils/telefono';
 import CampoArchivoAdjunto from '../../../components/CampoArchivoAdjunto';
 import CampoFotoAgrupacion from '../../../components/CampoFotoAgrupacion';
+import { leerComoDataURL } from '../../../utils/archivo';
 import SelectorHora from '../../../components/SelectorHora';
 import SelectEvento, { MENSAJE_EVENTO_REQUERIDO } from './SelectEvento';
 import { useEventos, useRangoEvento } from '../hooks/useEventos';
@@ -92,9 +93,9 @@ export default function FormularioSolicitudExistente({ onSuccess }) {
         if (!TIPOS_ARCHIVO_ADJUNTO_ACEPTADOS.includes(archivo.type)) { setErrores((prev) => ({ ...prev, archivo_adjunto: 'Debe ser una imagen PNG/JPG o un PDF.' })); return; }
         if (archivo.size > TAMANO_MAXIMO_ARCHIVO_ADJUNTO) { setErrores((prev) => ({ ...prev, archivo_adjunto: 'El archivo no debe superar 4MB.' })); return; }
         setErrores((prev) => ({ ...prev, archivo_adjunto: '' }));
-        const reader = new FileReader();
-        reader.onload = () => setValores((prev) => ({ ...prev, archivo_adjunto: reader.result, archivo_adjunto_nombre: archivo.name }));
-        reader.readAsDataURL(archivo);
+        leerComoDataURL(archivo)
+            .then((archivo_adjunto) => setValores((prev) => ({ ...prev, archivo_adjunto, archivo_adjunto_nombre: archivo.name })))
+            .catch((err) => setErrores((prev) => ({ ...prev, archivo_adjunto: err.message })));
     };
 
     const guardarEncargado = async (event) => {

@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Loader2, RefreshCw, Search } from 'lucide-react';
+import Aviso from '../../../components/Aviso';
+import BarraBusqueda from '../../../components/BarraBusqueda';
+import { EstadoCargando, EstadoVacio } from '../../../components/EstadoLista';
 import EstadoBadge from '../../SolicitudesAgrupaciones/components/EstadoBadge';
 import { formatearFecha } from '../../../utils/fecha';
+import Dato from '../../../components/Dato';
 import { obtenerAsignaciones } from '../services/asignacionBeneficiosService';
 import { obtenerSolicitudes } from '../../SolicitudesAgrupaciones/services/solicitudService';
 
@@ -44,15 +47,6 @@ const construirSecciones = (asignacion) => {
 
     return secciones;
 };
-
-function Dato({ label, value }) {
-    return (
-        <div>
-            <p className="text-[11px] uppercase tracking-wider text-foreground-faint">{label}</p>
-            <p className="text-sm text-foreground-soft truncate">{value || '—'}</p>
-        </div>
-    );
-}
 
 function TarjetaAsignacion({ asignacion }) {
     const solicitud = asignacion.solicitud_agrupacion;
@@ -193,26 +187,16 @@ export default function VerBeneficiosAsignados() {
                 <p className="mt-1 text-sm text-foreground-soft">Consulta los beneficios ya asignados a solicitudes aprobadas.</p>
             </div>
 
-            {error && (
-                <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <span>{error}</span>
-                    <button type="button" onClick={cargarDatos} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer">
-                        <RefreshCw size={14} />Reintentar
-                    </button>
-                </div>
-            )}
+            <Aviso mensaje={error} onReintentar={cargarDatos} />
 
             <div className="bg-surface border border-border rounded-xl p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-faint" />
-                    <input
-                        type="text"
-                        value={filtros.agrupacion}
-                        onChange={actualizarFiltro('agrupacion')}
-                        placeholder="Nombre de agrupación..."
-                        className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                </div>
+                <BarraBusqueda
+                    valor={filtros.agrupacion}
+                    onChange={(agrupacion) => setFiltros((prev) => ({ ...prev, agrupacion }))}
+                    placeholder="Nombre de agrupación..."
+                    tamano="sm"
+                    className="w-full"
+                />
 
                 <input
                     type="text"
@@ -232,15 +216,9 @@ export default function VerBeneficiosAsignados() {
             </div>
 
             {loading ? (
-                <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft">
-                    <Loader2 className="animate-spin text-primary" size={26} />Cargando asignaciones...
-                </div>
+                <EstadoCargando texto="Cargando asignaciones..." />
             ) : asignacionesFiltradas.length === 0 ? (
-                <div className="flex items-center justify-center py-16 border border-border rounded-xl bg-surface">
-                    <p className="text-sm text-foreground-faint text-center">
-                        {hayFiltrosActivos ? 'Ninguna asignación coincide con los filtros.' : 'Todavía no hay beneficios asignados.'}
-                    </p>
-                </div>
+                <EstadoVacio mensaje={hayFiltrosActivos ? 'Ninguna asignación coincide con los filtros.' : 'Todavía no hay beneficios asignados.'} />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {asignacionesFiltradas.map((asignacion) => (

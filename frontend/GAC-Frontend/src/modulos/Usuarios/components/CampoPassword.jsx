@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { INPUT_CLASS } from '../../Calendario/lib/formulario';
+import { INPUT_CLASS } from '../../../utils/formulario';
 
 /**
  * Input de contraseña con botón para mostrarla u ocultarla.
