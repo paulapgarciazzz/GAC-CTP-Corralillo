@@ -1,4 +1,5 @@
 import api, { getCsrfCookie } from '../../services/axios';
+import { manejarError } from '../../modulos/Calendario/services/manejoErrores';
 
 export const login = async (email, password) => {
     await getCsrfCookie(); //se obtiene el csrf
@@ -19,3 +20,19 @@ export const getUser = async () =>{
     const response = await api.get('user', { skipAuthRedirect: true });
     return response.data;
 };
+
+const postRecuperacion = async (url, datos, mensajeError) => {
+    try {
+        const response = await api.post(url, datos, { skipAuthRedirect: true });
+        return { success: true, data: response.data };
+    } catch (error) {
+        return manejarError(error, mensajeError);
+    }
+};
+
+// Recuperación de contraseña: envía un código al correo y luego lo canjea por una contraseña nueva.
+export const solicitarCodigoRecuperacion = (email) =>
+    postRecuperacion('/password/codigo', { email }, 'No se pudo enviar el código.');
+
+export const restablecerPassword = (datos) =>
+    postRecuperacion('/password/restablecer', datos, 'No se pudo restablecer la contraseña.');

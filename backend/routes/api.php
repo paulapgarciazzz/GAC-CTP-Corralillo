@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Modules\Usuarios\Controllers\AuthController;
 use App\Modules\Usuarios\Controllers\PerfilController;
 use App\Modules\Usuarios\Controllers\PermisoUsuarioController;
+use App\Modules\Usuarios\Controllers\RecuperacionPasswordController;
 use App\Modules\Usuarios\Controllers\UsuarioController;
 
 use App\Modules\SolicitudesAgrupaciones\Controllers\AgrupacionController;
@@ -47,6 +48,10 @@ Route::pattern('usuario', '[0-9]+');
 */
 
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+
+// Público: recuperación de contraseña desde el login.
+Route::post('/password/codigo', [RecuperacionPasswordController::class, 'enviarCodigo'])->middleware('throttle:3,1');
+Route::post('/password/restablecer', [RecuperacionPasswordController::class, 'restablecer'])->middleware('throttle:5,1');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'me']);
