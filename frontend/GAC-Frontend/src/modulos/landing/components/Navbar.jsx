@@ -4,6 +4,16 @@ import { useAuth } from '../../../auth/hooks/useAuth';
 import { useNavigate, Link } from '@tanstack/react-router';
 import {Sun, Moon, Menu, X} from 'lucide-react'
 
+const ENLACES = [
+    { href: '#inicio', texto: 'Inicio' },
+    { href: '#calendario', texto: 'Calendario' },
+    { href: '#conocenos', texto: 'Conocenos' },
+    { href: '#ubicacion', texto: 'Ubicación' },
+];
+
+const BOTON_PRIMARIO = 'px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition duration-300 font-medium shadow-md hover:shadow-lg';
+const BOTON_PELIGRO = 'px-6 py-2 bg-danger text-white rounded-lg hover:brightness-90 transition duration-300 font-medium shadow-md hover:shadow-lg';
+
 const Navbar = ({isDark, onToggleTheme}) => {
     const {isAuthenticated, logout} = useAuth();
     const navigate = useNavigate();
@@ -42,54 +52,40 @@ const Navbar = ({isDark, onToggleTheme}) => {
                         <span className="text-xl tracking-tight">CTP de Corralillo</span>
                     </div>
                     <ul className="hidden lg:flex ml-14 space-x-12">
-                        <li><Link to="/" className="hover:text-accent transition-colors">Inicio</Link></li>
-                        <li><a href="#calendario" className="hover:text-accent transition-colors">Calendario</a></li>
-                        <li><a href="#conocenos" className="hover:text-accent transition-colors">Conocenos</a></li>
-                        <li><a href="#ubicacion" className="hover:text-accent transition-colors">Ubicación</a></li>
+                        {ENLACES.map(({ href, texto }) => (
+                            <li key={href}><a href={href} className="hover:text-accent transition-colors">{texto}</a></li>
+                        ))}
                     </ul>
                     <div className="hidden lg:flex justify-center ml-14 space-x-4 items-center">
                         {!isAuthenticated ? (
-                            <>
-                                <Link to="/login">
-                                    <button className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition duration-300 font-medium shadow-md hover:shadow-lg" >
-                                        Iniciar sesión
-                                    </button>
-                                </Link>
-                                <button onClick={onToggleTheme} className="p-2 rounded-lg hover:bg-white/10 transition-colors" aria-label="Toggle Theme">
-                                    {isDark ? (
-                                        <Sun className="w-5 h-5 text-warning"/>
-                                    ):(
-                                        <Moon className={`w-5 h-5 ${iconColorClass}`}/>
-                                    )}
+                            <Link to="/login">
+                                <button className={BOTON_PRIMARIO}>
+                                    Iniciar sesión
                                 </button>
-                            </>
+                            </Link>
                         ) : (
                             // Usuario autenticado
                             <>
                                 <Link to="/dashboard">
-                                    <button className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition duration-300 font-medium shadow-md hover:shadow-lg">
+                                    <button className={BOTON_PRIMARIO}>
                                         Panel de Gestión
                                     </button>
                                 </Link>
 
-                                <button
-                                    onClick={handleLogout}
-                                    className="px-6 py-2 bg-danger text-white rounded-lg hover:brightness-90 transition duration-300 font-medium shadow-md hover:shadow-lg"
-                                >
+                                <button onClick={handleLogout} className={BOTON_PELIGRO}>
                                     Cerrar sesión
-                                </button>
-                                <button onClick={onToggleTheme} className="p-2 rounded-lg hover:bg-white/10 transition-colors" aria-label="Toggle Theme">
-                                    {isDark ? (
-                                        <Sun className="w-5 h-5 text-warning"/>
-                                    ):(
-                                        <Moon className={`w-5 h-5 ${iconColorClass}`}/>
-                                    )}
                                 </button>
                             </>
                         )}
-
+                        <button onClick={onToggleTheme} className="p-2 rounded-lg hover:bg-white/10 transition-colors" aria-label="Toggle Theme">
+                            {isDark ? (
+                                <Sun className="w-5 h-5 text-warning"/>
+                            ):(
+                                <Moon className={`w-5 h-5 ${iconColorClass}`}/>
+                            )}
+                        </button>
                     </div>
-                     <div className="lg:hidden ml-14 space-x-4">
+                     <div className="lg:hidden ml-14">
                         <button
                             className={`focus:outline-none ${textColorClass}`}
                             onClick={() => setIsMenuOpen((prev) => !prev)}
@@ -103,32 +99,25 @@ const Navbar = ({isDark, onToggleTheme}) => {
                 {isMenuOpen && (
                     <div className="lg:hidden mt-4 pb-2 -mx-4 px-4 rounded-b-2xl bg-surface text-foreground shadow-lg">
                         <ul className="flex flex-col space-y-4 pt-4">
-                            <li><Link to="/" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Inicio</Link></li>
-                            <li><a href="#calendario" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Calendario</a></li>
-                            <li><a href="#conocenos" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Conocenos</a></li>
-                            <li><a href="#ubicacion" onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">Ubicación</a></li>
+                            {ENLACES.map(({ href, texto }) => (
+                                <li key={href}><a href={href} onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">{texto}</a></li>
+                            ))}
                         </ul>
                         <div className="flex flex-col space-y-3 mt-6 pb-4">
                             {!isAuthenticated ? (
-                                <>
-                                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                                        <button className="w-full px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition duration-300 font-medium shadow-md hover:shadow-lg">
-                                            Iniciar sesión
-                                        </button>
-                                    </Link>
-                                    
-                                </>
+                                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                                    <button className={`w-full ${BOTON_PRIMARIO}`}>
+                                        Iniciar sesión
+                                    </button>
+                                </Link>
                             ) : (
                                 <>
                                     <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                                        <button className="w-full px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition duration-300 font-medium shadow-md hover:shadow-lg">
+                                        <button className={`w-full ${BOTON_PRIMARIO}`}>
                                             Panel de Gestión
                                         </button>
                                     </Link>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="w-full px-6 py-2 bg-danger text-white rounded-lg hover:brightness-90 transition duration-300 font-medium shadow-md hover:shadow-lg"
-                                    >
+                                    <button onClick={handleLogout} className={`w-full ${BOTON_PELIGRO}`}>
                                         Cerrar sesión
                                     </button>
                                 </>
