@@ -25,8 +25,8 @@ const VISTAS = {
     'Reportes de beneficios': { modulo: 'reportes', Pagina: lazy(() => import('../../Beneficios/pages/ReportesBeneficios')) },
     'Gestión de agrupaciones': { modulo: 'solicitudes', Pagina: lazy(() => import('../../Agrupaciones/pages/GestionAgrupacionesAjustes')) },
     'Gestión de encargados': { modulo: 'solicitudes', Pagina: lazy(() => import('../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes')) },
-    'Gestión de ubicaciones': { modulo: 'calendario', Pagina: lazy(() => import('../../Calendario/pages/GestionUbicacionesAjustes')) },
-    'Gestión del calendario': { modulo: 'calendario', Pagina: lazy(() => import('../../Calendario/pages/Calendario')) },
+    'Gestión de Ubicaciones': { modulo: 'calendario', Pagina: lazy(() => import('../../Calendario/pages/GestionUbicacionesAjustes')) },
+    'Gestión del Calendario': { modulo: 'calendario', Pagina: lazy(() => import('../../Calendario/pages/Calendario')) },
     'Lista de Usuarios': { modulo: 'usuarios', Pagina: lazy(() => import('../../Usuarios/pages/ListaUsuarios')) },
     'Roles y Permisos': { modulo: 'usuarios', Pagina: lazy(() => import('../../Usuarios/pages/RolesPermisos')) },
 };
