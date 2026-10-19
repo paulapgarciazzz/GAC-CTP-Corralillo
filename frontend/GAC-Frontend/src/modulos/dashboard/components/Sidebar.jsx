@@ -27,8 +27,8 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         },
         {name: "Calendario", icon: CalendarDays, active:false, modulo: "calendario",
             children: [
-                {name: "Gestión del calendario", icon: CalendarDays},
-                {name: "Gestión de ubicaciones", icon: MapPin},
+                {name: "Gestión del Calendario", icon: CalendarDays},
+                {name: "Gestión de Ubicaciones", icon: MapPin},
             ]
         },
         {name: "Gestion de Usuarios", icon: UserCog, active:false, modulo: "usuarios",
