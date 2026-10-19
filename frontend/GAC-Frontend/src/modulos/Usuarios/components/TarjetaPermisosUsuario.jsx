@@ -10,7 +10,7 @@ const mismosPermisos = (a, b) => a.size === b.size && [...a].every((p) => b.has(
 /**
  * Fila de un módulo: el módulo funciona como encabezado (switch de acceso) y,
  * si está encendido, sus permisos aparecen en un panel interno aparte.
- * "Ver" es la acción base: queda fija mientras el módulo esté encendido.
+ * "Ver" es la acción base: se enciende con el módulo y apagarlo apaga el módulo.
  * `activas` es un string ("crear,ver") para que memo compare por valor.
  */
 const FilaModulo = memo(function FilaModulo({ modulo, activas, editable, onToggleModulo, onToggleAccion }) {
@@ -46,17 +46,16 @@ const FilaModulo = memo(function FilaModulo({ modulo, activas, editable, onToggl
                         {ACCIONES.map((accion) => {
                             const esBase = accion.clave === ACCION_POR_DEFECTO;
                             return (
-                                <li key={accion.clave} className="flex items-center justify-between gap-2" title={esBase ? 'Se quita apagando el módulo' : undefined}>
-                                    <span className="text-sm text-foreground-soft">
-                                        {accion.nombre}
-                                        {esBase && <span className="text-foreground-faint"> · incluido</span>}
-                                    </span>
+                                <li key={accion.clave} className="flex items-center justify-between gap-2" title={esBase ? 'Apagarlo quita el acceso al módulo' : undefined}>
+                                    <span className="text-sm text-foreground-soft">{accion.nombre}</span>
                                     <Switch
                                         tamano="sm"
                                         checked={esBase || acciones.includes(accion.clave)}
-                                        onChange={(valor) => onToggleAccion(modulo.slug, accion.clave, valor)}
-                                        label={esBase ? `${accion.nombre} en ${modulo.nombre} (incluido mientras el módulo esté activo)` : `${accion.nombre} en ${modulo.nombre}`}
-                                        disabled={!editable || esBase}
+                                        onChange={(valor) => (esBase
+                                            ? onToggleModulo(modulo.slug, valor)
+                                            : onToggleAccion(modulo.slug, accion.clave, valor))}
+                                        label={esBase ? `${accion.nombre} en ${modulo.nombre} (apagarlo quita el acceso al módulo)` : `${accion.nombre} en ${modulo.nombre}`}
+                                        disabled={!editable}
                                     />
                                 </li>
                             );
