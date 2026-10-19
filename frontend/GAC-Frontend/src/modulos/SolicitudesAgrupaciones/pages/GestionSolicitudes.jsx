@@ -61,12 +61,13 @@ export default function GestionSolicitudes() {
     );
 
     const solicitudSeleccionada = solicitudes.find((s) => s.id === selectedId) ?? null;
-    const eventosConSolicitudes = [
-        ...new Map(solicitudes.filter((s) => s.evento).map((s) => [String(s.evento.id_evento), s.evento])).values(),
-    ].sort((a, b) => a.nombre.localeCompare(b.nombre));
+    // El filtro agrupa por nombre: varios eventos con el mismo nombre aparecen una sola vez.
+    const nombresEventos = [...new Set(solicitudes.filter((s) => s.evento).map((s) => s.evento.nombre))]
+        .sort((a, b) => a.localeCompare(b));
     const solicitudesFiltradas = solicitudes.filter((s) => {
         const coincideNombre = s.agrupacion.nombre.toLowerCase().includes(busqueda.trim().toLowerCase());
-        const coincideEvento = filtroEvento === 'todos' || String(s.id_evento ?? 'ninguno') === filtroEvento;
+        const coincideEvento = filtroEvento === 'todos'
+            || (filtroEvento === 'ninguno' ? !s.evento : `evento:${s.evento?.nombre}` === filtroEvento);
         return coincideNombre && coincideEvento;
     });
 
@@ -89,8 +90,8 @@ export default function GestionSolicitudes() {
                 >
                     <option value="todos">Todos los eventos</option>
                     <option value="ninguno">Sin evento</option>
-                    {eventosConSolicitudes.map((evento) => (
-                        <option key={evento.id_evento} value={String(evento.id_evento)}>{evento.nombre}</option>
+                    {nombresEventos.map((nombre) => (
+                        <option key={nombre} value={`evento:${nombre}`}>{nombre}</option>
                     ))}
                 </select>
             </div>
