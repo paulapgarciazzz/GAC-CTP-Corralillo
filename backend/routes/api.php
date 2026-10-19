@@ -20,10 +20,15 @@ use App\Modules\Beneficios\Controllers\MobiliarioController;
 use App\Modules\Beneficios\Controllers\RutaController;
 use App\Modules\Beneficios\Controllers\TransporteController;
 
+use App\Modules\Personalizacion\Patrocinadores\Controllers\ConfiguracionPatrocinadoresController;
+use App\Modules\Personalizacion\Patrocinadores\Controllers\PatrocinadorController;
+use App\Modules\Personalizacion\Patrocinadores\Controllers\PatrocinadorPublicoController;
+
 Route::pattern('agrupacion', '[0-9]+');
 Route::pattern('id', '[0-9]+');
 Route::pattern('actividad', '[0-9]+');
 Route::pattern('ubicacion', '[0-9]+');
+Route::pattern('patrocinador', '[0-9]+');
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -265,3 +270,49 @@ Route::prefix('asignaciones-beneficios')->group(function () {
         [AsignacionBeneficiosController::class, 'update']
     );
 });
+
+/*
+|--------------------------------------------------------------------------
+| Personalización: Patrocinadores
+|--------------------------------------------------------------------------
+|
+| Los endpoints de escritura (store/update/destroy/reordenar) quedan
+| bloqueados con el middleware 'personalizacion.bloqueado' hasta que el
+| módulo de Gestión de Usuarios entregue autenticación y roles reales.
+| Los de solo lectura (públicos y de administración) quedan abiertos.
+*/
+
+Route::prefix('public')->group(function () {
+    Route::get(
+        'patrocinadores',
+        [PatrocinadorPublicoController::class, 'index']
+    );
+
+    Route::get(
+        'configuracion-patrocinadores',
+        [PatrocinadorPublicoController::class, 'configuracion']
+    );
+});
+
+Route::get(
+    'configuracion-patrocinadores',
+    [ConfiguracionPatrocinadoresController::class, 'show']
+);
+
+Route::put('configuracion-patrocinadores', [ConfiguracionPatrocinadoresController::class, 'update'])
+    ->middleware('personalizacion.bloqueado');
+
+Route::patch('patrocinadores/reordenar', [PatrocinadorController::class, 'reordenar'])
+    ->middleware('personalizacion.bloqueado');
+
+Route::get('patrocinadores', [PatrocinadorController::class, 'index']);
+Route::get('patrocinadores/{patrocinador}', [PatrocinadorController::class, 'show']);
+
+Route::post('patrocinadores', [PatrocinadorController::class, 'store'])
+    ->middleware('personalizacion.bloqueado');
+
+Route::put('patrocinadores/{patrocinador}', [PatrocinadorController::class, 'update'])
+    ->middleware('personalizacion.bloqueado');
+
+Route::delete('patrocinadores/{patrocinador}', [PatrocinadorController::class, 'destroy'])
+    ->middleware('personalizacion.bloqueado');

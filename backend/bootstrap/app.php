@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\BloquearEscrituraPersonalizacion;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,6 +22,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/agrupaciones/*',
             'api/solicitudes-agrupaciones',
             'api/solicitudes-agrupaciones/*',
+            'api/patrocinadores',
+            'api/patrocinadores/*',
+            'api/configuracion-patrocinadores',
+        ]);
+        $middleware->alias([
+            'personalizacion.bloqueado' => BloquearEscrituraPersonalizacion::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
