@@ -16,6 +16,7 @@ final class Modulos
         'calendario',
         'usuarios',
         'reportes',
+        'personalizacion',
     ];
 
     public const ACCIONES = ['ver', 'crear', 'editar', 'eliminar'];

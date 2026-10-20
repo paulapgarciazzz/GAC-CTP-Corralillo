@@ -1,5 +1,5 @@
 import api, { getCsrfCookie } from '../../services/axios';
-import { manejarError } from '../../modulos/Calendario/services/manejoErrores';
+import { manejarError } from '../../services/manejoErrores';
 
 export const login = async (email, password) => {
     await getCsrfCookie(); //se obtiene el csrf

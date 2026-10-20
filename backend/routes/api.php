@@ -25,10 +25,15 @@ use App\Modules\Beneficios\Controllers\MobiliarioController;
 use App\Modules\Beneficios\Controllers\RutaController;
 use App\Modules\Beneficios\Controllers\TransporteController;
 
+use App\Modules\Personalizacion\Patrocinadores\Controllers\ConfiguracionPatrocinadoresController;
+use App\Modules\Personalizacion\Patrocinadores\Controllers\PatrocinadorController;
+use App\Modules\Personalizacion\Patrocinadores\Controllers\PatrocinadorPublicoController;
+
 Route::pattern('agrupacion', '[0-9]+');
 Route::pattern('id', '[0-9]+');
 Route::pattern('actividad', '[0-9]+');
 Route::pattern('ubicacion', '[0-9]+');
+Route::pattern('patrocinador', '[0-9]+');
 Route::pattern('usuario', '[0-9]+');
 
 /*
@@ -339,4 +344,66 @@ Route::middleware('auth:sanctum')->prefix('asignaciones-beneficios')->group(func
         '/{asignacion}',
         [AsignacionBeneficiosController::class, 'update']
     )->middleware('can:beneficios.editar');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Personalización: Patrocinadores
+|--------------------------------------------------------------------------
+*/
+
+// Público: sección de patrocinadores de la landing (solo activos).
+Route::prefix('public')->group(function () {
+    Route::get(
+        'patrocinadores',
+        [PatrocinadorPublicoController::class, 'index']
+    );
+
+    Route::get(
+        'configuracion-patrocinadores',
+        [PatrocinadorPublicoController::class, 'configuracion']
+    );
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get(
+        'configuracion-patrocinadores',
+        [ConfiguracionPatrocinadoresController::class, 'show']
+    )->middleware('can:personalizacion.ver');
+
+    Route::put(
+        'configuracion-patrocinadores',
+        [ConfiguracionPatrocinadoresController::class, 'update']
+    )->middleware('can:personalizacion.editar');
+
+    // Antes de 'patrocinadores/{patrocinador}' para que no se confunda con un ID.
+    Route::patch(
+        'patrocinadores/reordenar',
+        [PatrocinadorController::class, 'reordenar']
+    )->middleware('can:personalizacion.editar');
+
+    Route::get(
+        'patrocinadores',
+        [PatrocinadorController::class, 'index']
+    )->middleware('can:personalizacion.ver');
+
+    Route::post(
+        'patrocinadores',
+        [PatrocinadorController::class, 'store']
+    )->middleware('can:personalizacion.crear');
+
+    Route::get(
+        'patrocinadores/{patrocinador}',
+        [PatrocinadorController::class, 'show']
+    )->middleware('can:personalizacion.ver');
+
+    Route::put(
+        'patrocinadores/{patrocinador}',
+        [PatrocinadorController::class, 'update']
+    )->middleware('can:personalizacion.editar');
+
+    Route::delete(
+        'patrocinadores/{patrocinador}',
+        [PatrocinadorController::class, 'destroy']
+    )->middleware('can:personalizacion.eliminar');
 });

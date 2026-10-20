@@ -1,5 +1,5 @@
 import api from '../../../services/axios';
-import { manejarError } from './manejoErrores';
+import { manejarError } from '../../../services/manejoErrores';
 
 export const obtenerActividades = async () => {
     try {

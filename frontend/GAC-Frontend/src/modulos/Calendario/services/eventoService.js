@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import api from '../../../services/axios';
-import { manejarError } from './manejoErrores';
+import { manejarError } from '../../../services/manejoErrores';
 
 const desdeApi = (evento) => {
     const allDay = Boolean(evento.todo_el_dia) || !evento.hora_inicio;
