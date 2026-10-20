@@ -6,6 +6,8 @@ export default function TablaActividades({ actividades, soloLectura = false, emb
     // Embebida: ocupa toda la fila de la tabla de eventos; la primera columna se alinea
     // con el nombre del evento y la última con sus acciones.
     const celda = embebida ? 'px-3 first:pl-11 last:pr-4' : 'px-3';
+    // Cada acción aparece solo si llegó su handler (según permisos).
+    const conAcciones = !soloLectura && Boolean(onEdit || onDelete);
 
     return (
         <div className={embebida ? 'overflow-x-auto bg-background/40' : 'overflow-x-auto rounded-lg border border-border bg-surface'}>
@@ -18,7 +20,7 @@ export default function TablaActividades({ actividades, soloLectura = false, emb
                         <th className={`${celda} py-2 font-semibold`}>Ubicación</th>
                         <th className={`${celda} py-2 font-semibold`}>Agrupación</th>
                         <th className={`${celda} py-2 font-semibold`}>Estado</th>
-                        {!soloLectura && <th className={`${celda} py-2 font-semibold text-right`}>Acciones</th>}
+                        {conAcciones && <th className={`${celda} py-2 font-semibold text-right`}>Acciones</th>}
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -32,27 +34,31 @@ export default function TablaActividades({ actividades, soloLectura = false, emb
                             <td className={`${celda} py-2.5 text-foreground-soft`}>{actividad.ubicacion?.nombre ?? '—'}</td>
                             <td className={`${celda} py-2.5 text-foreground-soft`}>{actividad.agrupacion?.nombre ?? '—'}</td>
                             <td className={`${celda} py-2.5`}><EstadoActividadBadge estado={actividad.estado} /></td>
-                            {!soloLectura && (
+                            {conAcciones && (
                                 <td className={`${celda} py-2.5`}>
                                     <div className="flex justify-end gap-1">
-                                        <button
-                                            type="button"
-                                            onClick={() => onEdit(actividad)}
-                                            aria-label={`Editar ${actividad.titulo}`}
-                                            title="Editar actividad"
-                                            className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
-                                        >
-                                            <Pencil size={15} />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => onDelete(actividad)}
-                                            aria-label={`Eliminar ${actividad.titulo}`}
-                                            title="Eliminar actividad"
-                                            className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-danger-soft hover:text-danger cursor-pointer"
-                                        >
-                                            <Trash2 size={15} />
-                                        </button>
+                                        {onEdit && (
+                                            <button
+                                                type="button"
+                                                onClick={() => onEdit(actividad)}
+                                                aria-label={`Editar ${actividad.titulo}`}
+                                                title="Editar actividad"
+                                                className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
+                                            >
+                                                <Pencil size={15} />
+                                            </button>
+                                        )}
+                                        {onDelete && (
+                                            <button
+                                                type="button"
+                                                onClick={() => onDelete(actividad)}
+                                                aria-label={`Eliminar ${actividad.titulo}`}
+                                                title="Eliminar actividad"
+                                                className="rounded-md p-1.5 text-foreground-faint transition-colors hover:bg-danger-soft hover:text-danger cursor-pointer"
+                                            >
+                                                <Trash2 size={15} />
+                                            </button>
+                                        )}
                                     </div>
                                 </td>
                             )}

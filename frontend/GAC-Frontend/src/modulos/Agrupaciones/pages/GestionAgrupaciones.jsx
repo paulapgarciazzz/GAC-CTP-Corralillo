@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import Aviso from '../../../components/Aviso';
+import BarraBusqueda from '../../../components/BarraBusqueda';
 import { obtenerAgrupacionesAprobadas } from '../services/agrupacionService';
 import TarjetaAgrupacion from '../components/TarjetaAgrupacion';
 import ModalEditarAgrupacion from '../components/ModalEditarAgrupacion';
 import ModalDetalleAgrupacion from '../components/ModalDetalleAgrupacion';
+import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 
 export default function GestionAgrupaciones() {
+    const { puedeEditar } = usePermisosModulo('solicitudes');
     const [agrupaciones, setAgrupaciones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -39,23 +43,16 @@ export default function GestionAgrupaciones() {
 
     return (
         <div className="space-y-4">
-            <div className="relative w-full sm:max-w-xs">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-faint" />
-                <input
-                    type="text"
-                    value={busqueda}
-                    onChange={(e) => setBusqueda(e.target.value)}
-                    placeholder="Buscar por nombre o cédula del encargado"
-                    aria-label="Buscar agrupación"
-                    className="w-full pl-9 pr-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-            </div>
+            <BarraBusqueda
+                valor={busqueda}
+                onChange={setBusqueda}
+                placeholder="Buscar por nombre o cédula del encargado"
+                ariaLabel="Buscar agrupación"
+                tamano="sm"
+                className="w-full sm:max-w-xs"
+            />
 
-            {error && (
-                <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">
-                    {error}
-                </div>
-            )}
+            <Aviso mensaje={error} />
 
             {loading ? (
                 <div className="flex items-center justify-center py-16">
@@ -76,7 +73,7 @@ export default function GestionAgrupaciones() {
                             key={agrupacion.id}
                             agrupacion={agrupacion}
                             onVerDetalle={setAgrupacionDetalle}
-                            onEditar={setAgrupacionEditar}
+                            onEditar={puedeEditar ? setAgrupacionEditar : undefined}
                         />
                     ))}
                 </div>

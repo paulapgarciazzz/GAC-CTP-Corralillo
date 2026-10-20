@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Plus, RefreshCw } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import {
     DndContext,
     KeyboardSensor,
@@ -14,11 +14,14 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import ModalConfirmarEliminacionPatrocinador from '../components/ModalConfirmarEliminacionPatrocinador';
+import ModalConfirmarEliminacion from '../../../../components/ModalConfirmarEliminacion';
+import Aviso from '../../../../components/Aviso';
+import { EstadoCargando, EstadoVacio } from '../../../../components/EstadoLista';
+import { useConfirmarEliminacion } from '../../../../hooks/useConfirmarEliminacion';
+import { usePermisosModulo } from '../../../../auth/hooks/usePermisosModulo';
 import ModalPatrocinador from '../components/ModalPatrocinador';
 import TarjetaPatrocinador from '../components/TarjetaPatrocinador';
 import ConfiguracionSeccion from '../components/ConfiguracionSeccion';
-import { useConfirmarEliminacion } from '../hooks/useConfirmarEliminacion';
 import {
     actualizarPatrocinador,
     crearPatrocinador,
@@ -36,6 +39,7 @@ export default function PatrocinadoresTab() {
     const [mensajeExito, setMensajeExito] = useState('');
     const [guardandoOrden, setGuardandoOrden] = useState(false);
     const [modal, setModal] = useState({ abierto: false, patrocinador: null });
+    const { puedeCrear, puedeEditar, puedeEliminar } = usePermisosModulo('personalizacion');
 
     const sensores = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -136,43 +140,34 @@ export default function PatrocinadoresTab() {
         <div className="space-y-8">
             <section>
                 <h2 className="text-lg font-bold text-foreground mb-3">Título y descripción de la sección</h2>
-                <ConfiguracionSeccion />
+                <ConfiguracionSeccion puedeEditar={puedeEditar} />
             </section>
 
             <section className="space-y-5">
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
                         <h2 className="text-lg font-bold text-foreground">Patrocinadores</h2>
-                        <p className="mt-1 text-sm text-foreground-soft">
-                            Arrastra para cambiar el orden de aparición en la landing.
-                            {guardandoOrden && ' Guardando orden...'}
-                        </p>
+                        {puedeEditar && (
+                            <p className="mt-1 text-sm text-foreground-soft">
+                                Arrastra para cambiar el orden de aparición en la landing.
+                                {guardandoOrden && ' Guardando orden...'}
+                            </p>
+                        )}
                     </div>
-                    <button type="button" onClick={abrirCrear} className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors cursor-pointer">
-                        <Plus size={18} />Agregar patrocinador
-                    </button>
+                    {puedeCrear && (
+                        <button type="button" onClick={abrirCrear} className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors cursor-pointer">
+                            <Plus size={18} />Agregar patrocinador
+                        </button>
+                    )}
                 </div>
 
-                {mensajeExito && <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">{mensajeExito}</div>}
-                {error && (
-                    <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <span>{error}</span>
-                        <button type="button" onClick={cargarPatrocinadores} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer">
-                            <RefreshCw size={14} />Reintentar
-                        </button>
-                    </div>
-                )}
+                <Aviso tipo="exito" mensaje={mensajeExito} />
+                <Aviso mensaje={error} onReintentar={cargarPatrocinadores} />
 
                 {loading ? (
-                    <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft">
-                        <Loader2 className="animate-spin text-primary" size={24} />Cargando patrocinadores...
-                    </div>
+                    <EstadoCargando texto="Cargando patrocinadores..." />
                 ) : patrocinadores.length === 0 ? (
-                    !error && (
-                        <div className="flex items-center justify-center py-16 border border-border rounded-xl bg-surface">
-                            <p className="text-sm text-foreground-faint text-center">No hay patrocinadores registrados.</p>
-                        </div>
-                    )
+                    !error && <EstadoVacio mensaje="No hay patrocinadores registrados." />
                 ) : (
                     <DndContext sensors={sensores} collisionDetection={closestCenter} onDragEnd={alTerminarArrastre}>
                         <SortableContext items={patrocinadores.map((item) => item.id_patrocinador)} strategy={verticalListSortingStrategy}>
@@ -181,9 +176,10 @@ export default function PatrocinadoresTab() {
                                     <TarjetaPatrocinador
                                         key={patrocinador.id_patrocinador}
                                         patrocinador={patrocinador}
-                                        onEditar={abrirEditar}
-                                        onEliminar={eliminacion.abrir}
-                                        onToggleActivo={alternarActivo}
+                                        arrastrable={puedeEditar}
+                                        onEditar={puedeEditar ? abrirEditar : undefined}
+                                        onEliminar={puedeEliminar ? eliminacion.abrir : undefined}
+                                        onToggleActivo={puedeEditar ? alternarActivo : undefined}
                                     />
                                 ))}
                             </div>
@@ -198,8 +194,11 @@ export default function PatrocinadoresTab() {
                 onClose={cerrarModal}
                 onGuardar={guardarPatrocinador}
             />
-            <ModalConfirmarEliminacionPatrocinador
-                patrocinador={eliminacion.elemento}
+            <ModalConfirmarEliminacion
+                open={Boolean(eliminacion.elemento)}
+                titulo="Eliminar patrocinador"
+                nombre={eliminacion.elemento?.nombre}
+                textoBoton="Eliminar patrocinador"
                 loading={eliminacion.eliminando}
                 error={eliminacion.error}
                 onClose={eliminacion.cerrar}

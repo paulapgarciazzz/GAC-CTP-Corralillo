@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import SelectorHora from '../../../components/SelectorHora';
 import { sumarMinutos } from '../../../utils/hora';
-import ModalBase from './ModalBase';
-import { AlertaError, BotonesFormulario, CampoFormulario } from './Formulario';
-import { INPUT_CLASS } from '../lib/formulario';
+import ModalBase from '../../../components/ModalBase';
+import { AlertaError, BotonesFormulario, CampoFormulario } from '../../../components/Formulario';
+import { INPUT_CLASS } from '../../../utils/formulario';
 import { formatearRangoEvento } from '../lib/fechas';
 import { obtenerUbicaciones } from '../services/ubicacionService';
 import { obtenerAgrupacionesAprobadas } from '../services/actividadService';
@@ -63,11 +63,11 @@ function FormularioActividad({ evento, actividad, onClose, onGuardar }) {
         ? [...agrupaciones, { ...actividad.agrupacion, noAprobada: true }]
         : agrupaciones;
 
-    // El evento empieza a su hora el primer día y termina a su hora el último; los días intermedios no tienen límite.
-    // `hasta` de SelectorHora es exclusivo: la actividad debe empezar antes de que termine el día (o el evento)
+    // El horario del evento se repite todos sus días: cada actividad debe quedar dentro de él.
+    // `hasta` de SelectorHora es exclusivo: la actividad debe empezar antes de que termine el horario (o el día)
     // y su hora de finalización puede ser igual a la del final del evento.
-    const horaMinima = valores.fecha === fechaMin && evento.horaInicio ? evento.horaInicio : '00:00';
-    const horaMaxima = valores.fecha === fechaMax && evento.horaFin ? evento.horaFin : null;
+    const horaMinima = evento.horaInicio || '00:00';
+    const horaMaxima = evento.horaFin || null;
 
     const handleChange = (e) => {
         const { name, value } = e.target;

@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import Aviso from '../../../components/Aviso';
+import BarraBusqueda from '../../../components/BarraBusqueda';
 import { obtenerSolicitudes, actualizarEstadoSolicitud, eliminarSolicitud, enviarDetallesSolicitud } from '../services/solicitudService';
 import ListaSolicitudes from '../components/ListaSolicitudes';
 import DetalleSolicitud from '../components/DetalleSolicitud';
 import ModalEditarSolicitud from '../components/ModalEditarSolicitud';
+import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
+import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
+import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 
 export default function GestionSolicitudes() {
+    const { puedeEditar, puedeEliminar } = usePermisosModulo('solicitudes');
     const [solicitudes, setSolicitudes] = useState([]);
     const [selectedId, setSelectedId] = useState(null);
     const [solicitudEditando, setSolicitudEditando] = useState(null);
@@ -46,23 +52,22 @@ export default function GestionSolicitudes() {
         }
     };
 
-    const handleEliminar = async (id) => {
-        const result = await eliminarSolicitud(id);
-        if (result.success) {
-            setSolicitudes((prev) => prev.filter((s) => s.id !== id));
-            setSelectedId((prev) => (prev === id ? null : prev));
-        } else {
-            setError(result.error);
-        }
-    };
+    const eliminacion = useConfirmarEliminacion(
+        (solicitud) => eliminarSolicitud(solicitud.id),
+        (solicitud) => {
+            setSolicitudes((prev) => prev.filter((s) => s.id !== solicitud.id));
+            setSelectedId((prev) => (prev === solicitud.id ? null : prev));
+        },
+    );
 
     const solicitudSeleccionada = solicitudes.find((s) => s.id === selectedId) ?? null;
-    const eventosConSolicitudes = [
-        ...new Map(solicitudes.filter((s) => s.evento).map((s) => [String(s.evento.id_evento), s.evento])).values(),
-    ].sort((a, b) => a.nombre.localeCompare(b.nombre));
+    // El filtro agrupa por nombre: varios eventos con el mismo nombre aparecen una sola vez.
+    const nombresEventos = [...new Set(solicitudes.filter((s) => s.evento).map((s) => s.evento.nombre))]
+        .sort((a, b) => a.localeCompare(b));
     const solicitudesFiltradas = solicitudes.filter((s) => {
         const coincideNombre = s.agrupacion.nombre.toLowerCase().includes(busqueda.trim().toLowerCase());
-        const coincideEvento = filtroEvento === 'todos' || String(s.id_evento ?? 'ninguno') === filtroEvento;
+        const coincideEvento = filtroEvento === 'todos'
+            || (filtroEvento === 'ninguno' ? !s.evento : `evento:${s.evento?.nombre}` === filtroEvento);
         return coincideNombre && coincideEvento;
     });
 
@@ -70,16 +75,13 @@ export default function GestionSolicitudes() {
         <div className="space-y-4">
 
             <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative w-full max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-faint" />
-                    <input
-                        type="text"
-                        value={busqueda}
-                        onChange={(e) => setBusqueda(e.target.value)}
-                        placeholder="Buscar agrupación por nombre..."
-                        className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                </div>
+                <BarraBusqueda
+                    valor={busqueda}
+                    onChange={setBusqueda}
+                    placeholder="Buscar agrupación por nombre..."
+                    tamano="sm"
+                    className="w-full max-w-sm"
+                />
                 <select
                     value={filtroEvento}
                     onChange={(e) => setFiltroEvento(e.target.value)}
@@ -88,23 +90,14 @@ export default function GestionSolicitudes() {
                 >
                     <option value="todos">Todos los eventos</option>
                     <option value="ninguno">Sin evento</option>
-                    {eventosConSolicitudes.map((evento) => (
-                        <option key={evento.id_evento} value={String(evento.id_evento)}>{evento.nombre}</option>
+                    {nombresEventos.map((nombre) => (
+                        <option key={nombre} value={`evento:${nombre}`}>{nombre}</option>
                     ))}
                 </select>
             </div>
 
-            {error && (
-                <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">
-                    {error}
-                </div>
-            )}
-
-            {mensajeExito && (
-                <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">
-                    {mensajeExito}
-                </div>
-            )}
+            <Aviso mensaje={error} />
+            <Aviso tipo="exito" mensaje={mensajeExito} />
 
             {loading ? (
                 <div className="flex items-center justify-center py-16">
@@ -117,11 +110,11 @@ export default function GestionSolicitudes() {
                             solicitudes={solicitudesFiltradas}
                             selectedId={selectedId}
                             onSelect={setSelectedId}
-                            onAceptar={(id) => cambiarEstado(id, 'aprobada')}
-                            onRechazar={(id) => cambiarEstado(id, 'rechazada')}
-                            onEditar={setSolicitudEditando}
-                            onEnviarDetalles={handleEnviarDetalles}
-                            onEliminar={handleEliminar}
+                            onAceptar={puedeEditar ? (id) => cambiarEstado(id, 'aprobada') : undefined}
+                            onRechazar={puedeEditar ? (id) => cambiarEstado(id, 'rechazada') : undefined}
+                            onEditar={puedeEditar ? setSolicitudEditando : undefined}
+                            onEnviarDetalles={puedeEditar ? handleEnviarDetalles : undefined}
+                            onEliminar={puedeEliminar ? eliminacion.abrir : undefined}
                             hayBusqueda={busqueda.trim().length > 0 || filtroEvento !== 'todos'}
                         />
                     </div>
@@ -139,6 +132,16 @@ export default function GestionSolicitudes() {
                 onActualizado={(actualizada) => {
                     setSolicitudes((prev) => prev.map((s) => (s.id === actualizada.id ? actualizada : s)));
                 }}
+            />
+            <ModalConfirmarEliminacion
+                open={Boolean(eliminacion.elemento)}
+                titulo="Eliminar solicitud"
+                nombre={eliminacion.elemento && `la solicitud de ${eliminacion.elemento.agrupacion.nombre}`}
+                textoBoton="Eliminar solicitud"
+                loading={eliminacion.eliminando}
+                error={eliminacion.error}
+                onClose={eliminacion.cerrar}
+                onConfirm={eliminacion.confirmar}
             />
         </div>
     );

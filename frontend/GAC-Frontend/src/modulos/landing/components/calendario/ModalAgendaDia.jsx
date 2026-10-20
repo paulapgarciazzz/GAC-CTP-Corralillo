@@ -1,7 +1,7 @@
 import { format, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { CalendarRange, CalendarX2, Clock } from 'lucide-react';
-import ModalBase from '../../../Calendario/components/ModalBase';
+import ModalBase from '../../../../components/ModalBase';
 import { CATEGORY_COLORS } from '../../../Calendario/lib/categorias';
 import { formatearHorarioEvento, formatearRangoEvento } from '../../../Calendario/lib/fechas';
 import { useActividadesDelDia } from '../../hooks/useActividadesDelDia';

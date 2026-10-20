@@ -7,7 +7,9 @@ import ModalCrearEvento from '../components/ModalCrearEvento';
 import TablaEventos from '../components/TablaEventos';
 import ModalActividad from '../components/ModalActividad';
 import ModalActividadesEvento from '../components/ModalActividadesEvento';
-import ModalConfirmarEliminacion from '../components/ModalConfirmarEliminacion';
+import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
+import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
+import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 import { useActividades } from '../hooks/useActividades';
 import {
     obtenerEventos,
@@ -36,6 +38,7 @@ export default function Calendario() {
         quitarActividadesDeEvento,
         eliminacion: eliminacionActividad,
     } = useActividades();
+    const { puedeCrear, puedeEditar, puedeEliminar } = usePermisosModulo('calendario');
 
     useEffect(() => {
         let activo = true;
@@ -103,16 +106,19 @@ export default function Calendario() {
         return resultado;
     };
 
-    const handleDeleteEvent = async (id) => {
-        const resultado = await eliminarEvento(id);
-        if (resultado.success) {
-            setEvents((prev) => prev.filter((item) => item.id !== id));
-            quitarActividadesDeEvento(id);
+    const eliminacionEvento = useConfirmarEliminacion(
+        (evento) => eliminarEvento(evento.id),
+        (evento) => {
+            setEvents((prev) => prev.filter((item) => item.id !== evento.id));
+            quitarActividadesDeEvento(evento.id);
             setError('');
-        } else {
-            setError(resultado.error);
-        }
-        return resultado;
+        },
+    );
+
+    // Desde el formulario de edición: se cierra y se pide confirmación (sin modal sobre modal).
+    const eliminarDesdeFormulario = (evento) => {
+        cerrarModal();
+        eliminacionEvento.abrir(evento);
     };
 
     const cerrarModalActividad = () => setModalActividad(MODAL_ACTIVIDAD_CERRADO);
@@ -158,13 +164,13 @@ export default function Calendario() {
             <TablaEventos
                 events={events}
                 cargando={cargando}
-                onCreateClick={abrirCrear}
-                onEdit={abrirEditar}
-                onDelete={handleDeleteEvent}
+                onCreateClick={puedeCrear ? abrirCrear : undefined}
+                onEdit={puedeEditar ? abrirEditar : undefined}
+                onDelete={puedeEliminar ? eliminacionEvento.abrir : undefined}
                 actividadesDeEvento={obtenerDeEvento}
-                onAddActividad={(evento) => setModalActividad({ abierto: true, evento, actividad: null })}
-                onEditActividad={(evento, actividad) => setModalActividad({ abierto: true, evento, actividad })}
-                onDeleteActividad={eliminacionActividad.abrir}
+                onAddActividad={puedeCrear ? (evento) => setModalActividad({ abierto: true, evento, actividad: null }) : undefined}
+                onEditActividad={puedeEditar ? (evento, actividad) => setModalActividad({ abierto: true, evento, actividad }) : undefined}
+                onDeleteActividad={puedeEliminar ? eliminacionActividad.abrir : undefined}
             />
             <ModalCrearEvento
                 open={isModalOpen}
@@ -172,7 +178,7 @@ export default function Calendario() {
                 onClose={cerrarModal}
                 onCreate={handleCreateEvent}
                 onUpdate={handleUpdateEvent}
-                onDelete={handleDeleteEvent}
+                onDelete={puedeEliminar ? eliminarDesdeFormulario : undefined}
             />
             <ModalActividadesEvento
                 evento={eventoConActividades}
@@ -195,6 +201,17 @@ export default function Calendario() {
                 error={eliminacionActividad.error}
                 onClose={eliminacionActividad.cerrar}
                 onConfirm={eliminacionActividad.confirmar}
+            />
+            <ModalConfirmarEliminacion
+                open={Boolean(eliminacionEvento.elemento)}
+                titulo="Eliminar evento"
+                nombre={eliminacionEvento.elemento?.title}
+                advertencia="También se eliminarán las actividades del evento."
+                textoBoton="Eliminar evento"
+                loading={eliminacionEvento.eliminando}
+                error={eliminacionEvento.error}
+                onClose={eliminacionEvento.cerrar}
+                onConfirm={eliminacionEvento.confirmar}
             />
         </div>
     );

@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Printer, RefreshCw } from 'lucide-react';
+import { Printer } from 'lucide-react';
+import Aviso from '../../../components/Aviso';
+import { EstadoVacio } from '../../../components/EstadoLista';
 import FiltrosReporteBeneficios from '../components/FiltrosReporteBeneficios';
 import ReporteAlimentacion from '../components/ReporteAlimentacion';
 import ReporteMobiliario from '../components/ReporteMobiliario';
@@ -57,14 +59,7 @@ export default function ReportesBeneficios() {
                 <FiltrosReporteBeneficios generando={generando} onGenerar={handleGenerar} />
             </div>
 
-            {error && (
-                <div role="alert" className="print:hidden p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <span>{error}</span>
-                    <button type="button" onClick={() => filtrosAplicados && handleGenerar(filtrosAplicados)} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer">
-                        <RefreshCw size={14} />Reintentar
-                    </button>
-                </div>
-            )}
+            <Aviso mensaje={error} onReintentar={() => filtrosAplicados && handleGenerar(filtrosAplicados)} className="print:hidden" />
 
             {reporte && filtrosAplicados && (
                 <div className="space-y-6">
@@ -99,9 +94,7 @@ export default function ReportesBeneficios() {
                     </div>
 
                     {sinResultados ? (
-                        <div className="flex items-center justify-center py-16 border border-border rounded-xl bg-surface">
-                            <p className="text-sm text-foreground-faint text-center">No hay beneficios asignados para los filtros seleccionados.</p>
-                        </div>
+                        <EstadoVacio mensaje="No hay beneficios asignados para los filtros seleccionados." />
                     ) : (
                         <>
                             {reporte.alimentacion && <ReporteAlimentacion seccion={reporte.alimentacion} />}

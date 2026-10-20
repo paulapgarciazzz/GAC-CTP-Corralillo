@@ -1,30 +1,16 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { es } from 'date-fns/locale';
-import {
-    startOfMonth,
-    endOfMonth,
-    startOfWeek,
-    endOfWeek,
-    eachDayOfInterval,
-    isSameMonth,
-    isSameDay,
-    isToday,
-    format,
-} from 'date-fns';
+import { isSameMonth, isSameDay, isToday, format } from 'date-fns';
 import EventChip from './EventChip';
 import MoreEventsPopover from './MoreEventsPopover';
 import { ocurreEnDia } from '../lib/eventosPorDia';
+import { DIAS_SEMANA, diasDeLaGrillaMes } from '../lib/grillaMes';
 
-const WEEKDAY_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 const MAX_VISIBLE_EVENTS = 3;
 
 export default function MonthView({ currentDate, events, onDayClick, onEventClick }) {
-    const monthStart = startOfMonth(currentDate);
-    const monthEnd = endOfMonth(currentDate);
-    const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-    const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-    const days = eachDayOfInterval({ start: gridStart, end: gridEnd });
+    const days = diasDeLaGrillaMes(currentDate);
 
     const [diaMovil, setDiaMovil] = useState(null);
 
@@ -33,7 +19,7 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
     return (
         <div>
             <div className="grid grid-cols-7 border-b border-border bg-background">
-                {WEEKDAY_LABELS.map((label) => (
+                {DIAS_SEMANA.map((label) => (
                     <div
                         key={label}
                         className="py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-foreground-faint"

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { actualizarActividad, crearActividad, eliminarActividad } from '../services/actividadService';
-import { useConfirmarEliminacion } from './useConfirmarEliminacion';
+import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
 
 const SIN_ACTIVIDADES = [];
 

@@ -1,6 +1,10 @@
 import FormularioEventoNuevo from './FormularioEventoNuevo';
-import ModalBase from './ModalBase';
+import ModalBase from '../../../components/ModalBase';
 
+/**
+ * `onDelete(evento)` es opcional: sin él no se muestra el botón Eliminar.
+ * La confirmación la maneja quien abre el modal.
+ */
 export default function ModalCrearEvento({ open, evento, onClose, onCreate, onUpdate, onDelete }){
     if (!open) return null;
 
@@ -12,20 +16,13 @@ export default function ModalCrearEvento({ open, evento, onClose, onCreate, onUp
         return resultado;
     };
 
-    const handleDelete = async () => {
-        if (!evento) return { success: false };
-        const resultado = await onDelete(eventoId);
-        if (resultado?.success) onClose();
-        return resultado;
-    };
-
     return (
         <ModalBase titulo={evento ? 'Editar evento' : 'Crear evento'} onClose={onClose}>
             <FormularioEventoNuevo
                 evento={evento}
                 onSubmit={handleSubmit}
                 onCancel={onClose}
-                onDelete={handleDelete}
+                onDelete={evento && onDelete ? () => onDelete(evento) : undefined}
             />
         </ModalBase>
     );

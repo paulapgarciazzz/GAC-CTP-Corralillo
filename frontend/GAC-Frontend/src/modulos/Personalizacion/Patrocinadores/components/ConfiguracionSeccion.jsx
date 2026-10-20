@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Loader2, Save } from 'lucide-react';
+import Aviso from '../../../../components/Aviso';
+import { CampoFormulario } from '../../../../components/Formulario';
+import { EstadoCargando } from '../../../../components/EstadoLista';
+import { BOTON_PRIMARIO_CLASS, INPUT_CLASS } from '../../../../utils/formulario';
 import {
     actualizarConfiguracionPatrocinadores,
     obtenerConfiguracionPatrocinadores,
 } from '../services/patrocinadorService';
 
-export default function ConfiguracionSeccion() {
+/** Título y descripción de la sección de patrocinadores. Sin `puedeEditar` queda en solo lectura. */
+export default function ConfiguracionSeccion({ puedeEditar = false }) {
     const [valores, setValores] = useState({ titulo: '', descripcion: '' });
     const [cargando, setCargando] = useState(true);
     const [guardando, setGuardando] = useState(false);
     const [error, setError] = useState('');
+    const [errores, setErrores] = useState({});
     const [mensajeExito, setMensajeExito] = useState('');
 
     useEffect(() => {
@@ -27,10 +33,16 @@ export default function ConfiguracionSeccion() {
         };
     }, []);
 
-    const guardar = async (event) => {
-        event.preventDefault();
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setValores((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const guardar = async (e) => {
+        e.preventDefault();
         setGuardando(true);
         setError('');
+        setErrores({});
         setMensajeExito('');
 
         const resultado = await actualizarConfiguracionPatrocinadores(valores);
@@ -42,49 +54,31 @@ export default function ConfiguracionSeccion() {
             window.setTimeout(() => setMensajeExito(''), 3500);
         } else {
             setError(resultado.error);
+            setErrores(resultado.errors ?? {});
         }
     };
 
-    if (cargando) {
-        return (
-            <div className="flex items-center justify-center gap-2 py-10 text-foreground-soft">
-                <Loader2 className="animate-spin text-primary" size={20} />
-                Cargando configuración...
-            </div>
-        );
-    }
+    if (cargando) return <EstadoCargando texto="Cargando configuración..." />;
 
     return (
         <form onSubmit={guardar} className="space-y-4 max-w-xl">
-            <div>
-                <label className="block text-sm font-medium text-foreground-soft mb-1">Título de la sección</label>
-                <input
-                    type="text"
-                    value={valores.titulo}
-                    onChange={(event) => setValores((prev) => ({ ...prev, titulo: event.target.value }))}
-                    required
-                    maxLength={255}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-foreground-soft mb-1">Descripción (opcional)</label>
-                <textarea
-                    value={valores.descripcion ?? ''}
-                    onChange={(event) => setValores((prev) => ({ ...prev, descripcion: event.target.value }))}
-                    rows={3}
-                    maxLength={1000}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
-            </div>
+            <CampoFormulario id="config-patrocinadores-titulo" label="Título de la sección" error={errores.titulo?.[0]}>
+                <input id="config-patrocinadores-titulo" name="titulo" type="text" value={valores.titulo} onChange={handleChange} required maxLength={255} disabled={!puedeEditar} className={INPUT_CLASS} />
+            </CampoFormulario>
 
-            {mensajeExito && <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">{mensajeExito}</div>}
-            {error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">{error}</div>}
+            <CampoFormulario id="config-patrocinadores-descripcion" label="Descripción (opcional)" error={errores.descripcion?.[0]}>
+                <textarea id="config-patrocinadores-descripcion" name="descripcion" rows={3} value={valores.descripcion ?? ''} onChange={handleChange} maxLength={1000} disabled={!puedeEditar} className={`${INPUT_CLASS} resize-y`} />
+            </CampoFormulario>
 
-            <button type="submit" disabled={guardando} className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-colors cursor-pointer">
-                {guardando ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                {guardando ? 'Guardando...' : 'Guardar cambios'}
-            </button>
+            <Aviso tipo="exito" mensaje={mensajeExito} />
+            <Aviso mensaje={error} />
+
+            {puedeEditar && (
+                <button type="submit" disabled={guardando} className={`${BOTON_PRIMARIO_CLASS} sm:w-auto sm:px-4`}>
+                    {guardando ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                    {guardando ? 'Guardando...' : 'Guardar cambios'}
+                </button>
+            )}
         </form>
     );
 }

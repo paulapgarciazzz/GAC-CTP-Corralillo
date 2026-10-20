@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 /**
- * Estado del flujo "confirmar y eliminar" para usar con ModalConfirmarEliminacion.
+ * Estado del flujo "confirmar y eliminar" para usar con src/components/ModalConfirmarEliminacion.
  * `eliminar(elemento)` debe devolver `{ success, error }`; `onEliminado(elemento)` se llama al terminar bien.
  */
 export function useConfirmarEliminacion(eliminar, onEliminado) {

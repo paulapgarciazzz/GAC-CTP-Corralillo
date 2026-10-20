@@ -205,20 +205,20 @@ class ActividadService
             ]);
         }
 
-        // Si el evento tiene horario, el primer día empieza a su hora de inicio y el último termina a su hora de fin.
+        // Si el evento tiene horario, se repite todos sus días: la actividad debe quedar dentro de él.
         if (! $evento->todo_el_dia && $evento->hora_inicio) {
             $horaInicioEvento = substr($evento->hora_inicio, 0, 5);
             $horaFinEvento = $evento->hora_fin ? substr($evento->hora_fin, 0, 5) : null;
 
-            if ($fecha === $fechaInicio && $inicio < $horaInicioEvento) {
+            if ($inicio < $horaInicioEvento) {
                 throw ValidationException::withMessages([
-                    'hora_inicio' => "La actividad no puede empezar antes del inicio del evento ({$horaInicioEvento}).",
+                    'hora_inicio' => "La actividad no puede empezar antes del horario del evento ({$horaInicioEvento}).",
                 ]);
             }
 
-            if ($fecha === $fechaFin && $horaFinEvento && $fin > $horaFinEvento) {
+            if ($horaFinEvento && $fin > $horaFinEvento) {
                 throw ValidationException::withMessages([
-                    'hora_finalizacion' => "La actividad no puede terminar después del fin del evento ({$horaFinEvento}).",
+                    'hora_finalizacion' => "La actividad no puede terminar después del horario del evento ({$horaFinEvento}).",
                 ]);
             }
         }

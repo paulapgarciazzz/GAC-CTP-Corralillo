@@ -220,26 +220,27 @@ class ActividadTest extends TestCase
 
     public function test_valida_horas_dentro_del_horario_del_evento(): void
     {
-        // El evento va del 10 a las 08:00 al 12 a las 14:00.
+        // El evento va del 10 al 12, de 08:00 a 14:00 todos los días.
         $this->evento->update(['hora_inicio' => '08:00', 'hora_fin' => '14:00']);
 
+        // Cualquier día del evento (también los intermedios) respeta el horario.
         $this->postJson('/api/actividades', $this->datosActividad([
+            'fecha' => '2026-10-11',
             'hora_inicio' => '07:30',
             'hora_finalizacion' => '09:00',
         ]))->assertStatus(422)
             ->assertJsonValidationErrors(['hora_inicio']);
 
         $this->postJson('/api/actividades', $this->datosActividad([
-            'fecha' => '2026-10-12',
             'hora_inicio' => '13:30',
             'hora_finalizacion' => '14:30',
         ]))->assertStatus(422)
             ->assertJsonValidationErrors(['hora_finalizacion']);
 
-        // Los límites exactos son válidos y los días intermedios no tienen restricción.
+        // Los límites exactos son válidos en cualquier día.
         $this->crearActividad(['hora_inicio' => '08:00', 'hora_finalizacion' => '09:00']);
-        $this->crearActividad(['fecha' => '2026-10-12', 'hora_inicio' => '13:00', 'hora_finalizacion' => '14:00']);
-        $this->crearActividad(['fecha' => '2026-10-11', 'hora_inicio' => '06:00', 'hora_finalizacion' => '20:00']);
+        $this->crearActividad(['fecha' => '2026-10-11', 'hora_inicio' => '13:00', 'hora_finalizacion' => '14:00']);
+        $this->crearActividad(['fecha' => '2026-10-12', 'hora_inicio' => '08:00', 'hora_finalizacion' => '14:00']);
 
         // Un evento de todo el día no limita las horas.
         $this->evento->update(['todo_el_dia' => true]);

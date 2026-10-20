@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Loader2, RefreshCw } from 'lucide-react';
+import Aviso from '../../../components/Aviso';
+import { EstadoCargando } from '../../../components/EstadoLista';
 import FiltrosSolicitudesAprobadas from '../components/FiltrosSolicitudesAprobadas';
 import ListaSolicitudesAprobadas from '../components/ListaSolicitudesAprobadas';
 import ModalAsignacionBeneficios from '../components/ModalAsignacionBeneficios';
+import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 import { actualizarAsignacion, crearAsignacion, obtenerAsignaciones, obtenerSolicitudesAprobadas } from '../services/asignacionBeneficiosService';
 
 const FILTROS_INICIALES = { agrupacion: '', cedula: '', fecha: '', estadoAsignacion: 'todas' };
@@ -17,6 +19,9 @@ export default function AsignarBeneficios() {
     const [modal, setModal] = useState({ abierto: false, solicitud: null });
     const [guardando, setGuardando] = useState(false);
     const [errorModal, setErrorModal] = useState('');
+    const { puedeCrear, puedeEditar } = usePermisosModulo('beneficios');
+    // Asignar por primera vez es crear; cambiar una asignación existente es editar.
+    const puedeSeleccionar = (solicitud) => (solicitud.asignacion ? puedeEditar : puedeCrear);
 
     const cargarDatos = async () => {
         setLoading(true);
@@ -140,26 +145,18 @@ export default function AsignarBeneficios() {
                 <p className="mt-1 text-sm text-foreground-soft">Selecciona una solicitud aprobada para asignarle beneficios.</p>
             </div>
 
-            {mensajeExito && <div role="status" className="p-3 bg-success-soft border border-success/30 rounded-lg text-success text-sm">{mensajeExito}</div>}
-            {error && (
-                <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <span>{error}</span>
-                    <button type="button" onClick={cargarDatos} className="inline-flex items-center justify-center gap-2 px-3 py-1.5 border border-danger/40 rounded-lg font-medium hover:bg-danger/10 transition-colors cursor-pointer">
-                        <RefreshCw size={14} />Reintentar
-                    </button>
-                </div>
-            )}
+            <Aviso tipo="exito" mensaje={mensajeExito} />
+            <Aviso mensaje={error} onReintentar={cargarDatos} />
 
             <FiltrosSolicitudesAprobadas filtros={filtros} onChange={setFiltros} />
 
             {loading ? (
-                <div className="flex items-center justify-center gap-2 py-16 text-foreground-soft">
-                    <Loader2 className="animate-spin text-primary" size={26} />Cargando solicitudes...
-                </div>
+                <EstadoCargando texto="Cargando solicitudes..." />
             ) : (
                 <ListaSolicitudesAprobadas
                     solicitudes={solicitudesFiltradas}
                     onSeleccionar={abrirAsignacion}
+                    puedeSeleccionar={puedeSeleccionar}
                     hayFiltrosActivos={hayFiltrosActivos}
                 />
             )}

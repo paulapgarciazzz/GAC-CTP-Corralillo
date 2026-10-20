@@ -1,4 +1,4 @@
-import ModalBase from './ModalBase';
+import ModalBase from '../../../components/ModalBase';
 import TablaActividades from './TablaActividades';
 import { formatearRangoEvento } from '../lib/fechas';
 

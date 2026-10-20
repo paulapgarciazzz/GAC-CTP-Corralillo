@@ -3,8 +3,8 @@ import { format } from 'date-fns';
 import { Check } from 'lucide-react';
 import SelectorHora from '../../../components/SelectorHora';
 import { CATEGORY_COLORS } from '../lib/categorias';
-import { BOTON_PELIGRO_CLASS, INPUT_CLASS, LABEL_CLASS } from '../lib/formulario';
-import { AlertaError, BotonesFormulario } from './Formulario';
+import { BOTON_PELIGRO_CLASS, INPUT_CLASS, LABEL_CLASS } from '../../../utils/formulario';
+import { AlertaError, BotonesFormulario } from '../../../components/Formulario';
 
 const DARK_SOLID_BG = {
     info: 'dark:bg-info',
@@ -110,16 +110,6 @@ export default function FormularioEventoNuevo({ evento, onSubmit, onCancel, onDe
         }
     };
 
-    const handleDelete = async () => {
-        if (!window.confirm('¿Eliminar este evento?')) return;
-        setGuardando(true);
-        const resultado = await onDelete();
-        setGuardando(false);
-        if (resultado && !resultado.success) {
-            setError(resultado.error);
-        }
-    };
-
     return (
         <form onSubmit={handleSubmit} className="space-y-5">
             <AlertaError mensaje={error} />
@@ -172,8 +162,8 @@ export default function FormularioEventoNuevo({ evento, onSubmit, onCancel, onDe
                 textoEnviar={esEdicion ? 'Guardar' : 'Crear evento'}
                 onCancel={onCancel}
             >
-                {esEdicion && (
-                    <button type="button" onClick={handleDelete} disabled={guardando} className={BOTON_PELIGRO_CLASS}>
+                {esEdicion && onDelete && (
+                    <button type="button" onClick={onDelete} disabled={guardando} className={BOTON_PELIGRO_CLASS}>
                         Eliminar
                     </button>
                 )}

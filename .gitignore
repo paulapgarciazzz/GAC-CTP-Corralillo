@@ -59,3 +59,6 @@ Desktop.ini
 /.env
 docker_data/
 .env
+__pycache__/
+*.pyc
+.claude/

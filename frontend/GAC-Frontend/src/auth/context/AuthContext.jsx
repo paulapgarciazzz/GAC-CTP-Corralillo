@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useMemo } from "react";
 import { getUser, login as authlogin, logout as authlogout } from "../services/authService";
 
 
@@ -48,6 +48,15 @@ export const Authprovider = ({ children }) => {
         }
     };
 
+    // Vuelve a pedir el usuario (p. ej. tras cambiar sus propios datos).
+    const refrescarUsuario = async () => {
+        try {
+            setUser(await getUser());
+        } catch {
+            // Se conserva la sesión actual si la petición falla.
+        }
+    };
+
     const logout = async () => {
         try{
             await authlogout();
@@ -59,12 +68,25 @@ export const Authprovider = ({ children }) => {
         }
     };
 
-    const value = {
-        user,
-        loading,
-        login,
-        logout,
-        isAuthenticated: !!user,
-    };
+    const value = useMemo(() => {
+        const permisos = new Set(user?.permissions ?? []);
+        const esAdmin = Boolean(user?.es_admin);
+
+        return {
+            user,
+            loading,
+            login,
+            logout,
+            refrescarUsuario,
+            // Aplica un usuario recibido del backend (p. ej. tras editar el perfil) sin otra petición.
+            establecerUsuario: setUser,
+            isAuthenticated: !!user,
+            esAdmin,
+            // Permiso puntual, p. ej. can('usuarios.crear'). El administrador tiene todos.
+            can: (permiso) => esAdmin || permisos.has(permiso),
+            // Acceso a un módulo: "ver" es la acción base que el backend garantiza a todo módulo activo.
+            tieneModulo: (modulo) => esAdmin || permisos.has(`${modulo}.ver`),
+        };
+    }, [user, loading]); // login/logout/refrescarUsuario solo usan setters estables.
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

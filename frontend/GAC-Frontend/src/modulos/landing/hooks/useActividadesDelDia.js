@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { obtenerActividadesDeEvento } from '../../Calendario/services/actividadService';
 
-const SIN_RESULTADO = { clave: null, porEvento: new Map(), error: '' };
+const SIN_RESULTADO = { clave: null, porEvento: new Map() };
 
 /**
  * Actividades programadas en `dia` para cada uno de `eventos`, agrupadas por id de evento.
  * Se consultan al abrir el día (siempre datos frescos); un evento cuya consulta
- * falló no aparece en `porEvento`.
+ * falló no aparece en `porEvento`, así que `actividadesDe` devuelve `undefined`.
  */
 export function useActividadesDelDia(dia, eventos) {
     const [resultado, setResultado] = useState(SIN_RESULTADO);
@@ -23,15 +23,12 @@ export function useActividadesDelDia(dia, eventos) {
         Promise.all(idsEventos.map(obtenerActividadesDeEvento)).then((respuestas) => {
             if (!activo) return;
             const porEvento = new Map();
-            let error = '';
             respuestas.forEach((respuesta, i) => {
                 if (respuesta.success) {
                     porEvento.set(idsEventos[i], respuesta.data.filter((actividad) => actividad.fecha === fecha));
-                } else {
-                    error = respuesta.error;
                 }
             });
-            setResultado({ clave: `${fecha}|${ids}`, porEvento, error });
+            setResultado({ clave: `${fecha}|${ids}`, porEvento });
         });
 
         return () => {
@@ -43,7 +40,6 @@ export function useActividadesDelDia(dia, eventos) {
 
     return {
         cargando: Boolean(ids) && !vigente,
-        error: vigente ? resultado.error : '',
         actividadesDe: (idEvento) => (vigente ? resultado.porEvento.get(String(idEvento)) : undefined),
     };
 }

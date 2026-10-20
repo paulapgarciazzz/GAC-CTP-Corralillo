@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 /**
  * Filtro de eventos por nombre y rango de fechas. Un evento entra en el rango
- * si se solapa con él. Devuelve los eventos ordenados por fecha de inicio.
+ * si se solapa con él. Devuelve los eventos del más reciente al más antiguo (por fecha de inicio).
  */
 export function useFiltroEventos(events) {
     const [busqueda, setBusqueda] = useState('');
@@ -21,7 +21,7 @@ export function useFiltroEventos(events) {
                 if (hasta && evento.start > hasta) return false;
                 return true;
             })
-            .sort((a, b) => a.start - b.start);
+            .sort((a, b) => b.start - a.start);
     }, [events, busqueda, fechaDesde, fechaHasta]);
 
     return {

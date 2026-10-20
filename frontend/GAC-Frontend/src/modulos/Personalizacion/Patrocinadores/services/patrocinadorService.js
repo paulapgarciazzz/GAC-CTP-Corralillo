@@ -1,12 +1,13 @@
 import api from '../../../../services/axios';
-import { manejarError } from './manejoErrores';
+import { manejarError } from '../../../../services/manejoErrores';
 
+// FormData convierte los booleanos en "true"/"false", que la regla `boolean` de Laravel rechaza.
 const construirFormData = (datos) => {
     const formData = new FormData();
 
     Object.entries(datos).forEach(([clave, valor]) => {
         if (valor === undefined || valor === null) return;
-        formData.append(clave, valor);
+        formData.append(clave, typeof valor === 'boolean' ? (valor ? '1' : '0') : valor);
     });
 
     return formData;

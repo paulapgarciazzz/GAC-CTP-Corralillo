@@ -22,6 +22,7 @@ const Footer = () => {
                     <ul className="space-y-2 text-sm">
                         <li><a href="#inicio" className="transition-colors hover:text-white">Inicio</a></li>
                         <li><a href="#evento" className="transition-colors hover:text-white">Evento destacado</a></li>
+                        <li><a href="#calendario" className="transition-colors hover:text-white">Calendario</a></li>
                         <li><a href="#conocenos" className="transition-colors hover:text-white">Conócenos</a></li>
                         <li><a href="#ubicacion" className="transition-colors hover:text-white">Ubicación</a></li>
                         <li><Link to="/login" className="transition-colors hover:text-white">Iniciar sesión</Link></li>

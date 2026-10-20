@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useAuth } from "../../../auth/hooks/useAuth";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
+import ModalRecuperarPassword from "./ModalRecuperarPassword";
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [mostrarRecuperacion, setMostrarRecuperacion] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -26,7 +28,16 @@ const Login = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-rail to-[#05070f] p-4">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/10 space-y-6">
- 
+
+        {/* Volver a la landing */}
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft size={16} />
+          Volver al inicio
+        </Link>
+
         {/* Encabezado */}
         <div className="text-center space-y-2">
           <h2 className="text-3xl font-extrabold text-white tracking-tight">
@@ -94,6 +105,7 @@ const Login = () => {
           <div className="flex justify-end">
             <button
               type="button"
+              onClick={() => setMostrarRecuperacion(true)}
               className="text-xs font-medium text-[#7ecdda] hover:text-[#a8e2ea] transition-colors cursor-pointer"
             >
               ¿Olvidaste tu contraseña?
@@ -121,6 +133,11 @@ const Login = () => {
           </button>
         </form>
       </div>
+
+      {/* Fuera de la tarjeta: su backdrop-blur encerraría al modal (position: fixed) */}
+      {mostrarRecuperacion && (
+        <ModalRecuperarPassword emailInicial={email} onClose={() => setMostrarRecuperacion(false)} />
+      )}
     </div>
     );
 };

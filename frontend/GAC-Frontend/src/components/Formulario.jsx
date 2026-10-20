@@ -1,5 +1,6 @@
 import { Loader2 } from 'lucide-react';
-import { BOTON_PRIMARIO_CLASS, BOTON_SECUNDARIO_CLASS, LABEL_CLASS } from '../lib/formulario';
+import { BOTON_PRIMARIO_CLASS, BOTON_SECUNDARIO_CLASS, LABEL_CLASS } from '../utils/formulario';
+import Aviso from './Aviso';
 
 /**
  * Etiqueta + control + mensaje de error del backend (errors[campo][0]).
@@ -15,12 +16,7 @@ export function CampoFormulario({ id, label, error, className = '', children }) 
 }
 
 export function AlertaError({ mensaje }) {
-    if (!mensaje) return null;
-    return (
-        <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">
-            {mensaje}
-        </div>
-    );
+    return <Aviso tipo="error" mensaje={mensaje} />;
 }
 
 /**

@@ -2,20 +2,22 @@ import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDa
 import { useState } from "react"
 import logo from '../../../assets/logo.png'
 import { ChevronDown } from "lucide-react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Lock } from "lucide-react";
+import { useAuth } from "../../../auth/hooks/useAuth";
 
 const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
+    const { tieneModulo } = useAuth();
 
     const [links,setLinks] = useState([
 
         {name: "Inicio", icon: LayoutDashboard, active:false},
-        {name: "Solicitudes", icon: FileUser, active:false,
+        {name: "Solicitudes", icon: FileUser, active:false, modulo: "solicitudes",
             children: [
                 {name: "Bandeja de Solicitudes", icon: BookUser},
                 {name: "Gestión de Agrupaciones", icon: PersonStanding},
             ]
         },
-        {name: "Beneficios", icon: ShelvingUnit, active:false,
+        {name: "Beneficios", icon: ShelvingUnit, active:false, modulo: "beneficios",
             children: [
                 {name: "Gestión de beneficios", icon: SquareLibrary},
                 {name: "Asignar beneficios", icon: CirclePile},
@@ -23,19 +25,19 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
                 
             ]
         },
-        {name: "Calendario", icon: CalendarDays, active:false,
+        {name: "Calendario", icon: CalendarDays, active:false, modulo: "calendario",
             children: [
-                {name: "Gestión del calendario", icon: CalendarDays},
-                {name: "Gestión de ubicaciones", icon: MapPin},
+                {name: "Gestión del Calendario", icon: CalendarDays},
+                {name: "Gestión de Ubicaciones", icon: MapPin},
             ]
         },
-        {name: "Gestion de Usuarios", icon: UserCog, active:false,
+        {name: "Gestion de Usuarios", icon: UserCog, active:false, modulo: "usuarios",
             children: [
                 {name: "Lista de Usuarios", icon: Users},
                 {name: "Roles y Permisos", icon: Shield},
             ]
         },
-        {name: "Reportes", icon: ClipboardMinus, active:false,
+        {name: "Reportes", icon: ClipboardMinus, active:false, modulo: "reportes",
             children: [
                 {name: "Reportes de Solicitudes", icon: FileUser},
                 {name: "Reportes de Actividades", icon: Boxes},
@@ -45,9 +47,9 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         },
         {name: "Ajustes", icon: Settings, active:false,
             children: [
-                {name: "Gestión de agrupaciones", icon: PersonStanding},
-                {name: "Gestión de encargados", icon: Users},
-                {name: "Personalización del sistema", icon: Paintbrush},
+                {name: "Gestión de agrupaciones", icon: PersonStanding, modulo: "solicitudes"},
+                {name: "Gestión de encargados", icon: Users, modulo: "solicitudes"},
+                {name: "Personalización del sistema", icon: Paintbrush, modulo: "personalizacion"},
             ]
         },
         
@@ -64,6 +66,9 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
             return link.children ? {...link, active:false} : {...link,active:false};
         }));
     };
+    // Un enlace con `modulo` se bloquea si el usuario no tiene ningún permiso en ese módulo.
+    const bloqueado = (link) => Boolean(link.modulo) && !tieneModulo(link.modulo);
+
     const handleChildClick = (childName) => {
         onSelectView?.(childName);
         if(onCloseDrawer && window.innerWidth < 789) onCloseDrawer();
@@ -81,7 +86,17 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
             {/* Navegacion */}
             <nav className="flex-1 p-4 overflow-auto">
                 <ul className="space-y-1">
-                    {links.map((link,index)=>(
+                    {links.map((link,index)=> bloqueado(link) ? (
+                        <li key={index}>
+                            <button type="button" disabled aria-disabled="true" title="No tienes acceso a este módulo"
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-foreground-faint dark:text-white/35 cursor-not-allowed">
+                                <link.icon className="w-5 h-5 shrink-0 opacity-60"/>
+                                <span className="flex-1 text-left text-sm font-medium">{link.name}</span>
+                                <Lock className="w-4 h-4" aria-hidden="true"/>
+                                <span className="sr-only">(sin acceso)</span>
+                            </button>
+                        </li>
+                    ) : (
                         <li key={index}>
                             <button onClick={()=> handleClick(index)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${
                                 link.active
@@ -103,7 +118,17 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
                             </button>
                             {link.children && link.open && (
                                 <ul className="ml-2 mt-1 space-y-1 border-l border-border dark:border-white/10 pl-3">
-                                    {link.children.map((child,childIndex)=> (
+                                    {link.children.map((child,childIndex)=> bloqueado(child) ? (
+                                        <li key={childIndex}>
+                                            <button type="button" disabled aria-disabled="true" title="No tienes acceso a este módulo"
+                                                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground-faint dark:text-white/35 cursor-not-allowed">
+                                                <child.icon className="w-5 h-5 shrink-0 opacity-60"/>
+                                                <span className="flex-1 text-left">{child.name}</span>
+                                                <Lock className="w-3.5 h-3.5" aria-hidden="true"/>
+                                                <span className="sr-only">(sin acceso)</span>
+                                            </button>
+                                        </li>
+                                    ) : (
                                         <li key={childIndex}>
                                             <button onClick={()=> handleChildClick(child.name)} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                                                 child.name === selectedView

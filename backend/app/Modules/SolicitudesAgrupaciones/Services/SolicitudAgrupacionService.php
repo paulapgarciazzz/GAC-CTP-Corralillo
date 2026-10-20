@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Log;
 
 class SolicitudAgrupacionService
 {
+    /**
+     * Lista las solicitudes de la más reciente a la más antigua.
+     */
     public function listar(): Collection
     {
         return SolicitudAgrupacion::with([
@@ -24,7 +27,10 @@ class SolicitudAgrupacionService
             'evento',
             'estado',
             'auditorias',
-        ])->get();
+        ])
+            ->latest('fecha_solicitud')
+            ->latest('id')
+            ->get();
     }
 
     public function buscarPorId(int $id): SolicitudAgrupacion

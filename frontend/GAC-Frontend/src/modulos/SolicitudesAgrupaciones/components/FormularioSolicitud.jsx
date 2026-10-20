@@ -5,6 +5,7 @@ import { TIPOS_IDENTIFICACION, obtenerConfigIdentificacion, formatearValorIdenti
 import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono } from '../../../utils/telefono';
 import SelectorHora from '../../../components/SelectorHora';
 import CampoFotoAgrupacion from '../../../components/CampoFotoAgrupacion';
+import { leerComoDataURL } from '../../../utils/archivo';
 import SelectEvento, { MENSAJE_EVENTO_REQUERIDO } from './SelectEvento';
 import { useEventos, useRangoEvento } from '../hooks/useEventos';
 
@@ -104,11 +105,9 @@ export default function FormularioSolicitud({ onSuccess }) {
         }
 
         setErrores((prev) => ({ ...prev, archivo_adjunto: '' }));
-        const reader = new FileReader();
-        reader.onload = () => {
-            setValores((prev) => ({ ...prev, archivo_adjunto: reader.result, archivo_adjunto_nombre: archivo.name }));
-        };
-        reader.readAsDataURL(archivo);
+        leerComoDataURL(archivo)
+            .then((archivo_adjunto) => setValores((prev) => ({ ...prev, archivo_adjunto, archivo_adjunto_nombre: archivo.name })))
+            .catch((err) => setErrores((prev) => ({ ...prev, archivo_adjunto: err.message })));
     };
 
     const handleSubmit = async (e) => {

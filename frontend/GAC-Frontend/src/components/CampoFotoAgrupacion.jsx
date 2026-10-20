@@ -1,4 +1,5 @@
 import { Trash2, Upload, Users } from 'lucide-react';
+import { leerComoDataURL } from '../utils/archivo';
 
 const TIPOS_FOTO_ACEPTADOS = ['image/png', 'image/jpeg'];
 const TAMANO_MAXIMO_FOTO = 2 * 1024 * 1024;
@@ -19,9 +20,9 @@ export default function CampoFotoAgrupacion({ id = 'foto_url', fotoUrl, alt = 'F
         }
 
         onError?.('');
-        const reader = new FileReader();
-        reader.onload = () => onChange(reader.result);
-        reader.readAsDataURL(archivo);
+        leerComoDataURL(archivo)
+            .then(onChange)
+            .catch((err) => onError?.(err.message));
     };
 
     return (
