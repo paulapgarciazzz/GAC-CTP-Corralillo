@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react'
-import { Menu, Search, Sun, Moon, UserCircle, LogOut} from 'lucide-react'
+import { Menu, Search, Sun, Moon, UserCircle, LogOut,SquareArrowUpLeft} from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuth } from '../../../auth/hooks/useAuth'
 import Avatar from '../../../components/Avatar'
@@ -20,6 +20,9 @@ const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
     const abrirPerfil = () => {
         setIsDropdownOpen(false);
         setPerfilAbierto(true);
+    }
+    const salirAPaginaPrincipal = () => {
+        navigate({to: '/'});
     }
 
     const perfilGuardado = (actualizado) => {
@@ -71,7 +74,11 @@ const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
                                             <UserCircle className='w-4 h-4'/>
                                             Perfil
                                         </button>
-
+                                        
+                                        <button onClick={salirAPaginaPrincipal} className='flex items-center gap-3 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors'>
+                                            <SquareArrowUpLeft className='w-4 h-4'/>
+                                            Pagina principal
+                                        </button>
                                         <button className='flex items-center gap-3 w-full px-3 py-2 text-sm text-danger hover:bg-danger-soft rounded-lg transition-colors'  onClick={handleLogout}>
 
                                             <LogOut  className='w-4 h-4'/>
