@@ -22,10 +22,10 @@ const routeApi = getRouteApi('/dashboard');
 
 const VISTAS_VALIDAS = [
     'Bandeja de Solicitudes',
-    'Gestion de Agrupaciones',
+    'Gestión de Agrupaciones',
     'Reportes de Solicitudes',
     'Reportes de Actividades',
-    'Gestion de beneficios',
+    'Gestión de beneficios',
     'Asignar beneficios',
     'Ver beneficios asignados',
     'Reportes de beneficios',
@@ -33,7 +33,7 @@ const VISTAS_VALIDAS = [
     'Gestión de encargados',
     'Gestión de ubicaciones',
     'Personalización del sistema',
-    'Calendario',
+    'Gestión del calendario',
 ];
 
 const Dashboard =()=>{
@@ -98,10 +98,10 @@ const Dashboard =()=>{
                         </section>
                     )}
                     {selectedView === 'Bandeja de Solicitudes' && <GestionSolicitudes />}
-                    {selectedView === 'Gestion de Agrupaciones' && <GestionAgrupaciones />}
+                    {selectedView === 'Gestión de Agrupaciones' && <GestionAgrupaciones />}
                     {selectedView === 'Reportes de Solicitudes' && <ReportesAgrupaciones />}
                     {selectedView === 'Reportes de Actividades' && <ReportesActividades />}
-                    {selectedView === 'Gestion de beneficios' && <GestionBeneficios />}
+                    {selectedView === 'Gestión de beneficios' && <GestionBeneficios />}
                     {selectedView === 'Asignar beneficios' && <AsignarBeneficios />}
                     {selectedView === 'Ver beneficios asignados' && <VerBeneficiosAsignados />}
                     {selectedView === 'Reportes de beneficios' && <ReportesBeneficios />}
@@ -109,7 +109,7 @@ const Dashboard =()=>{
                     {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
                     {selectedView === 'Gestión de ubicaciones' && <GestionUbicacionesAjustes />}
                     {selectedView === 'Personalización del sistema' && <PersonalizacionPage />}
-                    {selectedView === 'Calendario' && <Calendario />}
+                    {selectedView === 'Gestión del calendario' && <Calendario />}
                 </main>
             </div>
 
