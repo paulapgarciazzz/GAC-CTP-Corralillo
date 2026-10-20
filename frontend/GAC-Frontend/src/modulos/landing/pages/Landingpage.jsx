@@ -5,6 +5,7 @@ import CalendarioEventos from '../components/calendario/CalendarioEventos'
 import Contador from '../components/Contador'
 import VisionMision from '../components/VisionMision'
 import Ubicacion from '../components/Ubicacion'
+import Patrocinadores from '../components/Patrocinadores'
 import Footer from '../components/Footer'
 import { useTheme } from '../../../hooks/useTheme'
 
@@ -19,6 +20,7 @@ const Landingpage = () => {
             <Contador />
             <VisionMision />
             <Ubicacion />
+            <Patrocinadores />
             <Footer />
         </div>
     )

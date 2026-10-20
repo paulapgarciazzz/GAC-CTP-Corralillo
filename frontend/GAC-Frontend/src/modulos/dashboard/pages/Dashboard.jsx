@@ -15,6 +15,7 @@ import GestionBeneficios from '../../Beneficios/pages/GestionBeneficios';
 import AsignarBeneficios from '../../Beneficios/pages/AsignarBeneficios';
 import VerBeneficiosAsignados from '../../Beneficios/pages/VerBeneficiosAsignados';
 import ReportesBeneficios from '../../Beneficios/pages/ReportesBeneficios';
+import PersonalizacionPage from '../../Personalizacion/pages/PersonalizacionPage';
 import { useTheme } from '../../../hooks/useTheme';
 
 const routeApi = getRouteApi('/dashboard');
@@ -31,6 +32,7 @@ const VISTAS_VALIDAS = [
     'Gestión de agrupaciones',
     'Gestión de encargados',
     'Gestión de ubicaciones',
+    'Personalización del sistema',
     'Gestión del calendario',
 ];
 
@@ -106,6 +108,7 @@ const Dashboard =()=>{
                     {selectedView === 'Gestión de agrupaciones' && <GestionAgrupacionesAjustes />}
                     {selectedView === 'Gestión de encargados' && <GestionEncargadosAjustes />}
                     {selectedView === 'Gestión de ubicaciones' && <GestionUbicacionesAjustes />}
+                    {selectedView === 'Personalización del sistema' && <PersonalizacionPage />}
                     {selectedView === 'Gestión del calendario' && <Calendario />}
                 </main>
             </div>
