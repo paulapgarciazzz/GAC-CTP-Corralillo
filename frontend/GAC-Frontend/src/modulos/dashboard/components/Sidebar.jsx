@@ -15,6 +15,7 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
             children: [
                 {name: "Bandeja de Solicitudes", icon: BookUser},
                 {name: "Gestión de Agrupaciones", icon: PersonStanding},
+                {name: "Gestión de Encargados", icon: Users},
             ]
         },
         {name: "Beneficios", icon: ShelvingUnit, active:false, modulo: "beneficios",
@@ -47,8 +48,6 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         },
         {name: "Ajustes", icon: Settings, active:false,
             children: [
-                {name: "Gestión de agrupaciones", icon: PersonStanding, modulo: "solicitudes"},
-                {name: "Gestión de encargados", icon: Users, modulo: "solicitudes"},
                 {name: "Personalización del sistema", icon: Paintbrush, modulo: "personalizacion"},
             ]
         },
