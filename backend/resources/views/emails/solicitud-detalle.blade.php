@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalles de la Solicitud</title>
+    <title>{{ $correo['asunto'] }}</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -107,13 +107,18 @@
 <body>
     <div class="email-container">
         <div class="email-header">
-            <h1>Detalles de la Solicitud</h1>
+            @include('emails.partials.escudo', ['url' => $correo['escudo_url']])
+            <h1>{{ $correo['textos']['encabezado'] }}</h1>
         </div>
 
         <div class="email-body">
-            <h2>Estimado {{ $encargado->primer_nombre }},</h2>
+            @if($correo['textos']['saludo'])
+            <h2>{{ $correo['textos']['saludo'] }}</h2>
+            @endif
 
-            <p>A continuación le compartimos los detalles registrados de su solicitud de agrupación.</p>
+            @if($correo['textos']['introduccion'])
+            <p>{{ $correo['textos']['introduccion'] }}</p>
+            @endif
 
             <p class="section-title">Datos del encargado</p>
             <div class="info-section">
@@ -205,14 +210,13 @@
                 @endif
             </div>
 
-            <hr class="divider">
-
-            <p style="color: #999; font-size: 12px;">Este es un correo automático del Sistema de Gestión de Actividades Complementarias. Por favor, no responda a este correo.</p>
+            @include('emails.partials.cierre')
         </div>
 
         <div class="email-footer">
-            <p><strong>Sistema de Gestión de Actividades Complementarias</strong></p>
-            <p>CTP Corralillo</p>
+            @if($correo['textos']['pie_pagina'])
+            <p>{{ $correo['textos']['pie_pagina'] }}</p>
+            @endif
         </div>
     </div>
 </body>

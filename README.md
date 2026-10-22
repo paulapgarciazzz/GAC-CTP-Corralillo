@@ -70,8 +70,17 @@ Resend rechace el envío si la API Key está limitada a ese subdominio.
 
 PHPUnit usa una base MariaDB separada llamada `proyecto_test`. Nunca debe usar
 `proyecto_db`, que corresponde al entorno de desarrollo. El archivo
-`backend/phpunit.xml` fuerza esta conexión, incluso cuando Docker inyecta las
-variables de desarrollo en el contenedor `app`.
+`backend/phpunit.xml` fuerza esta conexión con `<server>` además de `<env>`:
+Docker inyecta `DB_DATABASE=proyecto_db` como variable del sistema (`$_SERVER`),
+que Laravel lee antes que `$_ENV`, y `<env force="true">` por sí solo no la
+reemplaza. Si la conexión real no es `proyecto_test`, `tests/TestCase.php`
+aborta cada prueba antes de tocar la base.
+
+Para un aislamiento total se puede usar un usuario de MariaDB que solo tenga
+permisos sobre `proyecto_test` (p. ej. `laravel_test`) y ejecutar PHPUnit con
+una copia de `phpunit.xml` que use ese usuario; así, aunque algo fallara,
+MariaDB negaría el acceso a `proyecto_db`. La imagen Docker no tiene soporte
+JPEG en GD: en las pruebas usa `UploadedFile::fake()->image('x.png')`.
 
 El servicio `db` crea `proyecto_test` automáticamente en una instalación nueva
 mediante el script de inicialización montado en
@@ -117,26 +126,80 @@ lo que también funcionan con la configuración en caché:
 No uses `migrate:fresh` con el entorno normal ni intentes saltarte estas
 protecciones.
 
-### Arranque del contenedor `app` (migraciones y seeders automáticos)
+### Arranque del contenedor `app` (migraciones y seeders bajo autorización)
 
-`docker/php/entrypoint.sh` ejecuta en **cada arranque** del contenedor `app`
-(`docker compose up`, `restart` o `start`), sobre `proyecto_db`:
+`docker/php/entrypoint.sh` **no** ejecuta migraciones ni seeders por su cuenta:
+en cada arranque solo informa qué migraciones están pendientes
+(`migrate:status --pending`) y arranca `php-fpm`. El script se monta desde el
+repositorio (`./docker/php/entrypoint.sh`), así que sus cambios aplican sin
+reconstruir la imagen.
+
+**Procedimiento recomendado** para aplicar migraciones o seeders: contenedores
+temporales que se ejecutan una sola vez, sin el entrypoint.
 
 ```bash
-php artisan migrate --force --no-interaction
-php artisan db:seed --force --no-interaction
+# 1. Respaldo verificable (fuera del repositorio: contiene datos personales y hashes de contraseñas)
+docker exec laravel_mariadb mariadb-dump -ularavel_user -p --single-transaction --routines --triggers proyecto_db > respaldo.sql
+
+# 2. Revisar qué se ejecutaría (no modifica nada)
+docker compose run --rm --no-deps --entrypoint "" app php artisan migrate:status
+docker compose run --rm --no-deps --entrypoint "" app php artisan migrate --pretend
+
+# 3. Aplicar una sola vez
+docker compose run --rm --no-deps --entrypoint "" app php artisan migrate --force
+docker compose run --rm --no-deps --entrypoint "" app php artisan db:seed --class=PermisosSeeder --force
+
+# 4. Arranque normal
+docker compose up -d
 ```
 
-Esto aplica las migraciones pendientes y corre `DatabaseSeeder`, incluido
-`PermisosSeeder`. Ambos son aditivos y no borran datos, pero se ejecutan sin
-pedir confirmación. Para evitar migraciones o seeders no autorizados:
+Los comandos destructivos (`migrate:fresh`, `refresh`, `reset`, `rollback`,
+`db:wipe`) están bloqueados sobre `proyecto_db`.
 
-- Antes de levantar `app`, revisa qué migraciones llegaron con el último
-  `git pull` (`git diff --stat HEAD@{1} -- backend/database`).
-- Para trabajar solo con la base sin disparar el entrypoint, levanta únicamente
-  el servicio `db`: `docker compose up -d db`.
-- Para consultar el estado de las migraciones sin ejecutar el entrypoint:
-  `docker compose run --rm --no-deps --entrypoint "" app php artisan migrate:status`.
-- Define `ADMIN_NAME`, `ADMIN_EMAIL` y `ADMIN_PASSWORD` en `backend/.env`
-  antes de levantar `app`. Si faltan, `PermisosSeeder` falla, y como el script
-  usa `set -e`, el contenedor se detiene sin arrancar `php-fpm`.
+Notas:
+
+- Antes de migrar, revisa qué migraciones llegaron con el último `git pull`:
+  `git diff --stat HEAD@{1} -- backend/database`.
+- `PermisosSeeder` necesita `ADMIN_NAME`, `ADMIN_EMAIL` y `ADMIN_PASSWORD` en
+  `backend/.env`. Es idempotente: crea los permisos y el rol que falten, y el
+  usuario administrador solo si no existe (nunca cambia su contraseña).
+- Existen las variables `RUN_MIGRATIONS` y `RUN_SEEDERS` (por defecto `false`)
+  para que el entrypoint migre o siembre al arrancar, pero **no se recomiendan**:
+  `RUN_MIGRATIONS=true docker compose up -d` deja la variable guardada en el
+  contenedor, y cada reinicio posterior volvería a ejecutar migraciones y
+  seeders sin pedir autorización. Si alguna vez se usan, recrea después el
+  contenedor sin ellas (`docker compose up -d --force-recreate app`).
+
+## Módulo de Personalización
+
+Desde *Ajustes › Personalización del sistema* (permisos `personalizacion.ver`,
+`crear`, `editar` y `eliminar`) se administran:
+
+| Pestaña | Contenido |
+|---|---|
+| Landing page | Textos de la portada, «Conócenos», visión, misión y pie; fotos del carrusel del Hero |
+| Patrocinadores | Patrocinadores y textos de su sección |
+| Correos electrónicos | Asunto, encabezado, saludo, introducción, mensaje, despedida, firma, aviso y pie de los correos de solicitud aprobada, rechazada y detalle; escudo de los correos; vista previa sin envío |
+| Apariencia y galería | Escudo, logotipo del panel, colores institucionales y galería opcional de la landing |
+| Información de contacto | Correo, teléfono, dirección, ubicación del mapa y redes sociales |
+
+Los valores originales del sitio viven en el código
+(`backend/app/Modules/Personalizacion/Configuracion/Support/Predeterminados.php`
+y `frontend/GAC-Frontend/src/modulos/Personalizacion/publico/predeterminados.js`):
+la tabla `personalizacion` solo guarda lo que se cambia, por lo que no necesita
+seeders. Cada formulario tiene un botón para volver a los valores originales y
+cada imagen, uno para restaurar la predeterminada.
+
+### Escudo de los correos
+
+Se usa, en orden: el escudo propio de *Correos*, el de *Apariencia* o el
+original del colegio (`backend/public/img/escudo-ctp.png`, 240×240 px). Los
+correos lo enlazan con una URL absoluta, que los destinatarios solo pueden ver
+si es pública y HTTPS. Defínela en `backend/.env` del servidor:
+
+```bash
+PERSONALIZACION_URL_PUBLICA=https://dominio-del-backend
+```
+
+Si no se define se usa `APP_URL`. Las imágenes subidas se sirven desde
+`/storage`, así que el servidor necesita el enlace `php artisan storage:link`.

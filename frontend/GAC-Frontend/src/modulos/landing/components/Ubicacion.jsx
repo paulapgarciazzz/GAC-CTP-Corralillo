@@ -1,8 +1,13 @@
 import { MapPin } from 'lucide-react';
-
-const DIRECCION = '6JFF+WH Corralillo High School, Guanacaste Province, Moracia de Nicoya';
+import { usePersonalizacion } from '../../Personalizacion/publico/usePersonalizacion';
 
 export default function Ubicacion() {
+    const { contacto } = usePersonalizacion();
+    // Texto que se busca en Google Maps (Personalización › Contacto).
+    const DIRECCION = contacto.ubicacion_mapa || contacto.direccion;
+
+    if (!DIRECCION) return null;
+
     return (
         <section id="ubicacion" className="scroll-mt-24 bg-surface py-20">
             <div className="container mx-auto px-4">

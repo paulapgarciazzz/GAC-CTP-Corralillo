@@ -2,6 +2,7 @@ import Landingpage from '../modulos/landing/pages/Landingpage'
 import Dashboard from '../modulos/dashboard/pages/Dashboard'
 import { AccessGuard } from '../auth/guards/AccessGuard';
 import { Authprovider } from '../auth/context/AuthContext';
+import { PersonalizacionProvider } from '../modulos/Personalizacion/publico/PersonalizacionProvider';
 import Login from '../modulos/login/pages/LoginPage'
 
 import {
@@ -16,7 +17,9 @@ import LoginPage from '../modulos/login/pages/LoginPage';
 const rootRoute = createRootRoute({
     component:()=> 
      <Authprovider>
+     <PersonalizacionProvider>
      <Outlet/>
+     </PersonalizacionProvider>
      </Authprovider>
 })
 
