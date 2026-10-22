@@ -84,13 +84,59 @@ docker compose exec db mariadb -uroot -proot_password -e "CREATE DATABASE IF NOT
 
 Las migraciones de pruebas se ejecutan automáticamente sobre esa base mediante
 `RefreshDatabase` al correr PHPUnit. Para preparar manualmente la base sin
-riesgo, usa variables explícitas de testing:
+riesgo, limpia primero la configuración en caché (si existe, Laravel ignora las
+variables de entorno) y usa variables explícitas de testing:
 
 ```bash
+docker compose exec app php artisan config:clear
 docker compose exec app sh -c "DB_CONNECTION=mysql DB_HOST=db DB_PORT=3306 DB_DATABASE=proyecto_test DB_USERNAME=laravel_user DB_PASSWORD=laravel_password php artisan migrate --force"
-docker compose exec app php artisan test
+docker compose exec app composer test
 ```
 
-`RefreshDatabase` y cualquier `migrate:fresh` ejecutado por PHPUnit quedan
-limitados a `proyecto_test`. No uses `migrate:fresh` con el entorno normal,
-porque podría borrar los datos de `proyecto_db`.
+`composer test` ejecuta `config:clear` antes de `php artisan test`.
+
+### Protecciones de `proyecto_db`
+
+Tras el incidente del 2026-10-11/12 (un `php artisan test` vació `proyecto_db`
+con `migrate:fresh`), hay dos protecciones que no dependen de `phpunit.xml` ni
+de los `.env*`, sino de la base de datos ya resuelta en tiempo de ejecución, por
+lo que también funcionan con la configuración en caché:
+
+1. `AppServiceProvider` llama a `DB::prohibitDestructiveCommands()` cuando
+   **cualquier** conexión configurada apunta a `proyecto_db`, no solo la
+   predeterminada, porque `--database=` puede elegir otra. La base de cada
+   conexión se calcula aplicando `DB_URL` igual que Laravel al conectarse (la
+   URL tiene prioridad sobre `DB_DATABASE`). Si la configuración no se puede
+   interpretar, también se bloquea. Así quedan bloqueados `migrate:fresh`,
+   `migrate:refresh`, `migrate:reset`, `migrate:rollback` y `db:wipe`, incluso
+   con `--force`. `migrate` y `db:seed` siguen permitidos.
+2. `tests/TestCase.php` aborta cada prueba al crear la aplicación, antes de
+   `RefreshDatabase` o de cualquier otra operación de base de datos, si la
+   conexión no apunta a `proyecto_test`.
+
+No uses `migrate:fresh` con el entorno normal ni intentes saltarte estas
+protecciones.
+
+### Arranque del contenedor `app` (migraciones y seeders automáticos)
+
+`docker/php/entrypoint.sh` ejecuta en **cada arranque** del contenedor `app`
+(`docker compose up`, `restart` o `start`), sobre `proyecto_db`:
+
+```bash
+php artisan migrate --force --no-interaction
+php artisan db:seed --force --no-interaction
+```
+
+Esto aplica las migraciones pendientes y corre `DatabaseSeeder`, incluido
+`PermisosSeeder`. Ambos son aditivos y no borran datos, pero se ejecutan sin
+pedir confirmación. Para evitar migraciones o seeders no autorizados:
+
+- Antes de levantar `app`, revisa qué migraciones llegaron con el último
+  `git pull` (`git diff --stat HEAD@{1} -- backend/database`).
+- Para trabajar solo con la base sin disparar el entrypoint, levanta únicamente
+  el servicio `db`: `docker compose up -d db`.
+- Para consultar el estado de las migraciones sin ejecutar el entrypoint:
+  `docker compose run --rm --no-deps --entrypoint "" app php artisan migrate:status`.
+- Define `ADMIN_NAME`, `ADMIN_EMAIL` y `ADMIN_PASSWORD` en `backend/.env`
+  antes de levantar `app`. Si faltan, `PermisosSeeder` falla, y como el script
+  usa `set -e`, el contenedor se detiene sin arrancar `php-fpm`.
