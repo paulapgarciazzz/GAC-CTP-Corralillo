@@ -16,6 +16,19 @@ export function obtenerFechaLocalISO() {
     return `${anio}-${mes}-${dia}`;
 }
 
+/**
+ * Fecha actual en America/Costa_Rica como "YYYY-MM-DD", sin depender de la
+ * zona horaria del navegador de quien use el panel (puede no ser la misma).
+ */
+export function obtenerFechaCostaRicaISO() {
+    return new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Costa_Rica',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    }).format(new Date());
+}
+
 const formatearISOLocal = (date) => {
     const anio = date.getFullYear();
     const mes = String(date.getMonth() + 1).padStart(2, '0');

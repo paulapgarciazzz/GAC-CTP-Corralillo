@@ -1,4 +1,4 @@
-import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, Boxes, UserRoundArrowLeft, BookUser, SquareLibrary, CirclePile, ShieldAlert, Settings, ClipboardList, FileBarChart2, MapPin, Paintbrush } from "lucide-react";
+import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, Boxes, UserRoundArrowLeft, BookUser, SquareLibrary, CirclePile, ShieldAlert, Settings, ClipboardList, FileBarChart2, MapPin, Paintbrush, Activity } from "lucide-react";
 import { useState } from "react"
 import logoOriginal from '../../../assets/logo.png'
 import { usePersonalizacion } from '../../Personalizacion/publico/usePersonalizacion'
@@ -31,6 +31,12 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
             children: [
                 {name: "Gestión del Calendario", icon: CalendarDays},
                 {name: "Gestión de Ubicaciones", icon: MapPin},
+            ]
+        },
+        {name: "Conteo", icon: Activity, active:false, modulo: "conteo",
+            children: [
+                {name: "Panel de conteo", icon: Activity},
+                {name: "Reportes de conteo", icon: FileBarChart2},
             ]
         },
         {name: "Gestion de Usuarios", icon: UserCog, active:false, modulo: "usuarios",

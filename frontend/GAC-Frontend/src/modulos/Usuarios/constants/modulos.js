@@ -1,4 +1,4 @@
-import { CalendarDays, ClipboardMinus, FileUser, Paintbrush, ShelvingUnit, UserCog } from 'lucide-react';
+import { Activity, CalendarDays, ClipboardMinus, FileUser, Paintbrush, ShelvingUnit, UserCog } from 'lucide-react';
 
 /**
  * Fuente única de módulos y acciones del sistema de permisos.
@@ -12,6 +12,7 @@ export const MODULOS = [
     { slug: 'usuarios', nombre: 'Gestión de Usuarios', icono: UserCog },
     { slug: 'reportes', nombre: 'Reportes', icono: ClipboardMinus },
     { slug: 'personalizacion', nombre: 'Personalización', icono: Paintbrush },
+    { slug: 'conteo', nombre: 'Conteo de personas', icono: Activity },
 ];
 
 export const ACCIONES = [
