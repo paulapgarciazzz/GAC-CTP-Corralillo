@@ -17,6 +17,7 @@ final class Modulos
         'usuarios',
         'reportes',
         'personalizacion',
+        'conteo',
     ];
 
     public const ACCIONES = ['ver', 'crear', 'editar', 'eliminar'];

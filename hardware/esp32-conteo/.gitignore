@@ -1,0 +1,3 @@
+# Credenciales reales (WiFi y tokens de sensor): nunca al repositorio.
+esp32_conteo/config.h
+build/
