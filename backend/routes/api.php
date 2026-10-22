@@ -28,6 +28,11 @@ use App\Modules\Beneficios\Controllers\TransporteController;
 use App\Modules\Personalizacion\Patrocinadores\Controllers\ConfiguracionPatrocinadoresController;
 use App\Modules\Personalizacion\Patrocinadores\Controllers\PatrocinadorController;
 use App\Modules\Personalizacion\Patrocinadores\Controllers\PatrocinadorPublicoController;
+use App\Modules\Personalizacion\Configuracion\Controllers\FotoPersonalizacionController;
+use App\Modules\Personalizacion\Configuracion\Controllers\PersonalizacionController;
+use App\Modules\Personalizacion\Configuracion\Controllers\PersonalizacionPublicaController;
+use App\Modules\Personalizacion\Configuracion\Controllers\VistaPreviaCorreoController;
+use App\Modules\Personalizacion\Configuracion\Support\Predeterminados;
 
 Route::pattern('agrupacion', '[0-9]+');
 Route::pattern('id', '[0-9]+');
@@ -35,6 +40,7 @@ Route::pattern('actividad', '[0-9]+');
 Route::pattern('ubicacion', '[0-9]+');
 Route::pattern('patrocinador', '[0-9]+');
 Route::pattern('usuario', '[0-9]+');
+Route::pattern('foto', '[0-9]+');
 
 /*
 |--------------------------------------------------------------------------
@@ -406,4 +412,77 @@ Route::middleware('auth:sanctum')->group(function () {
         'patrocinadores/{patrocinador}',
         [PatrocinadorController::class, 'destroy']
     )->middleware('can:personalizacion.eliminar');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Personalización: Landing, Correos, Apariencia y galería, Contacto
+|--------------------------------------------------------------------------
+*/
+
+// Público: textos, contacto, colores, escudo/logo y fotos activas de la landing.
+// Nunca incluye los textos de los correos.
+Route::get(
+    'public/personalizacion',
+    [PersonalizacionPublicaController::class, 'index']
+);
+
+Route::middleware('auth:sanctum')->prefix('personalizacion')->group(function () {
+    // Fotos del Hero y de la galería. 'reordenar' va antes de '{foto}'.
+    Route::patch(
+        'fotos/reordenar',
+        [FotoPersonalizacionController::class, 'reordenar']
+    )->middleware('can:personalizacion.editar');
+
+    Route::get(
+        'fotos',
+        [FotoPersonalizacionController::class, 'index']
+    )->middleware('can:personalizacion.ver');
+
+    Route::post(
+        'fotos',
+        [FotoPersonalizacionController::class, 'store']
+    )->middleware('can:personalizacion.crear');
+
+    Route::put(
+        'fotos/{foto}',
+        [FotoPersonalizacionController::class, 'update']
+    )->middleware('can:personalizacion.editar');
+
+    Route::delete(
+        'fotos/{foto}',
+        [FotoPersonalizacionController::class, 'destroy']
+    )->middleware('can:personalizacion.eliminar');
+
+    // Vista previa de un correo con datos de ejemplo: no envía ni guarda nada.
+    Route::post(
+        'correos/vista-previa',
+        VistaPreviaCorreoController::class
+    )->middleware('can:personalizacion.ver');
+
+    // Textos de cada sección.
+    Route::get(
+        '{seccion}',
+        [PersonalizacionController::class, 'show']
+    )->whereIn('seccion', Predeterminados::SECCIONES)
+        ->middleware('can:personalizacion.ver');
+
+    Route::put(
+        '{seccion}',
+        [PersonalizacionController::class, 'update']
+    )->whereIn('seccion', Predeterminados::SECCIONES)
+        ->middleware('can:personalizacion.editar');
+
+    // Escudo/logo: subir uno propio o volver al predeterminado.
+    Route::post(
+        '{seccion}/imagenes/{campo}',
+        [PersonalizacionController::class, 'subirImagen']
+    )->whereIn('seccion', array_keys(Predeterminados::IMAGENES))
+        ->middleware('can:personalizacion.editar');
+
+    Route::delete(
+        '{seccion}/imagenes/{campo}',
+        [PersonalizacionController::class, 'restaurarImagen']
+    )->whereIn('seccion', array_keys(Predeterminados::IMAGENES))
+        ->middleware('can:personalizacion.editar');
 });

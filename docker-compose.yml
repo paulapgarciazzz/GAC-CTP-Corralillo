@@ -4,10 +4,19 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
     container_name: laravel_app
+    # El entrypoint se monta desde el repositorio para que sus cambios
+    # apliquen sin reconstruir la imagen (la imagen guarda una copia antigua).
+    entrypoint: ["sh", "/usr/local/bin/entrypoint.sh"]
+    command: ["php-fpm"]
     volumes:
       - ./backend:/var/www
       - backend_vendor:/var/www/vendor
+      - ./docker/php/entrypoint.sh:/usr/local/bin/entrypoint.sh:ro
     environment:
+      # Migraciones y seeders solo con autorización explícita. Recomendado:
+      # contenedor temporal (ver README), no activar estas variables.
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-false}
+      RUN_SEEDERS: ${RUN_SEEDERS:-false}
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306

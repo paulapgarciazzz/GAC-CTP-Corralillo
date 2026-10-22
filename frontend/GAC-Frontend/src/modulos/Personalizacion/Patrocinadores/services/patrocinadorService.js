@@ -1,5 +1,6 @@
 import api from '../../../../services/axios';
 import { manejarError } from '../../../../services/manejoErrores';
+import { MULTIPART } from '../../services/personalizacionService';
 
 // FormData convierte los booleanos en "true"/"false", que la regla `boolean` de Laravel rechaza.
 const construirFormData = (datos) => {
@@ -24,7 +25,7 @@ export const obtenerPatrocinadores = async () => {
 
 export const crearPatrocinador = async (datos) => {
     try {
-        const response = await api.post('/patrocinadores', construirFormData(datos));
+        const response = await api.post('/patrocinadores', construirFormData(datos), MULTIPART);
         return { success: true, data: response.data.data };
     } catch (error) {
         return manejarError(error, 'No se pudo crear el patrocinador.');
@@ -35,7 +36,7 @@ export const actualizarPatrocinador = async (id, datos) => {
     try {
         const formData = construirFormData(datos);
         formData.append('_method', 'PUT');
-        const response = await api.post(`/patrocinadores/${encodeURIComponent(id)}`, formData);
+        const response = await api.post(`/patrocinadores/${encodeURIComponent(id)}`, formData, MULTIPART);
         return { success: true, data: response.data.data };
     } catch (error) {
         return manejarError(error, 'No se pudo actualizar el patrocinador.');

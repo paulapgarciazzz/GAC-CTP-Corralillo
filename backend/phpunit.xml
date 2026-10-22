@@ -18,6 +18,21 @@
         </include>
     </source>
     <php>
+        <!--
+            Docker inyecta DB_DATABASE=proyecto_db como variable del sistema, que
+            llega a $_SERVER. <env force="true"> solo cambia $_ENV y putenv(), y
+            Laravel lee $_SERVER primero: sin estas líneas las pruebas apuntarían
+            a proyecto_db (causa del incidente del 2026-10-11/12). PHPUnit siempre
+            sobrescribe $_SERVER con <server>.
+        -->
+        <server name="DB_CONNECTION" value="mysql"/>
+        <server name="DB_HOST" value="db"/>
+        <server name="DB_PORT" value="3306"/>
+        <server name="DB_DATABASE" value="proyecto_test"/>
+        <server name="DB_USERNAME" value="laravel_user"/>
+        <server name="DB_PASSWORD" value="laravel_password"/>
+        <server name="DB_URL" value=""/>
+        <server name="MAIL_MAILER" value="array"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
