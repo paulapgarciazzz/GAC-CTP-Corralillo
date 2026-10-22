@@ -1,0 +1,4 @@
+# Entorno virtual local y cola de eventos pendientes del puente.
+.venv/
+pendientes.jsonl
+__pycache__/
