@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Modules\Conteo\Middleware\AutenticarSensor;
 use App\Modules\Usuarios\Support\Modulos;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Throwable;
 
@@ -41,6 +45,14 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(fn ($user) => $user->hasRole(Modulos::ROL_ADMIN) ? true : null);
 
         DB::prohibitDestructiveCommands($this->algunaConexionApuntaABaseProtegida());
+
+        // Dispositivos de conteo: se limita antes de autenticar, para frenar
+        // intentos de adivinar tokens. Un sensor real queda muy por debajo
+        // (una detección cada pocos segundos y un latido por minuto); ante un
+        // 429 el firmware reintenta más tarde con el mismo evento.
+        RateLimiter::for('sensores', fn (Request $request) => Limit::perMinute(120)->by(
+            $request->ip() . '|' . $request->header(AutenticarSensor::CABECERA_CODIGO)
+        ));
     }
 
     /**
