@@ -30,6 +30,8 @@ const VISTAS = {
     'Lista de Usuarios': { modulo: 'usuarios', Pagina: lazy(() => import('../../Usuarios/pages/ListaUsuarios')) },
     'Roles y Permisos': { modulo: 'usuarios', Pagina: lazy(() => import('../../Usuarios/pages/RolesPermisos')) },
     'Personalización del sistema': { modulo: 'personalizacion', Pagina: lazy(() => import('../../Personalizacion/pages/PersonalizacionPage')) },
+    'Panel de conteo': { modulo: 'conteo', Pagina: lazy(() => import('../../Conteo/pages/PanelConteo')) },
+    'Reportes de conteo': { modulo: 'conteo', Pagina: lazy(() => import('../../Conteo/pages/ReportesConteo')) },
 };
 
 

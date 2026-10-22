@@ -1,4 +1,8 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Check, ClipboardList, UserCheck } from 'lucide-react';
+import { obtenerOcupacionPublica } from '../../Conteo/services/conteoService';
+
+const INTERVALO_MS = 15000;
 
 // Animación ligera con solo iconos de lucide-react + CSS (sin dependencias
 // nuevas) para sugerir "una persona pasando lista": el clipboard flota, el
@@ -39,16 +43,72 @@ function AnimacionConteo() {
 }
 
 export default function Contador() {
+    const [ocupacion, setOcupacion] = useState(null);
+    const [cargando, setCargando] = useState(true);
+    const [desactualizado, setDesactualizado] = useState(false);
+
+    const activoRef = useRef(true);
+    const consultandoRef = useRef(false);
+
+    const consultar = useCallback(async () => {
+        if (consultandoRef.current) return;
+        consultandoRef.current = true;
+
+        const resultado = await obtenerOcupacionPublica();
+
+        consultandoRef.current = false;
+        if (!activoRef.current) return;
+
+        if (resultado.success) {
+            setOcupacion(resultado.data.ocupacion_estimada);
+            setDesactualizado(false);
+        } else {
+            setDesactualizado(true);
+        }
+
+        setCargando(false);
+    }, []);
+
+    useEffect(() => {
+        activoRef.current = true;
+
+        (async () => {
+            await consultar();
+        })();
+
+        const intervalo = setInterval(consultar, INTERVALO_MS);
+
+        return () => {
+            activoRef.current = false;
+            clearInterval(intervalo);
+        };
+    }, [consultar]);
+
+    const sinDatos = !cargando && ocupacion === null;
+    const valorMostrado = ocupacion === null ? '--' : ocupacion;
+
     return (
         <section className="bg-rail py-16 text-white">
             <div className="container mx-auto grid items-center gap-10 px-4 md:grid-cols-2">
                 <div className="text-center md:text-left">
                     <p className="mb-2 text-sm uppercase tracking-widest text-white/60">Sistema de conteo</p>
                     <p className="mb-1 text-lg font-medium text-white/90">Personas en la institución</p>
-                    <p className="text-5xl font-extrabold sm:text-6xl">--</p>
-                    <p className="mx-auto mt-3 max-w-md text-sm text-white/60 md:mx-0">
-                        Este dato se actualizará automáticamente cuando el sistema de conteo esté conectado.
+                    <p className={`text-5xl font-extrabold sm:text-6xl ${cargando ? 'animate-pulse' : ''}`}>
+                        {valorMostrado}
                     </p>
+                    <p className="mx-auto mt-3 max-w-md text-sm text-white/60 md:mx-0">
+                        Ocupación estimada. Información actualizada periódicamente.
+                    </p>
+                    {sinDatos && (
+                        <p className="mx-auto mt-1 max-w-md text-xs text-white/50 md:mx-0">
+                            Información no disponible por el momento.
+                        </p>
+                    )}
+                    {!sinDatos && desactualizado && (
+                        <p className="mx-auto mt-1 max-w-md text-xs italic text-white/50 md:mx-0">
+                            Podría estar desactualizada.
+                        </p>
+                    )}
                 </div>
                 <AnimacionConteo />
             </div>

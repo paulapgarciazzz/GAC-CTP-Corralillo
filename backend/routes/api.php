@@ -25,6 +25,12 @@ use App\Modules\Beneficios\Controllers\MobiliarioController;
 use App\Modules\Beneficios\Controllers\RutaController;
 use App\Modules\Beneficios\Controllers\TransporteController;
 
+use App\Modules\Conteo\Controllers\ConteoReportController;
+use App\Modules\Conteo\Controllers\DispositivoController;
+use App\Modules\Conteo\Controllers\MovimientoConteoController;
+use App\Modules\Conteo\Controllers\OcupacionController;
+use App\Modules\Conteo\Controllers\SensorConteoController;
+
 use App\Modules\Personalizacion\Patrocinadores\Controllers\ConfiguracionPatrocinadoresController;
 use App\Modules\Personalizacion\Patrocinadores\Controllers\PatrocinadorController;
 use App\Modules\Personalizacion\Patrocinadores\Controllers\PatrocinadorPublicoController;
@@ -486,3 +492,55 @@ Route::middleware('auth:sanctum')->prefix('personalizacion')->group(function () 
     )->whereIn('seccion', array_keys(Predeterminados::IMAGENES))
         ->middleware('can:personalizacion.editar');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Conteo de personas
+|--------------------------------------------------------------------------
+| Tres tipos de acceso, ninguno anónimo con escritura:
+| - Dispositivo: ESP32 o puente serial con X-Sensor-Codigo + token Bearer
+|   propio del sensor (AutenticarSensor), con límite de peticiones.
+| - Panel: sesión y permiso conteo.ver.
+| - Público (landing): solo lectura de la ocupación estimada.
+*/
+
+Route::middleware(['throttle:sensores', 'auth.sensor'])->prefix('conteo/dispositivo')->group(function () {
+    Route::post(
+        'movimientos',
+        [MovimientoConteoController::class, 'store']
+    );
+
+    Route::post(
+        'latido',
+        [DispositivoController::class, 'latido']
+    );
+});
+
+Route::middleware(['auth:sanctum', 'can:conteo.ver'])->prefix('conteo')->group(function () {
+    Route::get(
+        'movimientos',
+        [MovimientoConteoController::class, 'index']
+    );
+
+    Route::get(
+        'ocupacion-actual',
+        [OcupacionController::class, 'actual']
+    );
+
+    Route::get(
+        'sensores',
+        [SensorConteoController::class, 'index']
+    );
+
+    Route::get(
+        'reporte',
+        [ConteoReportController::class, 'index']
+    );
+});
+
+// Público: contador de la landing. Solo la ocupación, sin detalle. La landing
+// consulta cada 15 s y muchos visitantes comparten IP (NAT de la institución).
+Route::get(
+    'public/conteo/ocupacion',
+    [OcupacionController::class, 'publica']
+)->middleware('throttle:300,1');

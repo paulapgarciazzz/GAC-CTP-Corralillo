@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Permite exigir uno de varios permisos: permission:solicitudes.ver|beneficios.ver
         $middleware->alias([
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            // Dispositivos de conteo: X-Sensor-Codigo + token Bearer del sensor.
+            'auth.sensor' => \App\Modules\Conteo\Middleware\AutenticarSensor::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'api/encargados',
