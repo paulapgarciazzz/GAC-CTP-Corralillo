@@ -1,12 +1,14 @@
 import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, Boxes, UserRoundArrowLeft, BookUser, SquareLibrary, CirclePile, ShieldAlert, Settings, ClipboardList, FileBarChart2, MapPin, Paintbrush } from "lucide-react";
 import { useState } from "react"
-import logo from '../../../assets/logo.png'
+import logoOriginal from '../../../assets/logo.png'
+import { usePersonalizacion } from '../../Personalizacion/publico/usePersonalizacion'
 import { ChevronDown } from "lucide-react";
 import { ChevronRight, Lock } from "lucide-react";
 import { useAuth } from "../../../auth/hooks/useAuth";
 
 const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
     const { tieneModulo } = useAuth();
+    const { apariencia } = usePersonalizacion();
 
     const [links,setLinks] = useState([
 
@@ -76,7 +78,7 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         <aside className="print:hidden fixed left-0 top-0 h-screen bg-white dark:bg-rail overflow-hidden shadow-lg w-56 z-20 lg:mt-0 mt-14 flex flex-col">
             <div className="h-16 flex items-center justify-center px-4 border-b border-border dark:border-white/10">
                 <div className="flex items-center gap-2">
-                    <img className="h-12 w-12 shrink-0 object-contain" src={logo} alt="Escudo"/>
+                    <img className="h-12 w-12 shrink-0 object-contain" src={apariencia.logo_url || logoOriginal} alt="Escudo"/>
                         <h1 className="min-w-0 whitespace-nowrap text-lg font-bold leading-tight tracking-tight text-foreground dark:text-white">
                         CTP Corralillo
                         </h1>

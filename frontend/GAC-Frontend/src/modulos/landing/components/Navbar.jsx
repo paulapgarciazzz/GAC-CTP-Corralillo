@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import escudo from '../../../assets/escudo.png';
+import escudoOriginal from '../../../assets/escudo.png';
+import { usePersonalizacion } from '../../Personalizacion/publico/usePersonalizacion';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { useNavigate, Link } from '@tanstack/react-router';
 import {Sun, Moon, Menu, X} from 'lucide-react'
@@ -16,6 +17,7 @@ const BOTON_PELIGRO = 'px-6 py-2 bg-danger text-white rounded-lg hover:brightnes
 
 const Navbar = ({isDark, onToggleTheme}) => {
     const {isAuthenticated, logout} = useAuth();
+    const { landing, apariencia } = usePersonalizacion();
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -48,8 +50,8 @@ const Navbar = ({isDark, onToggleTheme}) => {
             <div className="container px-4 mx-auto relative text-sm">
                 <div className="flex justify-center items-center">
                     <div className= "flex items-center shrink-0">
-                        <img className="h-16 w-16 mr-2" src={escudo} alt="Escudo"/>
-                        <span className="text-xl tracking-tight">CTP de Corralillo</span>
+                        <img className="h-16 w-16 mr-2 object-contain" src={apariencia.escudo_url || escudoOriginal} alt="Escudo"/>
+                        <span className="text-xl tracking-tight">{landing.nombre_institucion}</span>
                     </div>
                     <ul className="hidden lg:flex ml-14 space-x-12">
                         {ENLACES.map(({ href, texto }) => (

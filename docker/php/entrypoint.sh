@@ -17,13 +17,31 @@ if ! grep -q "^APP_KEY=base64:" .env 2>/dev/null; then
     php artisan key:generate --force --no-interaction
 fi
 
-php artisan migrate --force --no-interaction
+# Migraciones y seeders nunca se ejecutan sin autorización explícita. Sin
+# RUN_MIGRATIONS/RUN_SEEDERS solo se informa qué migraciones están pendientes.
+# Lo recomendado es aplicarlas con un contenedor temporal (ver README):
+#   docker compose run --rm --no-deps --entrypoint "" app php artisan migrate --force
+if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
+    php artisan migrate --force --no-interaction
+else
+    echo "[entrypoint] RUN_MIGRATIONS no es 'true': no se ejecutan migraciones."
+    php artisan migrate:status --pending --no-interaction || true
+fi
 
-# Catálogos base (estados, tipos de alimentación, etc.). DatabaseSeeder solo
-# llama seeders idempotentes basados en upsert; nunca borra ni duplica datos.
-php artisan db:seed --force --no-interaction
+# Catálogos base y permisos. DatabaseSeeder solo llama seeders idempotentes;
+# nunca borra ni duplica datos.
+if [ "${RUN_SEEDERS:-false}" = "true" ]; then
+    php artisan db:seed --force --no-interaction
+else
+    echo "[entrypoint] RUN_SEEDERS no es 'true': no se ejecutan seeders."
+fi
 
 chmod -R 775 storage bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 
-exec php-fpm
+# Sin argumentos (p. ej. con la imagen anterior) arranca php-fpm.
+if [ "$#" -eq 0 ]; then
+    set -- php-fpm
+fi
+
+exec "$@"
