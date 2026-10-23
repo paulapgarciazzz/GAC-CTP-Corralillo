@@ -10,20 +10,21 @@ final class Modulos
 {
     public const ROL_ADMIN = 'admin';
 
-    public const MODULOS = [
-        'solicitudes',
-        'beneficios',
-        'calendario',
-        'usuarios',
-        'reportes',
-        'personalizacion',
-        'conteo',
-    ];
-
     public const ACCIONES = ['ver', 'crear', 'editar', 'eliminar'];
 
     /** Acción base: tener cualquier acción de un módulo implica poder verlo. */
     public const ACCION_BASE = 'ver';
+
+    /** Acciones que usa cada módulo; los de solo consulta tienen únicamente la acción base. */
+    public const MODULOS = [
+        'solicitudes' => self::ACCIONES,
+        'beneficios' => self::ACCIONES,
+        'calendario' => self::ACCIONES,
+        'usuarios' => self::ACCIONES,
+        'reportes' => [self::ACCION_BASE],
+        'personalizacion' => self::ACCIONES,
+        'conteo' => [self::ACCION_BASE],
+    ];
 
     /**
      * Lista completa de permisos con formato "{modulo}.{accion}".
@@ -34,8 +35,8 @@ final class Modulos
     {
         $permisos = [];
 
-        foreach (self::MODULOS as $modulo) {
-            foreach (self::ACCIONES as $accion) {
+        foreach (self::MODULOS as $modulo => $acciones) {
+            foreach ($acciones as $accion) {
                 $permisos[] = "{$modulo}.{$accion}";
             }
         }

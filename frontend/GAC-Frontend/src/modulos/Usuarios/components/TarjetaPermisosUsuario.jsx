@@ -16,6 +16,7 @@ const mismosPermisos = (a, b) => a.size === b.size && [...a].every((p) => b.has(
 const FilaModulo = memo(function FilaModulo({ modulo, activas, editable, onToggleModulo, onToggleAccion }) {
     const acciones = activas ? activas.split(',') : [];
     const encendido = acciones.length > 0;
+    const soloVer = modulo.acciones.length === 1;
     const Icono = modulo.icono;
 
     return (
@@ -27,7 +28,7 @@ const FilaModulo = memo(function FilaModulo({ modulo, activas, editable, onToggl
                 <div className="min-w-0 flex-1">
                     <p className="text-[15px] font-semibold text-foreground truncate">{modulo.nombre}</p>
                     <p className="text-xs text-foreground-faint">
-                        {encendido ? `${acciones.length} de ${ACCIONES.length} permisos` : 'Sin acceso'}
+                        {!encendido ? 'Sin acceso' : soloVer ? 'Solo consulta' : `${acciones.length} de ${modulo.acciones.length} permisos`}
                     </p>
                 </div>
                 <Switch
@@ -38,12 +39,12 @@ const FilaModulo = memo(function FilaModulo({ modulo, activas, editable, onToggl
                 />
             </div>
 
-            {encendido && (
+            {encendido && !soloVer && (
                 <div className="mt-2 mx-2 p-3 rounded-lg bg-background border border-border
                     transition-[opacity,translate] duration-200 starting:opacity-0 starting:-translate-y-1 motion-reduce:transition-none">
                     <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-foreground-faint">Permisos</p>
                     <ul aria-label={`Permisos en ${modulo.nombre}`} className="grid grid-cols-2 gap-x-4 gap-y-3">
-                        {ACCIONES.map((accion) => {
+                        {modulo.acciones.map((accion) => {
                             const esBase = accion.clave === ACCION_POR_DEFECTO;
                             return (
                                 <li key={accion.clave} className="flex items-center justify-between gap-2" title={esBase ? 'Apagarlo quita el acceso al módulo' : undefined}>
@@ -139,7 +140,7 @@ function TarjetaPermisosUsuario({ usuario, editable, onGuardado }) {
                     <FilaModulo
                         key={modulo.slug}
                         modulo={modulo}
-                        activas={ACCIONES.filter((a) => seleccion.has(permiso(modulo.slug, a.clave))).map((a) => a.clave).join(',')}
+                        activas={modulo.acciones.filter((a) => seleccion.has(permiso(modulo.slug, a.clave))).map((a) => a.clave).join(',')}
                         editable={editable && !guardando}
                         onToggleModulo={onToggleModulo}
                         onToggleAccion={onToggleAccion}

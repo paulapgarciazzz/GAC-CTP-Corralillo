@@ -16,13 +16,20 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (loading) return;
         setError('');
-        const result = await login(email, password);
         setLoading(true);
-        if(result.success){
-            navigate({to:'/dashboard'});
-        }else{
-            setError(result.error || 'Error al iniciar sesion');
+        try {
+            const result = await login(email, password);
+            if(result.success){
+                navigate({to:'/dashboard'});
+            }else{
+                setError(result.error || 'Error al iniciar sesion');
+            }
+        } catch {
+            setError('Error al iniciar sesion');
+        } finally {
+            setLoading(false);
         }
     };
     return (

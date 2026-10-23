@@ -1,5 +1,6 @@
 import Topbar from '../components/Topbar';
 import Sidebar from '../components/Sidebar';
+import Inicio from '../components/Inicio';
 import { lazy, Suspense, useState } from 'react'
 import { useEffect } from 'react';
 import { getRouteApi } from '@tanstack/react-router';
@@ -19,19 +20,18 @@ const VISTAS = {
     'Gestión de Agrupaciones': { modulo: 'solicitudes', Pagina: lazy(() => import('../../Agrupaciones/pages/GestionAgrupaciones')) },
     'Reportes de Solicitudes': { modulo: 'reportes', Pagina: lazy(() => import('../../Reportes/pages/Reportes_agrupaciones/ReportesAgrupaciones')) },
     'Reportes de Actividades': { modulo: 'reportes', Pagina: lazy(() => import('../../Reportes/pages/Reportes_actividades/ReportesActividades')) },
-    'Gestión de beneficios': { modulo: 'beneficios', Pagina: lazy(() => import('../../Beneficios/pages/GestionBeneficios')) },
-    'Asignar beneficios': { modulo: 'beneficios', Pagina: lazy(() => import('../../Beneficios/pages/AsignarBeneficios')) },
-    'Ver beneficios asignados': { modulo: 'beneficios', Pagina: lazy(() => import('../../Beneficios/pages/VerBeneficiosAsignados')) },
-    'Reportes de beneficios': { modulo: 'reportes', Pagina: lazy(() => import('../../Beneficios/pages/ReportesBeneficios')) },
-    'Gestión de agrupaciones': { modulo: 'solicitudes', Pagina: lazy(() => import('../../Agrupaciones/pages/GestionAgrupacionesAjustes')) },
-    'Gestión de encargados': { modulo: 'solicitudes', Pagina: lazy(() => import('../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes')) },
+    'Gestión de Beneficios': { modulo: 'beneficios', Pagina: lazy(() => import('../../Beneficios/pages/GestionBeneficios')) },
+    'Asignar Beneficios': { modulo: 'beneficios', Pagina: lazy(() => import('../../Beneficios/pages/AsignarBeneficios')) },
+    'Ver Beneficios Asignados': { modulo: 'beneficios', Pagina: lazy(() => import('../../Beneficios/pages/VerBeneficiosAsignados')) },
+    'Reportes de Beneficios': { modulo: 'reportes', Pagina: lazy(() => import('../../Beneficios/pages/ReportesBeneficios')) },
+    'Gestión de Encargados': { modulo: 'solicitudes', Pagina: lazy(() => import('../../SolicitudesAgrupaciones/pages/GestionEncargadosAjustes')) },
     'Gestión de Ubicaciones': { modulo: 'calendario', Pagina: lazy(() => import('../../Calendario/pages/GestionUbicacionesAjustes')) },
     'Gestión del Calendario': { modulo: 'calendario', Pagina: lazy(() => import('../../Calendario/pages/Calendario')) },
     'Lista de Usuarios': { modulo: 'usuarios', Pagina: lazy(() => import('../../Usuarios/pages/ListaUsuarios')) },
     'Roles y Permisos': { modulo: 'usuarios', Pagina: lazy(() => import('../../Usuarios/pages/RolesPermisos')) },
-    'Personalización del sistema': { modulo: 'personalizacion', Pagina: lazy(() => import('../../Personalizacion/pages/PersonalizacionPage')) },
-    'Panel de conteo': { modulo: 'conteo', Pagina: lazy(() => import('../../Conteo/pages/PanelConteo')) },
-    'Reportes de conteo': { modulo: 'conteo', Pagina: lazy(() => import('../../Conteo/pages/ReportesConteo')) },
+    'Personalización del Sistema': { modulo: 'personalizacion', Pagina: lazy(() => import('../../Personalizacion/pages/PersonalizacionPage')) },
+    'Panel de Conteo': { modulo: 'conteo', Pagina: lazy(() => import('../../Conteo/pages/PanelConteo')) },
+    'Reportes de Conteo': { modulo: 'conteo', Pagina: lazy(() => import('../../Conteo/pages/ReportesConteo')) },
 };
 
 
@@ -105,11 +105,7 @@ const Dashboard =()=>{
                     isMobile={isMobile}
                 />
                 <main className="p-4 sm:p-6">
-                    {selectedView === null && (
-                        <section className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
-                            <h1 className="text-2xl font-semibold text-foreground">Panel principal</h1>
-                        </section>
-                    )}
+                    {selectedView === null && <Inicio onAbrir={setSelectedView} />}
                     {vista && (tieneModulo(vista.modulo) ? (
                         <Suspense fallback={<EstadoCargando />}>
                             <vista.Pagina key={selectedView} />

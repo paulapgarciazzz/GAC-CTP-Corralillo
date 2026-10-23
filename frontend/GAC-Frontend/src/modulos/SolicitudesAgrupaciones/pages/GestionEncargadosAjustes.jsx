@@ -77,8 +77,8 @@ export default function GestionEncargadosAjustes() {
     return (
         <div className="space-y-5">
             <div>
-                <p className="text-sm text-foreground-faint">Ajustes</p>
-                <h1 className="text-2xl font-bold text-primary">Gestión de encargados</h1>
+                <p className="text-sm text-foreground-faint">Solicitudes</p>
+                <h1 className="text-2xl font-bold text-primary">Gestión de Encargados</h1>
                 <p className="mt-1 text-sm text-foreground-soft">Administra los encargados registrados y sus datos asociados.</p>
             </div>
             <Aviso tipo="exito" mensaje={mensajeExito} />

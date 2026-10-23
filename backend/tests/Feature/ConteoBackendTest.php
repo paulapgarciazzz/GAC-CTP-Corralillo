@@ -281,7 +281,7 @@ class ConteoBackendTest extends TestCase
 
     public function test_la_sesion_del_panel_no_sirve_para_registrar_movimientos(): void
     {
-        $this->usuarioCon(['conteo.ver', 'conteo.crear']);
+        $this->usuarioCon(['conteo.ver']);
 
         $this->postJson(self::URL_MOVIMIENTOS, ['identificador_evento' => 'evt-1'])->assertUnauthorized();
     }

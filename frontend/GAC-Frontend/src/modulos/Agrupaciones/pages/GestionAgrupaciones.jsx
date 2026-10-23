@@ -2,17 +2,21 @@ import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import Aviso from '../../../components/Aviso';
 import BarraBusqueda from '../../../components/BarraBusqueda';
-import { obtenerAgrupacionesAprobadas } from '../services/agrupacionService';
+import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
+import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
+import { eliminarAgrupacion, obtenerAgrupacionesAprobadas } from '../services/agrupacionService';
 import TarjetaAgrupacion from '../components/TarjetaAgrupacion';
 import ModalEditarAgrupacion from '../components/ModalEditarAgrupacion';
 import ModalDetalleAgrupacion from '../components/ModalDetalleAgrupacion';
+import DetalleEliminacionAgrupacion from '../components/DetalleEliminacionAgrupacion';
 import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 
 export default function GestionAgrupaciones() {
-    const { puedeEditar } = usePermisosModulo('solicitudes');
+    const { puedeEditar, puedeEliminar } = usePermisosModulo('solicitudes');
     const [agrupaciones, setAgrupaciones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [mensajeExito, setMensajeExito] = useState('');
     const [agrupacionDetalle, setAgrupacionDetalle] = useState(null);
     const [agrupacionEditar, setAgrupacionEditar] = useState(null);
     const [busqueda, setBusqueda] = useState('');
@@ -33,6 +37,14 @@ export default function GestionAgrupaciones() {
         setAgrupaciones((prev) => prev.map((a) => (a.id === agrupacionActualizada.id ? agrupacionActualizada : a)));
     };
 
+    const eliminacion = useConfirmarEliminacion(
+        (agrupacion) => eliminarAgrupacion(agrupacion.id),
+        (eliminada) => {
+            setAgrupaciones((prev) => prev.filter((a) => a.id !== eliminada.id));
+            setMensajeExito('Agrupación eliminada correctamente.');
+        },
+    );
+
     const terminoBusqueda = busqueda.trim().toLowerCase();
     const agrupacionesFiltradas = terminoBusqueda
         ? agrupaciones.filter((agrupacion) =>
@@ -52,6 +64,7 @@ export default function GestionAgrupaciones() {
                 className="w-full sm:max-w-xs"
             />
 
+            <Aviso tipo="exito" mensaje={mensajeExito} />
             <Aviso mensaje={error} />
 
             {loading ? (
@@ -74,6 +87,7 @@ export default function GestionAgrupaciones() {
                             agrupacion={agrupacion}
                             onVerDetalle={setAgrupacionDetalle}
                             onEditar={puedeEditar ? setAgrupacionEditar : undefined}
+                            onEliminar={puedeEliminar ? eliminacion.abrir : undefined}
                         />
                     ))}
                 </div>
@@ -90,6 +104,18 @@ export default function GestionAgrupaciones() {
                 agrupacion={agrupacionEditar}
                 onClose={() => setAgrupacionEditar(null)}
                 onActualizado={handleActualizado}
+            />
+
+            <ModalConfirmarEliminacion
+                open={Boolean(eliminacion.elemento)}
+                titulo="Eliminar agrupación"
+                nombre={eliminacion.elemento && `la agrupación ${eliminacion.elemento.nombre || 'sin nombre'}`}
+                advertencia={eliminacion.elemento && <DetalleEliminacionAgrupacion agrupacion={eliminacion.elemento} />}
+                textoBoton="Eliminar agrupación"
+                loading={eliminacion.eliminando}
+                error={eliminacion.error}
+                onClose={eliminacion.cerrar}
+                onConfirm={eliminacion.confirmar}
             />
         </div>
     );

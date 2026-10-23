@@ -1,7 +1,7 @@
-import { Pencil, Users } from 'lucide-react';
+import { Pencil, Trash2, Users } from 'lucide-react';
 
-// `onEditar` es opcional: sin él no se muestra el botón de editar.
-export default function TarjetaAgrupacion({ agrupacion, onVerDetalle, onEditar }) {
+// `onEditar` y `onEliminar` son opcionales: sin ellos no se muestra el botón.
+export default function TarjetaAgrupacion({ agrupacion, onVerDetalle, onEditar, onEliminar }) {
     return (
         <div
             onClick={() => onVerDetalle(agrupacion)}
@@ -25,16 +25,28 @@ export default function TarjetaAgrupacion({ agrupacion, onVerDetalle, onEditar }
                         Miembros: {agrupacion.cantidad_integrantes}
                     </span>
 
-                    {onEditar && (
+                    {(onEditar || onEliminar) && (
                         <div className="flex items-center gap-1 shrink-0">
-                            <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); onEditar(agrupacion); }}
-                                aria-label={`Editar ${agrupacion.nombre}`}
-                                className="p-1 rounded-md border border-primary text-primary hover:bg-primary/10 transition-colors cursor-pointer"
-                            >
-                                <Pencil size={12} />
-                            </button>
+                            {onEditar && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); onEditar(agrupacion); }}
+                                    aria-label={`Editar ${agrupacion.nombre}`}
+                                    className="p-1 rounded-md border border-primary text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+                                >
+                                    <Pencil size={12} />
+                                </button>
+                            )}
+                            {onEliminar && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); onEliminar(agrupacion); }}
+                                    aria-label={`Eliminar ${agrupacion.nombre}`}
+                                    className="p-1 rounded-md border border-danger text-danger hover:bg-danger-soft transition-colors cursor-pointer"
+                                >
+                                    <Trash2 size={12} />
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
