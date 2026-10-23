@@ -1,7 +1,7 @@
 import {
     FileUser, ShelvingUnit, CalendarDays, UserCog, ClipboardMinus, Settings,
     BookUser, PersonStanding, Users, SquareLibrary, CirclePile, ClipboardList,
-    MapPin, Shield, Boxes, FileBarChart2, Paintbrush, ChevronRight, Lock,
+    MapPin, Shield, Boxes, FileBarChart2, Paintbrush, ChevronRight, Lock, Activity,
 } from 'lucide-react';
 import { useAuth } from '../../../auth/hooks/useAuth';
 
@@ -25,9 +25,9 @@ const MODULOS = [
         descripcion: 'Administra el catálogo y su asignación.',
         tono: 'bg-warning-soft text-warning',
         vistas: [
-            { nombre: 'Gestión de beneficios', icono: SquareLibrary },
-            { nombre: 'Asignar beneficios', icono: CirclePile },
-            { nombre: 'Ver beneficios asignados', icono: ClipboardList },
+            { nombre: 'Gestión de Beneficios', icono: SquareLibrary },
+            { nombre: 'Asignar Beneficios', icono: CirclePile },
+            { nombre: 'Ver Beneficios Asignados', icono: ClipboardList },
         ],
     },
     {
@@ -37,6 +37,14 @@ const MODULOS = [
         vistas: [
             { nombre: 'Gestión del Calendario', icono: CalendarDays },
             { nombre: 'Gestión de Ubicaciones', icono: MapPin },
+        ],
+    },
+    {
+        titulo: 'Conteo', modulo: 'conteo', icono: Activity,
+        descripcion: 'Monitorea la ocupación en tiempo real.',
+        tono: 'bg-danger-soft text-danger',
+        vistas: [
+            { nombre: 'Panel de Conteo', icono: Activity },
         ],
     },
     {
@@ -55,7 +63,8 @@ const MODULOS = [
         vistas: [
             { nombre: 'Reportes de Solicitudes', icono: FileUser },
             { nombre: 'Reportes de Actividades', icono: Boxes },
-            { nombre: 'Reportes de beneficios', icono: FileBarChart2 },
+            { nombre: 'Reportes de Beneficios', icono: FileBarChart2 },
+            { nombre: 'Reportes de Conteo', icono: Activity },
         ],
     },
     {
@@ -63,7 +72,7 @@ const MODULOS = [
         descripcion: 'Personaliza la apariencia del sistema.',
         tono: 'bg-foreground-faint/15 text-foreground-soft',
         vistas: [
-            { nombre: 'Personalización del sistema', icono: Paintbrush },
+            { nombre: 'Personalización del Sistema', icono: Paintbrush },
         ],
     },
 ];

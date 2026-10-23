@@ -5,16 +5,6 @@ import { Activity, CalendarDays, ClipboardMinus, FileUser, Paintbrush, ShelvingU
  * Debe coincidir con backend/app/Modules/Usuarios/Support/Modulos.php.
  * Un permiso tiene el formato "{modulo}.{accion}", p. ej. "calendario.ver".
  */
-export const MODULOS = [
-    { slug: 'solicitudes', nombre: 'Solicitudes', icono: FileUser },
-    { slug: 'beneficios', nombre: 'Beneficios', icono: ShelvingUnit },
-    { slug: 'calendario', nombre: 'Calendario', icono: CalendarDays },
-    { slug: 'usuarios', nombre: 'Gestión de Usuarios', icono: UserCog },
-    { slug: 'reportes', nombre: 'Reportes', icono: ClipboardMinus },
-    { slug: 'personalizacion', nombre: 'Personalización', icono: Paintbrush },
-    { slug: 'conteo', nombre: 'Conteo de personas', icono: Activity },
-];
-
 export const ACCIONES = [
     { clave: 'crear', nombre: 'Crear' },
     { clave: 'ver', nombre: 'Ver' },
@@ -24,5 +14,18 @@ export const ACCIONES = [
 
 // Acción que se activa por defecto al encender un módulo.
 export const ACCION_POR_DEFECTO = 'ver';
+
+// Módulos de solo consulta: no tienen crear/editar/eliminar.
+const SOLO_VER = ACCIONES.filter((a) => a.clave === ACCION_POR_DEFECTO);
+
+export const MODULOS = [
+    { slug: 'solicitudes', nombre: 'Solicitudes', icono: FileUser, acciones: ACCIONES },
+    { slug: 'beneficios', nombre: 'Beneficios', icono: ShelvingUnit, acciones: ACCIONES },
+    { slug: 'calendario', nombre: 'Calendario', icono: CalendarDays, acciones: ACCIONES },
+    { slug: 'usuarios', nombre: 'Gestión de Usuarios', icono: UserCog, acciones: ACCIONES },
+    { slug: 'reportes', nombre: 'Reportes', icono: ClipboardMinus, acciones: SOLO_VER },
+    { slug: 'personalizacion', nombre: 'Personalización', icono: Paintbrush, acciones: ACCIONES },
+    { slug: 'conteo', nombre: 'Conteo de personas', icono: Activity, acciones: SOLO_VER },
+];
 
 export const permiso = (modulo, accion) => `${modulo}.${accion}`;

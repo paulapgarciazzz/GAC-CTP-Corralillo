@@ -1,4 +1,4 @@
-import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, Boxes, UserRoundArrowLeft, BookUser, SquareLibrary, CirclePile, ShieldAlert, Settings, ClipboardList, FileBarChart2, MapPin, Paintbrush, Activity } from "lucide-react";
+import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, Boxes, BookUser, SquareLibrary, CirclePile, ShieldAlert, Settings, ClipboardList, FileBarChart2, MapPin, Paintbrush, Activity } from "lucide-react";
 import { useState } from "react"
 import logoOriginal from '../../../assets/logo.png'
 import { usePersonalizacion } from '../../Personalizacion/publico/usePersonalizacion'
@@ -22,9 +22,9 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         },
         {name: "Beneficios", icon: ShelvingUnit, active:false, modulo: "beneficios",
             children: [
-                {name: "Gestión de beneficios", icon: SquareLibrary},
-                {name: "Asignar beneficios", icon: CirclePile},
-                {name: "Ver beneficios asignados", icon: ClipboardList},
+                {name: "Gestión de Beneficios", icon: SquareLibrary},
+                {name: "Asignar Beneficios", icon: CirclePile},
+                {name: "Ver Beneficios Asignados", icon: ClipboardList},
                 
             ]
         },
@@ -36,8 +36,7 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
         },
         {name: "Conteo", icon: Activity, active:false, modulo: "conteo",
             children: [
-                {name: "Panel de conteo", icon: Activity},
-                {name: "Reportes de conteo", icon: FileBarChart2},
+                {name: "Panel de Conteo", icon: Activity},
             ]
         },
         {name: "Gestion de Usuarios", icon: UserCog, active:false, modulo: "usuarios",
@@ -50,13 +49,13 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
             children: [
                 {name: "Reportes de Solicitudes", icon: FileUser},
                 {name: "Reportes de Actividades", icon: Boxes},
-                {name: "Reportes de Asistencia", icon: UserRoundArrowLeft},
-                {name: "Reportes de beneficios", icon: FileBarChart2},
+                {name: "Reportes de Beneficios", icon: FileBarChart2},
+                {name: "Reportes de Conteo", icon: Activity, modulo: "conteo"},
             ]
         },
         {name: "Ajustes", icon: Settings, active:false,
             children: [
-                {name: "Personalización del sistema", icon: Paintbrush, modulo: "personalizacion"},
+                {name: "Personalización del Sistema", icon: Paintbrush, modulo: "personalizacion"},
             ]
         },
         
