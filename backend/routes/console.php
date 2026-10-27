@@ -3,6 +3,10 @@
 use App\Modules\Conteo\Models\SensorConteo;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+
+// Borra los tokens de Sanctum vencidos (ver 'expiration' en config/sanctum.php).
+Schedule::command('sanctum:prune-expired --hours=24')->daily();
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());

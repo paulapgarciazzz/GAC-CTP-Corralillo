@@ -2,7 +2,9 @@
 
 namespace App\Modules\SolicitudesAgrupaciones\Requests;
 
+use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateSolicitudAgrupacionRequest extends FormRequest
 {
@@ -13,6 +15,13 @@ class UpdateSolicitudAgrupacionRequest extends FormRequest
 
     public function rules(): array
     {
+        // El correo y el teléfono son únicos en `encargado`; se ignora al
+        // encargado dueño de esta solicitud.
+        $cedulaEncargado = SolicitudAgrupacion::with('agrupacion')
+            ->find($this->route('id'))
+            ?->agrupacion
+            ?->ced_encargado;
+
         return [
             'encargado' => [
                 'sometimes',
@@ -35,12 +44,14 @@ class UpdateSolicitudAgrupacionRequest extends FormRequest
                 'required',
                 'email',
                 'max:150',
+                Rule::unique('encargado', 'email')->ignore($cedulaEncargado, 'cedula'),
             ],
             'encargado.numero_tel' => [
                 'sometimes',
                 'required',
                 'string',
                 'max:20',
+                Rule::unique('encargado', 'numero_tel')->ignore($cedulaEncargado, 'cedula'),
             ],
 
             'agrupacion' => [
@@ -114,6 +125,8 @@ class UpdateSolicitudAgrupacionRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'encargado.email.unique' => 'Este correo electrónico ya está registrado.',
+            'encargado.numero_tel.unique' => 'Este número de teléfono ya está registrado.',
             'solicitud.id_evento.required' => 'Debe seleccionar el evento en el que desea participar.',
         ];
     }

@@ -198,9 +198,19 @@ class SolicitudAgrupacionService
     public function actualizar(int $id, array $datos): SolicitudAgrupacion
     {
         return DB::transaction(function () use ($id, $datos) {
-            $solicitud = SolicitudAgrupacion::with('agrupacion.encargado')
+            $solicitud = SolicitudAgrupacion::with(['agrupacion.encargado', 'estado'])
                 ->lockForUpdate()
                 ->findOrFail($id);
+
+            $asignaFecha = !empty($datos['solicitud']['fecha_asignada'])
+                || !empty($datos['solicitud']['hora_asignada']);
+
+            if ($asignaFecha && $solicitud->estado->nom_estado !== 'aprobada') {
+                throw new HttpException(
+                    422,
+                    'Solo se puede asignar fecha a solicitudes aprobadas.'
+                );
+            }
 
             if (!empty($datos['encargado'])) {
                 $solicitud->agrupacion->encargado->update($datos['encargado']);

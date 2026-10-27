@@ -5,6 +5,7 @@ namespace App\Modules\SolicitudesAgrupaciones\Requests;
 use App\Modules\SolicitudesAgrupaciones\Rules\ArchivoAdjuntoValido;
 use App\Modules\SolicitudesAgrupaciones\Rules\FotoValida;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreSolicitudEncargadoExistenteRequest extends FormRequest
 {
@@ -17,7 +18,13 @@ class StoreSolicitudEncargadoExistenteRequest extends FormRequest
     {
         return [
             'cedula' => ['required', 'string', 'max:20', 'exists:encargado,cedula'],
-            'id_agrupacion' => ['nullable', 'integer', 'exists:agrupacion,id', 'required_without:agrupacion'],
+            // La agrupación debe pertenecer al encargado de la cédula enviada.
+            'id_agrupacion' => [
+                'nullable',
+                'integer',
+                'required_without:agrupacion',
+                Rule::exists('agrupacion', 'id')->where('ced_encargado', $this->input('cedula')),
+            ],
             'agrupacion' => ['nullable', 'array', 'required_without:id_agrupacion'],
             'agrupacion.nombre' => ['required_with:agrupacion', 'string', 'max:150'],
             'agrupacion.lugar_procedencia' => ['required_with:agrupacion', 'string', 'max:150'],
@@ -39,6 +46,7 @@ class StoreSolicitudEncargadoExistenteRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'id_agrupacion.exists' => 'La agrupación seleccionada no pertenece a este encargado.',
             'solicitud.id_evento.required' => 'Debe seleccionar el evento en el que desea participar.',
         ];
     }
