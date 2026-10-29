@@ -51,7 +51,7 @@ function CargarMas({ visible, cargando, onCargar }) {
 }
 
 export default function RolesPermisos() {
-    const { can } = useAuth();
+    const { user: usuarioActual, can } = useAuth();
     const listado = useListadoPaginado(obtenerUsuariosConPermisos, { acumular: true });
     const { items: usuarios, error, cargandoInicial, cargandoMas, hayMas, busquedaActiva } = listado;
     const editable = can('usuarios.editar');
@@ -97,7 +97,8 @@ export default function RolesPermisos() {
                 <>
                     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 items-start">
                         {usuarios.map((usuario) => (
-                            <TarjetaPermisosUsuario key={usuario.id} usuario={usuario} editable={editable} onGuardado={listado.actualizarItem} />
+                            // Nadie edita sus propios permisos (el backend también lo rechaza).
+                            <TarjetaPermisosUsuario key={usuario.id} usuario={usuario} editable={editable && usuario.id !== usuarioActual?.id} onGuardado={listado.actualizarItem} />
                         ))}
                     </div>
                     <CargarMas visible={hayMas} cargando={cargandoMas} onCargar={listado.cargarMas} />

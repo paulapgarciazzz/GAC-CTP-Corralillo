@@ -3,6 +3,7 @@
 namespace App\Modules\Usuarios\Requests;
 
 use App\Modules\SolicitudesAgrupaciones\Rules\FotoValida;
+use App\Modules\Usuarios\Support\MensajesValidacion;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -12,6 +13,8 @@ use Illuminate\Validation\Rule;
  */
 class ActualizarPerfilRequest extends FormRequest
 {
+    use MensajesValidacion;
+
     public function authorize(): bool
     {
         return true;

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use App\Modules\Calendario\Models\Actividad;
 use App\Modules\Calendario\Models\EstadoActividad;
 use App\Modules\Calendario\Models\Evento;
@@ -10,9 +11,13 @@ use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\Encargado;
 use App\Modules\SolicitudesAgrupaciones\Models\Estado;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
+use App\Modules\Usuarios\Support\Modulos;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class ActividadTest extends TestCase
@@ -30,6 +35,17 @@ class ActividadTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $admin = User::create([
+            'name' => 'Admin de prueba',
+            'email' => 'admin-actividades@ejemplo.com',
+            'password' => 'secreto123',
+            'activo' => true,
+        ]);
+        $admin->assignRole(Role::findOrCreate(Modulos::ROL_ADMIN, 'web'));
+        Sanctum::actingAs($admin);
 
         Carbon::setTestNow('2026-10-01 08:00:00');
 
