@@ -1,0 +1,6 @@
+.git
+frontend
+backend/vendor
+backend/node_modules
+# Enlace simbólico de `php artisan storage:link`; Docker no puede copiarlo
+backend/public/storage

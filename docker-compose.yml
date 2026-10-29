@@ -65,7 +65,7 @@ services:
       - app_network
 
   frontend:
-    image: node:22-alpine
+    image: node:22.23.4-alpine
     container_name: react_frontend
     working_dir: /app
     volumes:
