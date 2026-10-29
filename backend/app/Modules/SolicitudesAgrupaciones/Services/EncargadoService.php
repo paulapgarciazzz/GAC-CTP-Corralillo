@@ -15,7 +15,11 @@ class EncargadoService
 {
     public function listarAdministrativa(): Collection
     {
-        return Encargado::withCount('agrupaciones')
+        // Solo se gestionan encargados con al menos una solicitud aprobada.
+        return Encargado::whereHas('solicitudes.estado', function ($query) {
+            $query->where('nom_estado', 'aprobada');
+        })
+            ->withCount('agrupaciones')
             ->withCount('solicitudes')
             ->get();
     }
