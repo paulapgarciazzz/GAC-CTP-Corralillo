@@ -3,10 +3,13 @@
 namespace App\Modules\Beneficios\Services;
 
 use App\Modules\Beneficios\Models\Alimentacion;
+use App\Modules\Beneficios\Support\EliminaSiNoEstaEnUso;
 use Illuminate\Database\Eloquent\Collection;
 
 class AlimentacionService
 {
+    use EliminaSiNoEstaEnUso;
+
     /**
      * Obtiene todos los tipos de alimentación.
      */
@@ -45,10 +48,13 @@ class AlimentacionService
     }
 
     /**
-     * Elimina un tipo de alimentación.
+     * Elimina un tipo de alimentación si no está asignado.
      */
     public function eliminar(Alimentacion $alimentacion): void
     {
-        $alimentacion->delete();
+        $this->eliminarSiNoEstaEnUso(
+            $alimentacion,
+            'No se puede eliminar el tiempo de comida porque está asignado a una o más agrupaciones.'
+        );
     }
 }
