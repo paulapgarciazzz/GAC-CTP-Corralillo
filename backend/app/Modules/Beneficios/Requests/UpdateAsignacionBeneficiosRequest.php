@@ -4,6 +4,7 @@ namespace App\Modules\Beneficios\Requests;
 
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateAsignacionBeneficiosRequest extends FormRequest
 {
@@ -26,7 +27,14 @@ class UpdateAsignacionBeneficiosRequest extends FormRequest
             'id_mobiliario' => ['prohibited'],
             'matricula' => ['prohibited'],
 
-            'id_solicitud_agrupacion' => ['sometimes', 'required', 'integer', 'exists:solicitud_agrupacion,id'],
+            'id_solicitud_agrupacion' => [
+                'sometimes',
+                'required',
+                'integer',
+                'exists:solicitud_agrupacion,id',
+                Rule::unique('asignacion_beneficios', 'id_solicitud_agrupacion')
+                    ->ignore($this->route('asignacion')),
+            ],
             'observaciones' => ['sometimes', 'nullable', 'string', 'max:1000'],
 
             'mobiliarios' => ['sometimes', 'nullable', 'array'],
@@ -48,6 +56,13 @@ class UpdateAsignacionBeneficiosRequest extends FormRequest
             'transportes.*.id' => ['nullable', 'integer'],
             'transportes.*.matricula' => ['required_with:transportes', 'string', 'max:6', 'exists:transporte,matricula'],
             'transportes.*.id_ruta' => ['required_with:transportes', 'integer', 'exists:ruta,id_ruta'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'id_solicitud_agrupacion.unique' => 'La solicitud seleccionada ya tiene una asignación de beneficios.',
         ];
     }
 

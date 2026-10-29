@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Modules\Beneficios\Services\AsignacionBeneficiosService;
 use App\Modules\Conteo\Middleware\AutenticarSensor;
+use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\Usuarios\Support\Modulos;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -45,6 +47,14 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(fn ($user) => $user->hasRole(Modulos::ROL_ADMIN) ? true : null);
 
         DB::prohibitDestructiveCommands($this->algunaConexionApuntaABaseProtegida());
+
+        // Las raciones de alimentación asignadas dependen de los integrantes
+        // de la agrupación; se actualizan cuando estos cambian.
+        Agrupacion::updated(function (Agrupacion $agrupacion) {
+            if ($agrupacion->wasChanged('cantidad_integrantes')) {
+                app(AsignacionBeneficiosService::class)->sincronizarRaciones($agrupacion);
+            }
+        });
 
         // Dispositivos de conteo: se limita antes de autenticar, para frenar
         // intentos de adivinar tokens. Un sensor real queda muy por debajo

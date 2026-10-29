@@ -49,10 +49,13 @@ const mensajePorEstado = (status, fallback) => {
     return fallback;
 };
 
+// En un 500 el `message` del backend puede traer el detalle técnico (SQL), así que no se muestra.
+const mensajeBackend = (error) => (error.response?.status >= 500 ? null : error.response?.data?.message);
+
 export const manejarError = (error, fallback) => ({
     success: false,
     status: error.response?.status,
-    error: error.response?.data?.message
+    error: mensajeBackend(error)
         || Object.values(extraerErrores(error))[0]?.[0]
         || mensajePorEstado(error.response?.status, fallback),
     errors: extraerErrores(error),

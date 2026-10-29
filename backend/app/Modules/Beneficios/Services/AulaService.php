@@ -3,10 +3,13 @@
 namespace App\Modules\Beneficios\Services;
 
 use App\Modules\Beneficios\Models\Aula;
+use App\Modules\Beneficios\Support\EliminaSiNoEstaEnUso;
 use Illuminate\Database\Eloquent\Collection;
 
 class AulaService
 {
+    use EliminaSiNoEstaEnUso;
+
     /**
      * Obtiene todas las aulas.
      */
@@ -45,10 +48,13 @@ class AulaService
     }
 
     /**
-     * Elimina un aula.
+     * Elimina un aula si no está asignada.
      */
     public function eliminar(Aula $aula): void
     {
-        $aula->delete();
+        $this->eliminarSiNoEstaEnUso(
+            $aula,
+            'No se puede eliminar el aula porque está asignada a una o más agrupaciones.'
+        );
     }
 }

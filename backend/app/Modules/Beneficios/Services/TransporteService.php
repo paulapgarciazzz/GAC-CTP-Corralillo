@@ -3,10 +3,13 @@
 namespace App\Modules\Beneficios\Services;
 
 use App\Modules\Beneficios\Models\Transporte;
+use App\Modules\Beneficios\Support\EliminaSiNoEstaEnUso;
 use Illuminate\Database\Eloquent\Collection;
 
 class TransporteService
 {
+    use EliminaSiNoEstaEnUso;
+
     /**
      * Obtiene todos los transportes.
      */
@@ -45,10 +48,13 @@ class TransporteService
     }
 
     /**
-     * Elimina un transporte.
+     * Elimina un transporte si no está asignado.
      */
     public function eliminar(Transporte $transporte): void
     {
-        $transporte->delete();
+        $this->eliminarSiNoEstaEnUso(
+            $transporte,
+            'No se puede eliminar el transporte porque está asignado a una o más agrupaciones.'
+        );
     }
 }
