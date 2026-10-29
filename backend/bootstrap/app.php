@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -33,4 +34,24 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
+        // El framework responde "Too Many Attempts." sin traducir; se conservan 429 y sus cabeceras.
+        $exceptions->render(function (ThrottleRequestsException $e, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            $segundos = max(1, (int) ($e->getHeaders()['Retry-After'] ?? 60));
+            $minutos = (int) ceil($segundos / 60);
+            $espera = match (true) {
+                $segundos < 60 => "en {$segundos} segundos",
+                $minutos === 1 => 'en 1 minuto',
+                default => "en {$minutos} minutos",
+            };
+
+            return response()->json(
+                ['message' => "Demasiados intentos. Intenta de nuevo {$espera}."],
+                429,
+                $e->getHeaders(),
+            );
+        });
     })->create();

@@ -2,11 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use App\Modules\Calendario\Models\Actividad;
 use App\Modules\Calendario\Models\EstadoActividad;
 use App\Modules\Calendario\Models\Evento;
 use App\Modules\Calendario\Models\Ubicacion;
+use App\Modules\Usuarios\Support\Modulos;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class UbicacionTest extends TestCase
@@ -14,6 +19,22 @@ class UbicacionTest extends TestCase
     use RefreshDatabase;
 
     private const IMAGEN = 'data:image/png;base64,iVBORw0KGgo=';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $admin = User::create([
+            'name' => 'Admin de prueba',
+            'email' => 'admin-ubicaciones@ejemplo.com',
+            'password' => 'secreto123',
+            'activo' => true,
+        ]);
+        $admin->assignRole(Role::findOrCreate(Modulos::ROL_ADMIN, 'web'));
+        Sanctum::actingAs($admin);
+    }
 
     public function test_crea_lista_muestra_y_actualiza_ubicaciones(): void
     {

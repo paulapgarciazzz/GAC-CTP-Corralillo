@@ -2,6 +2,7 @@
 
 namespace App\Modules\Calendario\Requests;
 
+use App\Modules\SolicitudesAgrupaciones\Rules\FotoValida;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreUbicacionRequest extends FormRequest
@@ -33,7 +34,7 @@ class StoreUbicacionRequest extends FormRequest
             'imagen' => [
                 'nullable',
                 'string',
-                'starts_with:data:image/',
+                new FotoValida(),
             ],
         ];
     }

@@ -78,7 +78,8 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    // Mensajes de validación en lang/es; lo que falte cae a fallback_locale.
+    'locale' => env('APP_LOCALE', 'es'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 

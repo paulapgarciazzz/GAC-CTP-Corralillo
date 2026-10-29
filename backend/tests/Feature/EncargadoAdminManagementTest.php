@@ -9,10 +9,12 @@ use App\Modules\SolicitudesAgrupaciones\Models\Estado;
 use App\Modules\SolicitudesAgrupaciones\Models\Participacion;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\ActuaComoAdmin;
 use Tests\TestCase;
 
 class EncargadoAdminManagementTest extends TestCase
 {
+    use ActuaComoAdmin;
     use RefreshDatabase;
 
     private const PNG_1X1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
@@ -45,6 +47,7 @@ class EncargadoAdminManagementTest extends TestCase
     {
         parent::setUp();
 
+        $this->actuarComoAdmin();
     }
 
     public function test_get_encargados_devuelve_listado_administrativo(): void

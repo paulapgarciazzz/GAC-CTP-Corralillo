@@ -35,7 +35,7 @@ class UsuarioController extends Controller
     public function store(StoreUsuarioRequest $request): JsonResponse
     {
         return (new UsuarioResource(
-            $this->usuarioService->crear($request->validated())
+            $this->usuarioService->crear($request->validated(), $request->user())
         ))->response()->setStatusCode(201);
     }
 

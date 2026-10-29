@@ -7,9 +7,11 @@ use App\Modules\Calendario\Models\EstadoActividad;
 use App\Modules\Calendario\Models\Evento;
 use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -67,20 +69,22 @@ class ActividadService
      */
     public function crear(array $datos): Actividad
     {
-        $this->validarReglas($datos);
+        return $this->conBloqueoDeFechas([$datos['fecha']], function () use ($datos) {
+            $this->validarReglas($datos);
 
-        $datos['id_estado_actividad'] = $this->calcularEstado(
-            $datos['fecha'],
-            $datos['hora_inicio'],
-            $datos['hora_finalizacion']
-        );
+            $datos['id_estado_actividad'] = $this->calcularEstado(
+                $datos['fecha'],
+                $datos['hora_inicio'],
+                $datos['hora_finalizacion']
+            );
 
-        return DB::transaction(function () use ($datos) {
-            $actividad = Actividad::create($datos);
+            return DB::transaction(function () use ($datos) {
+                $actividad = Actividad::create($datos);
 
-            $this->sincronizarHorarioAsignado($actividad->id_evento, $actividad->id_agrupacion);
+                $this->sincronizarHorarioAsignado($actividad->id_evento, $actividad->id_agrupacion);
 
-            return $actividad->refresh()->load(self::RELACIONES);
+                return $actividad->refresh()->load(self::RELACIONES);
+            });
         });
     }
 
@@ -90,27 +94,30 @@ class ActividadService
     public function actualizar(Actividad $actividad, array $datos): Actividad
     {
         $completos = array_merge($this->datosActuales($actividad), $datos);
+        $fechas = [$actividad->fecha->format('Y-m-d'), $completos['fecha']];
 
-        $this->validarReglas($completos, $actividad->id_actividad);
+        return $this->conBloqueoDeFechas($fechas, function () use ($actividad, $datos, $completos) {
+            $this->validarReglas($completos, $actividad->id_actividad);
 
-        $datos['id_estado_actividad'] = $this->calcularEstado(
-            $completos['fecha'],
-            $completos['hora_inicio'],
-            $completos['hora_finalizacion']
-        );
-
-        return DB::transaction(function () use ($actividad, $datos) {
-            $agrupacionAnterior = $actividad->id_agrupacion;
-
-            $actividad->update($datos);
-
-            $this->sincronizarHorarioAsignado(
-                $actividad->id_evento,
-                $agrupacionAnterior,
-                $actividad->id_agrupacion
+            $datos['id_estado_actividad'] = $this->calcularEstado(
+                $completos['fecha'],
+                $completos['hora_inicio'],
+                $completos['hora_finalizacion']
             );
 
-            return $actividad->refresh()->load(self::RELACIONES);
+            return DB::transaction(function () use ($actividad, $datos) {
+                $agrupacionAnterior = $actividad->id_agrupacion;
+
+                $actividad->update($datos);
+
+                $this->sincronizarHorarioAsignado(
+                    $actividad->id_evento,
+                    $agrupacionAnterior,
+                    $actividad->id_agrupacion
+                );
+
+                return $actividad->refresh()->load(self::RELACIONES);
+            });
         });
     }
 
@@ -251,6 +258,34 @@ class ActividadService
                 'id_agrupacion' => 'La agrupación no tiene una solicitud aprobada para este evento.',
             ]);
         }
+    }
+
+    /**
+     * Ejecuta $callback con las fechas bloqueadas, para que dos guardados
+     * simultáneos no pasen a la vez la validación de choques.
+     * Las fechas se bloquean siempre en el mismo orden para evitar interbloqueos.
+     */
+    private function conBloqueoDeFechas(array $fechas, callable $callback): mixed
+    {
+        $fechas = array_unique($fechas);
+        rsort($fechas);
+
+        $ejecutar = $callback;
+
+        foreach ($fechas as $fecha) {
+            $siguiente = $ejecutar;
+            $ejecutar = function () use ($fecha, $siguiente) {
+                try {
+                    return Cache::lock("calendario:actividades:{$fecha}", 10)->block(5, $siguiente);
+                } catch (LockTimeoutException) {
+                    throw ValidationException::withMessages([
+                        'hora_inicio' => 'Se está guardando otra actividad en esa fecha. Intente de nuevo.',
+                    ]);
+                }
+            };
+        }
+
+        return $ejecutar();
     }
 
     private function agrupacionAprobadaEnEvento(int $idAgrupacion, int $idEvento): bool
