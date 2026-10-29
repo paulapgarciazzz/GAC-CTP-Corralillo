@@ -2,6 +2,7 @@
 
 namespace App\Modules\Calendario\Requests;
 
+use App\Modules\SolicitudesAgrupaciones\Rules\FotoValida;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -37,11 +38,16 @@ class UpdateUbicacionRequest extends FormRequest
                 'integer',
                 'min:1',
             ],
+            // Solo se valida una imagen nueva: el formulario reenvía la imagen guardada
+            // y las anteriores a esta regla podían ser de otro tipo o tamaño.
             'imagen' => [
                 'sometimes',
                 'nullable',
                 'string',
-                'starts_with:data:image/',
+                Rule::when(
+                    $this->input('imagen') !== $ubicacion?->imagen,
+                    [new FotoValida()]
+                ),
             ],
         ];
     }

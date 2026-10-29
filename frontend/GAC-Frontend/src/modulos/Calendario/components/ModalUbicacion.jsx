@@ -4,7 +4,9 @@ import ModalBase from '../../../components/ModalBase';
 import { AlertaError, BotonesFormulario, CampoFormulario } from '../../../components/Formulario';
 import { INPUT_CLASS } from '../../../utils/formulario';
 import { leerComoDataURL } from '../../../utils/archivo';
-import { esImagen } from '../../../utils/imagen';
+
+const TIPOS_IMAGEN_ACEPTADOS = ['image/png', 'image/jpeg'];
+const TAMANO_MAXIMO_IMAGEN = 2 * 1024 * 1024;
 
 export default function ModalUbicacion({ open, ubicacion, onClose, onGuardar }) {
     if (!open) return null;
@@ -41,8 +43,12 @@ function FormularioUbicacion({ ubicacion, onClose, onGuardar }) {
         e.target.value = '';
         if (!archivo) return;
 
-        if (!esImagen(archivo)) {
-            setError('El archivo seleccionado debe ser una imagen.');
+        if (!TIPOS_IMAGEN_ACEPTADOS.includes(archivo.type)) {
+            setError('La imagen debe ser PNG o JPG.');
+            return;
+        }
+        if (archivo.size > TAMANO_MAXIMO_IMAGEN) {
+            setError('La imagen no debe superar 2MB.');
             return;
         }
 
@@ -117,7 +123,8 @@ function FormularioUbicacion({ ubicacion, onClose, onGuardar }) {
                             </button>
                         )}
                     </div>
-                    <input id="ubicacion-imagen" type="file" accept="image/*" onChange={handleImagenChange} className="hidden" />
+                    <input id="ubicacion-imagen" type="file" accept="image/png,image/jpeg" onChange={handleImagenChange} className="hidden" />
+                    <p className="text-xs text-foreground-faint">PNG o JPG, máximo 2MB.</p>
                     {errores.imagen && <p className="text-xs text-danger">{errores.imagen[0]}</p>}
                 </div>
 
