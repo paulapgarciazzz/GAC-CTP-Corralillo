@@ -1,10 +1,8 @@
 import { useMemo } from 'react';
 import { filtrarEventosProximos } from '../hooks/useEventos';
+import { OPCION_CLASS } from '../../../utils/formulario';
 
 export const MENSAJE_EVENTO_REQUERIDO = 'Debe seleccionar el evento en el que desea participar.';
-
-// La lista nativa no hereda el tema: las opciones necesitan sus propios colores para verse en modo oscuro.
-const OPCION_CLASS = 'bg-surface text-foreground';
 
 export default function SelectEvento({ eventos, cargando, value, onChange, idIncluido = null, error = '' }) {
     const opciones = useMemo(() => filtrarEventosProximos(eventos, idIncluido), [eventos, idIncluido]);
