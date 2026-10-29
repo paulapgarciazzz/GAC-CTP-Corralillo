@@ -6,6 +6,7 @@ import { PAISES_TELEFONO, CODIGO_PAIS_POR_DEFECTO, MAX_DIGITOS_PREFIJO_CUSTOM, o
 import SelectorHora from '../../../components/SelectorHora';
 import CampoFotoAgrupacion from '../../../components/CampoFotoAgrupacion';
 import { leerComoDataURL } from '../../../utils/archivo';
+import { OPCION_CLASS } from '../../../utils/formulario';
 import SelectEvento, { MENSAJE_EVENTO_REQUERIDO } from './SelectEvento';
 import { useEventos, useRangoEvento } from '../hooks/useEventos';
 
@@ -181,7 +182,7 @@ export default function FormularioSolicitud({ onSuccess }) {
                         <select id="tipo_identificacion" name="tipo_identificacion" value={valores.tipo_identificacion} onChange={handleTipoIdentificacionChange} required
                             className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                             {TIPOS_IDENTIFICACION.map((tipo) => (
-                                <option key={tipo.value} value={tipo.value}>{tipo.etiqueta}</option>
+                                <option key={tipo.value} value={tipo.value} className={OPCION_CLASS}>{tipo.etiqueta}</option>
                             ))}
                         </select>
                     </div>
@@ -211,7 +212,7 @@ export default function FormularioSolicitud({ onSuccess }) {
                         <select id="codigo_pais_tel" name="codigo_pais_tel" value={valores.codigo_pais_tel} onChange={handleCodigoPaisChange} required
                             className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                             {PAISES_TELEFONO.map((p) => (
-                                <option key={p.value} value={p.value}>{p.pais}{p.prefijo ? ` (+${p.prefijo})` : ''}</option>
+                                <option key={p.value} value={p.value} className={OPCION_CLASS}>{p.pais}{p.prefijo ? ` (+${p.prefijo})` : ''}</option>
                             ))}
                         </select>
                     </div>

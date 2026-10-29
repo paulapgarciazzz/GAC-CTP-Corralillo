@@ -5,6 +5,7 @@ import { obtenerConfigIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono, parsearNumeroTelefono } from '../../../utils/telefono';
 import CampoArchivoAdjunto from '../../../components/CampoArchivoAdjunto';
 import SelectorHora from '../../../components/SelectorHora';
+import { OPCION_CLASS } from '../../../utils/formulario';
 import SelectEvento, { MENSAJE_EVENTO_REQUERIDO } from './SelectEvento';
 import { useEventos, useRangoEvento } from '../hooks/useEventos';
 
@@ -181,7 +182,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                                 <select id="codigo_pais_tel" name="codigo_pais_tel" value={valores.codigo_pais_tel} onChange={handleCodigoPaisChange} required
                                     className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                                     {PAISES_TELEFONO.map((p) => (
-                                        <option key={p.value} value={p.value}>{p.pais}{p.prefijo ? ` (+${p.prefijo})` : ''}</option>
+                                        <option key={p.value} value={p.value} className={OPCION_CLASS}>{p.pais}{p.prefijo ? ` (+${p.prefijo})` : ''}</option>
                                     ))}
                                 </select>
                             </div>

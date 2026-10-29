@@ -1,5 +1,8 @@
 export const INPUT_CLASS = 'w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60';
 
+// La lista nativa de un <select> no hereda el tema: las opciones necesitan sus propios colores para verse en modo oscuro.
+export const OPCION_CLASS = 'bg-surface text-foreground';
+
 export const LABEL_CLASS = 'text-xs font-medium text-foreground-soft uppercase tracking-wider block';
 
 const BOTON_BASE = 'w-full py-2 px-3 text-sm whitespace-nowrap rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';

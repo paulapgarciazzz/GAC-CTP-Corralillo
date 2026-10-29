@@ -50,6 +50,18 @@ class EncargadoAdminManagementTest extends TestCase
         $this->actuarComoAdmin();
     }
 
+    private function crearSolicitud(string $cedula, string $estado, array $agrupacion = []): SolicitudAgrupacion
+    {
+        $agrupacion = Agrupacion::create($this->baseAgrupacion($cedula, $agrupacion));
+
+        return SolicitudAgrupacion::create([
+            'id_agrupacion' => $agrupacion->id,
+            'fecha_solicitud' => now(),
+            'id_estado' => Estado::where('nom_estado', $estado)->first()->id,
+            'comentarios' => 'solicitud de prueba',
+        ]);
+    }
+
     public function test_get_encargados_devuelve_listado_administrativo(): void
     {
         Encargado::create($this->baseEncargado());
@@ -58,6 +70,8 @@ class EncargadoAdminManagementTest extends TestCase
             'email' => 'otro@example.com',
             'numero_tel' => '77778888',
         ]));
+        $this->crearSolicitud('123456789', 'aprobada');
+        $this->crearSolicitud('987654321', 'aprobada', ['nombre' => 'Agrupación B']);
 
         $response = $this->getJson('/api/encargados');
 
@@ -65,22 +79,40 @@ class EncargadoAdminManagementTest extends TestCase
         $this->assertCount(2, $response->json('data'));
     }
 
-    public function test_get_encargados_incluye_agrupaciones_count_y_solicitudes_count(): void
+    public function test_get_encargados_excluye_encargados_sin_solicitud_aprobada(): void
     {
-        $encargado = Encargado::create($this->baseEncargado());
-        $agrupacion = Agrupacion::create($this->baseAgrupacion($encargado->cedula));
-        $solicitud = SolicitudAgrupacion::create([
-            'id_agrupacion' => $agrupacion->id,
-            'fecha_solicitud' => now(),
-            'id_estado' => Estado::where('nom_estado', 'pendiente')->first()->id,
-            'comentarios' => 'solicitud de prueba',
-        ]);
+        Encargado::create($this->baseEncargado());
+        Encargado::create($this->baseEncargado([
+            'cedula' => '987654321',
+            'email' => 'otro@example.com',
+            'numero_tel' => '77778888',
+        ]));
+        Encargado::create($this->baseEncargado([
+            'cedula' => '111222333',
+            'email' => 'tercero@example.com',
+            'numero_tel' => '66667777',
+        ]));
+        $this->crearSolicitud('123456789', 'aprobada');
+        $this->crearSolicitud('987654321', 'pendiente', ['nombre' => 'Agrupación B']);
+        $this->crearSolicitud('111222333', 'rechazada', ['nombre' => 'Agrupación C']);
 
         $response = $this->getJson('/api/encargados');
 
         $response->assertOk();
-        $response->assertJsonPath('data.0.agrupaciones_count', 1);
-        $response->assertJsonPath('data.0.solicitudes_count', 1);
+        $this->assertSame(['123456789'], array_column($response->json('data'), 'cedula'));
+    }
+
+    public function test_get_encargados_incluye_agrupaciones_count_y_solicitudes_count(): void
+    {
+        $encargado = Encargado::create($this->baseEncargado());
+        $solicitud = $this->crearSolicitud($encargado->cedula, 'aprobada');
+        $this->crearSolicitud($encargado->cedula, 'pendiente', ['nombre' => 'Agrupación B']);
+
+        $response = $this->getJson('/api/encargados');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.agrupaciones_count', 2);
+        $response->assertJsonPath('data.0.solicitudes_count', 2);
 
         $solicitud->auditorias()->forceCreate([
             'id_solicitud' => $solicitud->id,

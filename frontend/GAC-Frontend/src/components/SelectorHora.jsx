@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { crearFiltroHora } from '../utils/hora';
+import { OPCION_CLASS } from '../utils/formulario';
 
 // La opción vacía ('--') permite borrar la hora.
 const HORAS = ['', ...Array.from({ length: 12 }, (_, i) => String(i + 1))];
@@ -14,9 +15,6 @@ const PERIODOS = [
 const CONTENEDOR_CLASS = 'relative flex w-full items-center border border-border rounded-lg bg-background focus-within:ring-2 focus-within:ring-primary';
 
 const PARTE_CLASS = 'py-2 bg-transparent text-foreground cursor-pointer rounded-md focus:outline-none focus-visible:bg-primary/10 disabled:opacity-60 disabled:cursor-not-allowed';
-
-// El <select> es transparente, así que la lista nativa no hereda el tema: las opciones necesitan sus propios colores.
-const OPCION_CLASS = 'bg-surface text-foreground';
 
 // Debe coincidir con `max-h-48` de la lista (12rem): unas 6 opciones visibles.
 const ALTO_LISTA = 192;

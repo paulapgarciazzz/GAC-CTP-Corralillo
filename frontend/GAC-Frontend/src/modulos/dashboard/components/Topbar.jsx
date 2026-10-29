@@ -1,8 +1,9 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Menu, Search, Sun, Moon, UserCircle, LogOut,SquareArrowUpLeft} from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuth } from '../../../auth/hooks/useAuth'
 import Avatar from '../../../components/Avatar'
+import { useCerrarConEscape } from '../../../hooks/useCerrarConEscape'
 
 // El modal de perfil se descarga solo cuando se abre.
 const ModalPerfil = lazy(() => import('../../Usuarios/components/ModalPerfil'));
@@ -10,7 +11,20 @@ const ModalPerfil = lazy(() => import('../../Usuarios/components/ModalPerfil'));
 const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [perfilAbierto, setPerfilAbierto] = useState(false);
+    const menuRef = useRef(null);
     const navigate = useNavigate();
+
+    // Un overlay fixed no sirve aquí: el backdrop-blur del <nav> lo limita a la barra.
+    useEffect(() => {
+        if (!isDropdownOpen) return;
+        const handleClickFuera = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) setIsDropdownOpen(false);
+        };
+        document.addEventListener('mousedown', handleClickFuera);
+        return () => document.removeEventListener('mousedown', handleClickFuera);
+    }, [isDropdownOpen]);
+    useCerrarConEscape(isDropdownOpen, () => setIsDropdownOpen(false));
+
     const { user: usuario, logout, establecerUsuario } = useAuth();
     const handleLogout = async () => {
         await logout();
@@ -22,6 +36,7 @@ const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
         setPerfilAbierto(true);
     }
     const salirAPaginaPrincipal = () => {
+        setIsDropdownOpen(false);
         navigate({to: '/'});
     }
 
@@ -54,15 +69,13 @@ const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
                         </button>
 
                         {/* Perfil*/}
-                        <div className="relative">
+                        <div className="relative" ref={menuRef}>
                             <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} aria-label="Menú de usuario" aria-expanded={isDropdownOpen}
                                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-primary/10 transition-colors">
                                 <Avatar nombre={usuario?.name} foto={usuario?.foto} tamano="sm" className="border-2 border-border"/>
                             </button>
                             {isDropdownOpen && (
                                 <>
-                                <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)}/>
-
                                     <div className='absolute right-0 mt-2 w-56 bg-surface rounded-lg shadow-lg border border-border z-20'>
 
                                         <div className='p-3 border-b border-border'>
