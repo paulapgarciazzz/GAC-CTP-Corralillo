@@ -7,6 +7,7 @@ use App\Modules\Beneficios\Models\AsignacionAula;
 use App\Modules\Beneficios\Models\AsignacionBeneficios;
 use App\Modules\Beneficios\Models\AsignacionMobiliario;
 use App\Modules\Beneficios\Models\AsignacionTransporte;
+use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -113,9 +114,31 @@ class AsignacionBeneficiosService
     }
 
     /**
+     * Copia la nueva cantidad_integrantes a las raciones ya asignadas de la
+     * agrupación. Solo toca solicitudes vigentes (fecha_asignada de hoy en
+     * adelante o sin fecha) para no alterar los reportes de festivales pasados.
+     */
+    public function sincronizarRaciones(Agrupacion $agrupacion): void
+    {
+        $idsAsignaciones = AsignacionBeneficios::query()
+            ->whereIn('id_solicitud_agrupacion', SolicitudAgrupacion::query()
+                ->select('id')
+                ->where('id_agrupacion', $agrupacion->id)
+                ->where(fn ($query) => $query
+                    ->whereNull('fecha_asignada')
+                    ->orWhere('fecha_asignada', '>=', today()->toDateString())))
+            ->select('id');
+
+        AsignacionAlimentacion::query()
+            ->whereIn('id_asignacion_beneficios', $idsAsignaciones)
+            ->update(['cantidad' => $agrupacion->cantidad_integrantes]);
+    }
+
+    /**
      * La cantidad de cada alimentación asignada no la decide el cliente: siempre
-     * se toma de agrupacion.cantidad_integrantes para que no pueda desincronizarse
-     * ni ser manipulada desde el frontend.
+     * se toma de agrupacion.cantidad_integrantes para que no pueda ser manipulada
+     * desde el frontend. Si luego cambian los integrantes, sincronizarRaciones
+     * actualiza las raciones vigentes.
      */
     private function obtenerCantidadIntegrantes(int $idSolicitudAgrupacion): int
     {

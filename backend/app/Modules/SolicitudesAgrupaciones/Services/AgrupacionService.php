@@ -2,6 +2,7 @@
 
 namespace App\Modules\SolicitudesAgrupaciones\Services;
 
+use App\Modules\Beneficios\Models\AsignacionBeneficios;
 use App\Modules\SolicitudesAgrupaciones\Models\Agrupacion;
 use App\Modules\SolicitudesAgrupaciones\Models\Auditoria;
 use App\Modules\SolicitudesAgrupaciones\Models\Participacion;
@@ -58,6 +59,13 @@ class AgrupacionService
     {
         DB::transaction(function () use ($agrupacion) {
             $idsSolicitudes = $agrupacion->solicitudes()->pluck('id')->all();
+
+            if (AsignacionBeneficios::whereIn('id_solicitud_agrupacion', $idsSolicitudes)->exists()) {
+                throw new HttpException(
+                    422,
+                    'No se puede eliminar la agrupación porque una de sus solicitudes tiene beneficios asignados.'
+                );
+            }
 
             if (! empty($idsSolicitudes)) {
                 Auditoria::whereIn('id_solicitud', $idsSolicitudes)->delete();

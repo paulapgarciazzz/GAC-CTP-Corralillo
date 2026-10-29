@@ -3,10 +3,13 @@
 namespace App\Modules\Beneficios\Services;
 
 use App\Modules\Beneficios\Models\Mobiliario;
+use App\Modules\Beneficios\Support\EliminaSiNoEstaEnUso;
 use Illuminate\Database\Eloquent\Collection;
 
 class MobiliarioService
 {
+    use EliminaSiNoEstaEnUso;
+
     /**
      * Obtiene todo el mobiliario.
      */
@@ -45,10 +48,13 @@ class MobiliarioService
     }
 
     /**
-     * Elimina un mobiliario.
+     * Elimina un mobiliario si no está asignado.
      */
     public function eliminar(Mobiliario $mobiliario): void
     {
-        $mobiliario->delete();
+        $this->eliminarSiNoEstaEnUso(
+            $mobiliario,
+            'No se puede eliminar el mobiliario porque está asignado a una o más agrupaciones.'
+        );
     }
 }

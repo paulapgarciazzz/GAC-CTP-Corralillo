@@ -3,10 +3,13 @@
 namespace App\Modules\Beneficios\Services;
 
 use App\Modules\Beneficios\Models\Ruta;
+use App\Modules\Beneficios\Support\EliminaSiNoEstaEnUso;
 use Illuminate\Database\Eloquent\Collection;
 
 class RutaService
 {
+    use EliminaSiNoEstaEnUso;
+
     /**
      * Obtiene todas las rutas.
      */
@@ -45,10 +48,13 @@ class RutaService
     }
 
     /**
-     * Elimina una ruta.
+     * Elimina una ruta si no está asignada.
      */
     public function eliminar(Ruta $ruta): void
     {
-        $ruta->delete();
+        $this->eliminarSiNoEstaEnUso(
+            $ruta,
+            'No se puede eliminar la ruta porque está asignada a uno o más transportes.'
+        );
     }
 }
