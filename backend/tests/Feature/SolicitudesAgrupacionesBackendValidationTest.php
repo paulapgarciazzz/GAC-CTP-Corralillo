@@ -8,10 +8,12 @@ use App\Modules\SolicitudesAgrupaciones\Models\Encargado;
 use App\Modules\SolicitudesAgrupaciones\Models\Estado;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\ActuaComoAdmin;
 use Tests\TestCase;
 
 class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 {
+    use ActuaComoAdmin;
     use RefreshDatabase;
 
     private const PNG_1X1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
@@ -72,6 +74,8 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_no_se_pueden_crear_dos_encargados_con_la_misma_cedula(): void
     {
+        $this->actuarComoAdmin();
+
         $this->postJson('/api/encargados', $this->baseEncargado());
 
         $response = $this->postJson('/api/encargados', $this->baseEncargado([
@@ -85,6 +89,8 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_no_se_pueden_crear_dos_encargados_con_el_mismo_email(): void
     {
+        $this->actuarComoAdmin();
+
         $this->postJson('/api/encargados', $this->baseEncargado());
 
         $response = $this->postJson('/api/encargados', $this->baseEncargado([
@@ -99,6 +105,8 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_no_se_pueden_crear_dos_encargados_con_el_mismo_telefono(): void
     {
+        $this->actuarComoAdmin();
+
         $this->postJson('/api/encargados', $this->baseEncargado());
 
         $response = $this->postJson('/api/encargados', $this->baseEncargado([
@@ -234,6 +242,8 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_un_encargado_puede_tener_varias_agrupaciones(): void
     {
+        $this->actuarComoAdmin();
+
         $encargado = Encargado::create($this->baseEncargado());
 
         $this->postJson('/api/agrupaciones', $this->baseAgrupacion($encargado->cedula, ['nombre' => 'Agrupación A']))->assertCreated();
@@ -244,6 +254,8 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_dos_agrupaciones_pueden_tener_el_mismo_nombre(): void
     {
+        $this->actuarComoAdmin();
+
         $encargado = Encargado::create($this->baseEncargado());
         $otro = Encargado::create($this->baseEncargado([
             'cedula' => '987654321',
@@ -293,6 +305,8 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_una_agrupacion_puede_tener_multiples_solicitudes(): void
     {
+        $this->actuarComoAdmin();
+
         $this->crearEstadoPendiente();
         $encargado = Encargado::create($this->baseEncargado());
         $agrupacion = Agrupacion::create($this->baseAgrupacion($encargado->cedula));
@@ -404,6 +418,8 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_aprobar_una_solicitud_guarda_fecha_y_hora_asignadas(): void
     {
+        $this->actuarComoAdmin();
+
         $this->crearEstadoPendiente();
         $encargado = Encargado::create($this->baseEncargado());
         $agrupacion = Agrupacion::create($this->baseAgrupacion($encargado->cedula));
@@ -570,6 +586,8 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_actualizar_una_solicitud_cambia_el_evento_pero_no_lo_limpia(): void
     {
+        $this->actuarComoAdmin();
+
         $evento = $this->crearEvento();
         $encargado = Encargado::create($this->baseEncargado());
         $agrupacion = Agrupacion::create($this->baseAgrupacion($encargado->cedula));
@@ -594,6 +612,8 @@ class SolicitudesAgrupacionesBackendValidationTest extends TestCase
 
     public function test_no_se_puede_eliminar_un_evento_con_solicitudes(): void
     {
+        $this->actuarComoAdmin();
+
         $evento = $this->crearEvento();
         $encargado = Encargado::create($this->baseEncargado());
         $agrupacion = Agrupacion::create($this->baseAgrupacion($encargado->cedula));

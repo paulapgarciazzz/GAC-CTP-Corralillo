@@ -3,11 +3,20 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\ActuaComoAdmin;
 use Tests\TestCase;
 
 class EncargadoTipoIdentificacionTest extends TestCase
 {
+    use ActuaComoAdmin;
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actuarComoAdmin();
+    }
 
     private function datosBase(array $overrides = []): array
     {
