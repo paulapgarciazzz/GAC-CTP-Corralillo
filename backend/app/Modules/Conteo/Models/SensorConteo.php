@@ -51,9 +51,18 @@ class SensorConteo extends Model
     {
         $token = Str::random(48);
 
-        $this->forceFill(['token_hash' => hash('sha256', $token)])->save();
+        $this->establecerToken($token);
 
         return $token;
+    }
+
+    /**
+     * Guarda solo el hash de un token generado fuera de la aplicación (p. ej.
+     * una variable de entorno privada del servidor). Invalida el anterior.
+     */
+    public function establecerToken(string $token): void
+    {
+        $this->forceFill(['token_hash' => hash('sha256', $token)])->save();
     }
 
     public function aceptaToken(?string $token): bool

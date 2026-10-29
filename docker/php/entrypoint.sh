@@ -36,6 +36,13 @@ else
     echo "[entrypoint] RUN_SEEDERS no es 'true': no se ejecutan seeders."
 fi
 
+# Tokens de sensores desde variables de entorno privadas (CONTEO_TOKEN_*).
+# Solo guarda el hash en sensor_conteo.token_hash, no reemplaza un token
+# distinto ya registrado y sin variables no hace nada. Un fallo (p. ej. la
+# base aún no responde) no impide arrancar la aplicación.
+php artisan conteo:sincronizar-tokens --no-interaction \
+    || echo "[entrypoint] conteo:sincronizar-tokens falló; se continúa el arranque."
+
 chmod -R 775 storage bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 

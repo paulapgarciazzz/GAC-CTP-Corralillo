@@ -420,4 +420,75 @@ class ConteoBackendTest extends TestCase
         $this->assertDatabaseCount('sensor_conteo', 2);
         $this->assertSame($hashAntes, $this->sensorEntrada->fresh()->token_hash);
     }
+
+    /*
+    | Tokens desde variables de entorno (conteo:sincronizar-tokens)
+    */
+
+    private function tokensEnEntorno(array $tokens, bool $reemplazar = false): void
+    {
+        config([
+            'conteo.tokens_sensores' => $tokens,
+            'conteo.reemplazar_tokens' => $reemplazar,
+        ]);
+    }
+
+    public function test_sincronizar_registra_solo_el_hash_y_el_sensor_se_autentica(): void
+    {
+        $this->sensorEntrada->forceFill(['token_hash' => null])->save();
+        $token = str_repeat('a1B2', 12);
+        $this->tokensEnEntorno(['ENTRADA-01' => $token, 'SALIDA-01' => null]);
+
+        $this->artisan('conteo:sincronizar-tokens')
+            ->doesntExpectOutputToContain($token)
+            ->assertSuccessful();
+
+        $this->assertSame(hash('sha256', $token), $this->sensorEntrada->fresh()->token_hash);
+        $this->comoSensor('ENTRADA-01', $token)->postJson('/api/conteo/dispositivo/latido')->assertOk();
+        $this->comoSensor('SALIDA-01', $this->tokenSalida)->postJson('/api/conteo/dispositivo/latido')->assertOk();
+    }
+
+    public function test_sincronizar_no_sobrescribe_un_token_distinto_ya_registrado(): void
+    {
+        $hashAntes = $this->sensorEntrada->fresh()->token_hash;
+        $this->tokensEnEntorno(['ENTRADA-01' => str_repeat('z9', 24)]);
+
+        $this->artisan('conteo:sincronizar-tokens')->assertSuccessful();
+        $this->artisan('conteo:sincronizar-tokens')->assertSuccessful();
+
+        $this->assertSame($hashAntes, $this->sensorEntrada->fresh()->token_hash);
+        $this->comoSensor('ENTRADA-01', $this->tokenEntrada)->postJson('/api/conteo/dispositivo/latido')->assertOk();
+    }
+
+    public function test_sincronizar_reemplaza_solo_con_autorizacion_explicita(): void
+    {
+        $token = str_repeat('z9', 24);
+        $this->tokensEnEntorno(['ENTRADA-01' => $token], reemplazar: true);
+
+        $this->artisan('conteo:sincronizar-tokens')->assertSuccessful();
+
+        $this->comoSensor('ENTRADA-01', $token)->postJson('/api/conteo/dispositivo/latido')->assertOk();
+        $this->comoSensor('ENTRADA-01', $this->tokenEntrada)->postJson('/api/conteo/dispositivo/latido')->assertUnauthorized();
+    }
+
+    public function test_sincronizar_ignora_tokens_cortos_y_sensores_inexistentes(): void
+    {
+        $this->sensorEntrada->forceFill(['token_hash' => null])->save();
+        $this->tokensEnEntorno(['ENTRADA-01' => 'corto', 'NO-EXISTE' => str_repeat('x', 40)]);
+
+        $this->artisan('conteo:sincronizar-tokens')->assertSuccessful();
+
+        $this->assertNull($this->sensorEntrada->fresh()->token_hash);
+        $this->assertDatabaseCount('sensor_conteo', 2);
+    }
+
+    public function test_sincronizar_sin_variables_no_cambia_nada(): void
+    {
+        $hashAntes = $this->sensorEntrada->fresh()->token_hash;
+        $this->tokensEnEntorno(['ENTRADA-01' => null, 'SALIDA-01' => '']);
+
+        $this->artisan('conteo:sincronizar-tokens')->assertSuccessful();
+
+        $this->assertSame($hashAntes, $this->sensorEntrada->fresh()->token_hash);
+    }
 }

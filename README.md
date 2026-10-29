@@ -170,6 +170,26 @@ Notas:
   seeders sin pedir autorización. Si alguna vez se usan, recrea después el
   contenedor sin ellas (`docker compose up -d --force-recreate app`).
 
+### Tokens de sensores de conteo en servidores sin Shell (Render)
+
+En cada arranque el entrypoint ejecuta `php artisan conteo:sincronizar-tokens`,
+que lee `CONTEO_TOKEN_ENTRADA_01` y `CONTEO_TOKEN_SALIDA_01` (mínimo 32
+caracteres) y guarda **solo su hash** en `sensor_conteo.token_hash`. No crea
+sensores, no toca usuarios ni movimientos y no muestra el token. Sin esas
+variables no hace nada.
+
+1. Generar un token aleatorio de 48 caracteres (letras y números).
+2. En Render → *Environment*, agregar `CONTEO_TOKEN_ENTRADA_01` con ese valor
+   (las variables de entorno de Render son privadas) y desplegar.
+3. En los logs del despliegue debe aparecer
+   `[conteo] ENTRADA-01: token registrado (solo su hash).` y, en los
+   siguientes, `el token ya está registrado.`
+4. Configurar el mismo token en el dispositivo (`config.h`).
+
+Si el sensor ya tiene **otro** token, se conserva y el log lo advierte. Para
+rotarlo: cambiar la variable y definir `CONTEO_REEMPLAZAR_TOKENS=true` durante
+un despliegue; después quitarla o dejarla en `false`.
+
 ## Módulo de Personalización
 
 Desde *Ajustes › Personalización del sistema* (permisos `personalizacion.ver`,
