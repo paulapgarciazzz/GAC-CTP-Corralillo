@@ -41,7 +41,7 @@ class PermisoUsuarioController extends Controller
         }
 
         return new UsuarioResource(
-            $this->usuarioService->sincronizarPermisos($usuario, $request->validated('permisos'))
+            $this->usuarioService->sincronizarPermisos($usuario, $request->validated('permisos'), $request->user())
         );
     }
 }

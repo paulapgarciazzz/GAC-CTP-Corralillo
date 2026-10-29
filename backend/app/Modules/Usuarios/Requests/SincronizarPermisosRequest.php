@@ -2,12 +2,15 @@
 
 namespace App\Modules\Usuarios\Requests;
 
+use App\Modules\Usuarios\Support\MensajesValidacion;
 use App\Modules\Usuarios\Support\Modulos;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class SincronizarPermisosRequest extends FormRequest
 {
+    use MensajesValidacion;
+
     public function authorize(): bool
     {
         return true;

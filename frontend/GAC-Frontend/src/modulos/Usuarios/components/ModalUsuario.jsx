@@ -22,8 +22,9 @@ function FilaSwitch({ titulo, descripcion, checked, onChange, disabled, error })
  * Crear / editar usuario. Se monta solo mientras está abierto, así el estado inicial
  * siempre parte del usuario recibido.
  * `onGuardar(datos)` devuelve `{ success, error, errors }`.
+ * El switch "Administrador" solo se muestra a administradores (`puedeAsignarAdmin`).
  */
-export default function ModalUsuario({ usuario, esUsuarioActual, onClose, onGuardar }) {
+export default function ModalUsuario({ usuario, esUsuarioActual, puedeAsignarAdmin, onClose, onGuardar }) {
     const editando = Boolean(usuario);
     const [form, setForm] = useState({
         name: usuario?.name ?? '',
@@ -46,12 +47,14 @@ export default function ModalUsuario({ usuario, esUsuarioActual, onClose, onGuar
 
         const datos = { ...form, name: form.name.trim(), email: form.email.trim() };
         if (editando && !datos.password) delete datos.password;
+        if (!puedeAsignarAdmin) delete datos.es_admin;
 
         const resultado = await onGuardar(datos);
         if (!resultado.success) {
             setGuardando(false);
             setErrores(resultado.errors ?? {});
-            if (!Object.keys(resultado.errors ?? {}).length) setErrorGeneral(resultado.error);
+            // `usuario` es un error de la cuenta completa, sin campo propio en el formulario.
+            if (!Object.keys(resultado.errors ?? {}).length || resultado.errors?.usuario) setErrorGeneral(resultado.error);
         }
     };
 
@@ -93,14 +96,16 @@ export default function ModalUsuario({ usuario, esUsuarioActual, onClose, onGuar
                         disabled={esUsuarioActual}
                         error={errores.activo?.[0]}
                     />
-                    <FilaSwitch
-                        titulo="Administrador"
-                        descripcion={esUsuarioActual ? 'No puedes quitarte el rol de administrador.' : 'Acceso total a todos los módulos.'}
-                        checked={form.es_admin}
-                        onChange={cambiar('es_admin')}
-                        disabled={esUsuarioActual}
-                        error={errores.es_admin?.[0]}
-                    />
+                    {puedeAsignarAdmin && (
+                        <FilaSwitch
+                            titulo="Administrador"
+                            descripcion={esUsuarioActual ? 'No puedes quitarte el rol de administrador.' : 'Acceso total a todos los módulos.'}
+                            checked={form.es_admin}
+                            onChange={cambiar('es_admin')}
+                            disabled={esUsuarioActual}
+                            error={errores.es_admin?.[0]}
+                        />
+                    )}
                 </div>
 
                 <AlertaError mensaje={errorGeneral} />

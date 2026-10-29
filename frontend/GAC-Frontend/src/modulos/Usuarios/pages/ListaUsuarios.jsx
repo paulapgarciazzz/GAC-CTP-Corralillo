@@ -46,7 +46,7 @@ function FilasCargando() {
 }
 
 export default function ListaUsuarios() {
-    const { user: usuarioActual, refrescarUsuario } = useAuth();
+    const { user: usuarioActual, esAdmin, refrescarUsuario } = useAuth();
     const { puedeCrear, puedeEditar, puedeEliminar } = usePermisosModulo('usuarios');
     const listado = useListadoPaginado(obtenerUsuarios);
     const [modal, setModal] = useState({ abierto: false, usuario: null });
@@ -83,10 +83,11 @@ export default function ListaUsuarios() {
 
     const { items: usuarios, meta, error, cargandoInicial, busquedaActiva } = listado;
     const sinResultados = !cargandoInicial && !error && usuarios.length === 0;
+    // Las cuentas de administrador solo las gestiona otro administrador.
     const accionesProps = (usuario) => ({
         usuario,
-        puedeEditar,
-        puedeEliminar: puedeEliminar && usuario.id !== usuarioActual?.id,
+        puedeEditar: puedeEditar && (esAdmin || !usuario.es_admin),
+        puedeEliminar: puedeEliminar && (esAdmin || !usuario.es_admin) && usuario.id !== usuarioActual?.id,
         onEditar: (u) => setModal({ abierto: true, usuario: u }),
         onEliminar: eliminacion.abrir,
     });
@@ -209,6 +210,7 @@ export default function ListaUsuarios() {
                 <ModalUsuario
                     usuario={modal.usuario}
                     esUsuarioActual={modal.usuario?.id === usuarioActual?.id}
+                    puedeAsignarAdmin={esAdmin}
                     onClose={cerrarModal}
                     onGuardar={guardarUsuario}
                 />

@@ -2,11 +2,14 @@
 
 namespace App\Modules\Usuarios\Requests;
 
+use App\Modules\Usuarios\Support\MensajesValidacion;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateUsuarioRequest extends FormRequest
 {
+    use MensajesValidacion;
+
     public function authorize(): bool
     {
         return true;
