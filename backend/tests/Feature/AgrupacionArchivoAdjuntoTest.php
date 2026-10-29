@@ -4,10 +4,12 @@ namespace Tests\Feature;
 
 use App\Modules\SolicitudesAgrupaciones\Models\Encargado;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\ActuaComoAdmin;
 use Tests\TestCase;
 
 class AgrupacionArchivoAdjuntoTest extends TestCase
 {
+    use ActuaComoAdmin;
     use RefreshDatabase;
 
     private const PNG_1X1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
@@ -17,6 +19,8 @@ class AgrupacionArchivoAdjuntoTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->actuarComoAdmin();
 
         $this->encargado = Encargado::create([
             'cedula' => '123456789',

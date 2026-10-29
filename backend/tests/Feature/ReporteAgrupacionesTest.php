@@ -8,10 +8,12 @@ use App\Modules\SolicitudesAgrupaciones\Models\Encargado;
 use App\Modules\SolicitudesAgrupaciones\Models\Estado;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\ActuaComoAdmin;
 use Tests\TestCase;
 
 class ReporteAgrupacionesTest extends TestCase
 {
+    use ActuaComoAdmin;
     use RefreshDatabase;
 
     private Evento $evento;
@@ -23,6 +25,8 @@ class ReporteAgrupacionesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->actuarComoAdmin();
 
         $this->evento = Evento::create([
             'nombre' => 'Festival de Primavera',

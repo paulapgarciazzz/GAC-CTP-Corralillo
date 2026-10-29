@@ -12,10 +12,12 @@ use App\Modules\SolicitudesAgrupaciones\Models\Encargado;
 use App\Modules\SolicitudesAgrupaciones\Models\Estado;
 use App\Modules\SolicitudesAgrupaciones\Models\SolicitudAgrupacion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\ActuaComoAdmin;
 use Tests\TestCase;
 
 class BeneficiosBackendTest extends TestCase
 {
+    use ActuaComoAdmin;
     use RefreshDatabase;
 
     private Agrupacion $agrupacion;
@@ -33,6 +35,8 @@ class BeneficiosBackendTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->actuarComoAdmin();
 
         $encargado = Encargado::create([
             'cedula' => '123456789',
