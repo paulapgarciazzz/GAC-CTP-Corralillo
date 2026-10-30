@@ -78,7 +78,7 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                         <button
                                             type="button"
                                             onClick={(e) => { e.stopPropagation(); onAceptar(solicitud.id); }}
-                                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-white hover:bg-primary-hover transition-colors cursor-pointer"
+                                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary hover:bg-primary-hover transition-colors cursor-pointer"
                                         >
                                             Aceptar
                                         </button>

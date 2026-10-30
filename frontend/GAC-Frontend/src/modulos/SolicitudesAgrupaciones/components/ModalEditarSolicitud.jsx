@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Loader2, X } from 'lucide-react';
+import { useAtraparFoco } from '../../../hooks/useAtraparFoco';
+import { BOTON_CERRAR_MODAL_CLASS, MODAL_OVERLAY_CLASS, MODAL_PANEL_CLASS } from '../../../utils/modal';
 import { actualizarSolicitud } from '../services/solicitudService';
 import { obtenerConfigIdentificacion } from '../../../utils/identificacion';
 import { PAISES_TELEFONO, MAX_DIGITOS_PREFIJO_CUSTOM, obtenerConfigTelefono, combinarNumeroTelefono, parsearNumeroTelefono } from '../../../utils/telefono';
@@ -49,6 +51,9 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
     const [errorEvento, setErrorEvento] = useState('');
     const { eventos, cargando: cargandoEventos } = useEventos();
     const rango = useRangoEvento(eventos, valores.id_evento, setValores);
+
+    const panelRef = useRef(null);
+    useAtraparFoco(true, panelRef);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -129,25 +134,27 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            className={MODAL_OVERLAY_CLASS}
             onClick={onClose}
         >
             <div
+                ref={panelRef}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="titulo-modal-editar-solicitud"
+                tabIndex={-1}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface rounded-2xl shadow-2xl p-8 relative"
+                className={`${MODAL_PANEL_CLASS} max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8`}
             >
                 <button
                     type="button"
                     onClick={onClose}
                     aria-label="Cerrar"
-                    className="absolute top-4 right-4 text-foreground-faint hover:text-foreground transition-colors cursor-pointer"
+                    className={BOTON_CERRAR_MODAL_CLASS}
                 >
-                    <X size={22} />
+                    <X size={20} aria-hidden="true" />
                 </button>
-                <h3 id="titulo-modal-editar-solicitud" className="text-2xl text-center font-bold text-primary mb-6">
+                <h3 id="titulo-modal-editar-solicitud" className="text-2xl text-center font-semibold text-foreground mb-6 px-8">
                     Editar solicitud
                 </h3>
 
@@ -156,47 +163,47 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                         <legend className="text-lg font-semibold text-primary">Datos del encargado</legend>
                         <div className="grid sm:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <label htmlFor="cedula" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">{configIdentificacion.etiquetaCorta} (no editable)</label>
+                                <label htmlFor="cedula" className="block text-sm font-semibold text-foreground">{configIdentificacion.etiquetaCorta} (no editable)</label>
                                 <input id="cedula" name="cedula" type="text" value={solicitud.encargado?.cedula ?? ''} disabled readOnly
-                                    className="w-full px-4 py-2 border border-border rounded-lg bg-surface-soft text-foreground-faint cursor-not-allowed" />
+                                    className="w-full px-4 py-2 border border-border rounded-lg bg-surface-soft text-foreground-soft cursor-not-allowed" />
                             </div>
                             <div className="space-y-1">
-                                <label htmlFor="primer_nombre" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Nombre</label>
+                                <label htmlFor="primer_nombre" className="block text-sm font-semibold text-foreground">Nombre</label>
                                 <input id="primer_nombre" name="primer_nombre" type="text" value={valores.primer_nombre} onChange={handleChange} required
                                     pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]+" title="Solo letras y espacios" minLength={2} maxLength={100}
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div className="space-y-1">
-                                <label htmlFor="apellido" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Apellido</label>
+                                <label htmlFor="apellido" className="block text-sm font-semibold text-foreground">Apellido</label>
                                 <input id="apellido" name="apellido" type="text" value={valores.apellido} onChange={handleChange} required
                                     pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]+" title="Solo letras y espacios" minLength={2} maxLength={100}
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div className="space-y-1">
-                                <label htmlFor="email" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Correo electrónico</label>
+                                <label htmlFor="email" className="block text-sm font-semibold text-foreground">Correo electrónico</label>
                                 <input id="email" name="email" type="email" value={valores.email} onChange={handleChange} required
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div className="space-y-1">
-                                <label htmlFor="codigo_pais_tel" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">País</label>
+                                <label htmlFor="codigo_pais_tel" className="block text-sm font-semibold text-foreground">País</label>
                                 <select id="codigo_pais_tel" name="codigo_pais_tel" value={valores.codigo_pais_tel} onChange={handleCodigoPaisChange} required
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                    className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                                     {PAISES_TELEFONO.map((p) => (
                                         <option key={p.value} value={p.value} className={OPCION_CLASS}>{p.pais}{p.prefijo ? ` (+${p.prefijo})` : ''}</option>
                                     ))}
                                 </select>
                             </div>
                             <div className="space-y-1">
-                                <label htmlFor="numero_tel" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Número de teléfono</label>
+                                <label htmlFor="numero_tel" className="block text-sm font-semibold text-foreground">Número de teléfono</label>
                                 <div className="flex gap-2">
                                     {valores.codigo_pais_tel === 'OTRO' && (
                                         <input id="prefijo_custom_tel" name="prefijo_custom_tel" type="text" inputMode="numeric" value={valores.prefijo_custom_tel} onChange={handlePrefijoCustomChange} required
                                             placeholder="Prefijo" maxLength={MAX_DIGITOS_PREFIJO_CUSTOM}
-                                            className="w-20 px-2 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                            className="w-20 px-2 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                                     )}
                                     <input id="numero_tel" name="numero_tel" type="tel" inputMode="numeric" value={valores.numero_tel} onChange={handleNumeroTelChange} required
                                         pattern={configTelefono.pattern} title={configTelefono.title} maxLength={configTelefono.maxLength}
-                                        className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                        className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                                 </div>
                             </div>
                         </div>
@@ -206,21 +213,21 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                         <legend className="text-lg font-semibold text-primary">Datos de la agrupación</legend>
                         <div className="grid sm:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <label htmlFor="nombre" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Nombre de la agrupación</label>
+                                <label htmlFor="nombre" className="block text-sm font-semibold text-foreground">Nombre de la agrupación</label>
                                 <input id="nombre" name="nombre" type="text" value={valores.nombre} onChange={handleChange} required
                                     pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]+" title="Solo letras y espacios" minLength={2} maxLength={150}
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div className="space-y-1">
-                                <label htmlFor="lugar_procedencia" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Lugar de procedencia</label>
+                                <label htmlFor="lugar_procedencia" className="block text-sm font-semibold text-foreground">Lugar de procedencia</label>
                                 <input id="lugar_procedencia" name="lugar_procedencia" type="text" value={valores.lugar_procedencia} onChange={handleChange} required
                                     pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü\s]+" title="Solo letras y espacios" minLength={2} maxLength={150}
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div className="space-y-1">
-                                <label htmlFor="cantidad_integrantes" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Cantidad de integrantes</label>
+                                <label htmlFor="cantidad_integrantes" className="block text-sm font-semibold text-foreground">Cantidad de integrantes</label>
                                 <input id="cantidad_integrantes" name="cantidad_integrantes" type="number" min="1" max="200" step="1" value={valores.cantidad_integrantes} onChange={handleChange} required
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div className="space-y-1 sm:col-span-2">
                                 <CampoArchivoAdjunto archivoAdjuntoUrl={solicitud.agrupacion?.archivo_adjunto_url} resena={solicitud.agrupacion?.resena} />
@@ -233,20 +240,20 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                         <div className="grid sm:grid-cols-2 gap-4">
                             <SelectEvento eventos={eventos} cargando={cargandoEventos} value={valores.id_evento} onChange={handleChange} idIncluido={solicitud.id_evento} error={errorEvento} />
                             <div className="space-y-1">
-                                <label htmlFor="fecha_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Fecha deseada de participación</label>
+                                <label htmlFor="fecha_solicitada" className="block text-sm font-semibold text-foreground">Fecha deseada de participación</label>
                                 <input id="fecha_solicitada" name="fecha_solicitada" type="date" min={rango?.fechaMin} max={rango?.fechaMax} disabled={!rango} value={valores.fecha_solicitada} onChange={handleChange} required
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed" />
+                                    className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed" />
                             </div>
                             <div className="space-y-1">
-                                <label htmlFor="hora_solicitada" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Hora deseada de participación</label>
+                                <label htmlFor="hora_solicitada" className="block text-sm font-semibold text-foreground">Hora deseada de participación</label>
                                 <SelectorHora id="hora_solicitada" name="hora_solicitada" value={valores.hora_solicitada} onChange={handleChange}
                                     desde={rango?.horaDesde} hasta={rango?.horaHasta} disabled={!rango} />
                             </div>
                             <div className="space-y-1 sm:col-span-2">
-                                <label htmlFor="comentarios" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Comentarios</label>
+                                <label htmlFor="comentarios" className="block text-sm font-semibold text-foreground">Comentarios</label>
                                 <textarea id="comentarios" name="comentarios" rows={4} value={valores.comentarios} onChange={handleChange} required
                                     minLength={10} maxLength={1000}
-                                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                         </div>
                     </fieldset>
@@ -260,7 +267,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 px-4 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-md transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                        className="w-full py-3 px-4 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-on-primary font-semibold rounded-xl shadow-md transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
                     >
                         {loading && <Loader2 size={18} className="animate-spin" />}
                         {loading ? 'Guardando...' : 'Guardar cambios'}

@@ -12,7 +12,7 @@ export default function FiltrosSolicitudesAprobadas({ filtros, onChange }) {
                     value={filtros.agrupacion}
                     onChange={actualizar('agrupacion')}
                     placeholder="Nombre de agrupación..."
-                    className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full pl-9 pr-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
                 />
             </div>
 
@@ -21,7 +21,7 @@ export default function FiltrosSolicitudesAprobadas({ filtros, onChange }) {
                 value={filtros.cedula}
                 onChange={actualizar('cedula')}
                 placeholder="Cédula del encargado..."
-                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
             />
 
             <input
@@ -29,14 +29,14 @@ export default function FiltrosSolicitudesAprobadas({ filtros, onChange }) {
                 value={filtros.fecha}
                 onChange={actualizar('fecha')}
                 aria-label="Filtrar por fecha"
-                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
 
             <select
                 value={filtros.estadoAsignacion}
                 onChange={actualizar('estadoAsignacion')}
                 aria-label="Filtrar por estado de asignación"
-                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
                 <option value="todas">Todas</option>
                 <option value="pendiente">Pendiente de asignar</option>

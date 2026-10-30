@@ -1,18 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Users, X } from 'lucide-react';
 import { obtenerConfigIdentificacion } from '../../../utils/identificacion';
 import CampoArchivoAdjunto from '../../../components/CampoArchivoAdjunto';
+import { useAtraparFoco } from '../../../hooks/useAtraparFoco';
+import { BOTON_CERRAR_MODAL_CLASS, MODAL_OVERLAY_CLASS, MODAL_PANEL_CLASS } from '../../../utils/modal';
 
 function Campo({ etiqueta, valor }) {
     return (
         <div className="space-y-1">
-            <p className="text-xs font-medium text-foreground-faint uppercase tracking-wider">{etiqueta}</p>
+            <p className="text-xs font-medium text-foreground-faint uppercase tracking-wide">{etiqueta}</p>
             <p className="text-sm text-foreground whitespace-pre-wrap">{valor || '—'}</p>
         </div>
     );
 }
 
 export default function ModalDetalleAgrupacion({ open, agrupacion, onClose }) {
+    const panelRef = useRef(null);
+    useAtraparFoco(open && !!agrupacion, panelRef);
+
     useEffect(() => {
         if (!open) return;
 
@@ -29,34 +34,36 @@ export default function ModalDetalleAgrupacion({ open, agrupacion, onClose }) {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            className={MODAL_OVERLAY_CLASS}
             onClick={onClose}
         >
             <div
+                ref={panelRef}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="titulo-modal-detalle-agrupacion"
+                tabIndex={-1}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface rounded-2xl shadow-2xl p-8 relative"
+                className={`${MODAL_PANEL_CLASS} max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8`}
             >
                 <button
                     type="button"
                     onClick={onClose}
                     aria-label="Cerrar"
-                    className="absolute top-4 right-4 text-foreground-faint hover:text-foreground transition-colors cursor-pointer"
+                    className={BOTON_CERRAR_MODAL_CLASS}
                 >
-                    <X size={22} />
+                    <X size={20} aria-hidden="true" />
                 </button>
 
                 <div className="flex flex-col items-center gap-3 mb-6">
-                    <div className="w-24 h-24 rounded-full bg-primary/10 border border-border overflow-hidden flex items-center justify-center">
+                    <div className="w-24 h-24 rounded-full bg-surface-soft border border-border overflow-hidden flex items-center justify-center">
                         {agrupacion.foto_url ? (
                             <img src={agrupacion.foto_url} alt={agrupacion.nombre} className="w-full h-full object-cover" />
                         ) : (
-                            <Users size={32} className="text-primary/40" />
+                            <Users size={32} className="text-foreground-faint" aria-hidden="true" />
                         )}
                     </div>
-                    <h3 id="titulo-modal-detalle-agrupacion" className="text-2xl text-center font-bold text-primary">
+                    <h3 id="titulo-modal-detalle-agrupacion" className="text-2xl text-center font-semibold text-foreground">
                         {agrupacion.nombre}
                     </h3>
                 </div>
