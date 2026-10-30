@@ -16,7 +16,7 @@ function BarraEvento({ evento, dia, soloEscritorio }) {
         >
             <span lang="es" className="line-clamp-3 hyphens-auto wrap-break-word sm:line-clamp-2">
                 {mostrarHora && (
-                    <span className="mr-1 hidden font-semibold opacity-75 sm:inline">{format(evento.start, 'HH:mm')}</span>
+                    <span className="mr-1 hidden font-semibold sm:inline">{format(evento.start, 'HH:mm')}</span>
                 )}
                 {evento.title}
             </span>

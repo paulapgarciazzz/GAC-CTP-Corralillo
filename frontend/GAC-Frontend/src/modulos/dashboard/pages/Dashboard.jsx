@@ -100,6 +100,7 @@ const Dashboard =()=>{
             <div className={!isMobile ? 'lg:ml-56 print:ml-0' : ''}>
                 <Topbar
                     isDark={isDark}
+                    isDrawerOpen={isMobile && isSidebarOpen}
                     onToggleDrawer={toggleDrawer}
                     onToggleTheme={toggleTheme}
                     isMobile={isMobile}

@@ -42,7 +42,7 @@ const FilaModulo = memo(function FilaModulo({ modulo, activas, editable, onToggl
             {encendido && !soloVer && (
                 <div className="mt-2 mx-2 p-3 rounded-lg bg-background border border-border
                     transition-[opacity,translate] duration-200 starting:opacity-0 starting:-translate-y-1 motion-reduce:transition-none">
-                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-foreground-faint">Permisos</p>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground-faint">Permisos</p>
                     <ul aria-label={`Permisos en ${modulo.nombre}`} className="grid grid-cols-2 gap-x-4 gap-y-3">
                         {modulo.acciones.map((accion) => {
                             const esBase = accion.clave === ACCION_POR_DEFECTO;

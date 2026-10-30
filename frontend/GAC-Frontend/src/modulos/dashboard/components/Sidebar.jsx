@@ -1,14 +1,22 @@
 import { FileUser, CalendarDays, ClipboardMinus, UserCog, ShelvingUnit, LayoutDashboard, Users, UserPlus, Shield, PersonStanding, Boxes, BookUser, SquareLibrary, CirclePile, ShieldAlert, Settings, ClipboardList, FileBarChart2, MapPin, Paintbrush, Activity } from "lucide-react";
-import { useState } from "react"
+import { useRef, useState } from "react"
 import logoOriginal from '../../../assets/logo.webp'
 import { usePersonalizacion } from '../../Personalizacion/publico/usePersonalizacion'
 import { ChevronDown } from "lucide-react";
 import { ChevronRight, Lock } from "lucide-react";
 import { useAuth } from "../../../auth/hooks/useAuth";
+import { useAtraparFoco } from "../../../hooks/useAtraparFoco";
+import { useCerrarConEscape } from "../../../hooks/useCerrarConEscape";
 
-const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
+const Sidebar = ({ onCloseDrawer, isMobile, selectedView, onSelectView }) =>{
     const { tieneModulo } = useAuth();
     const { apariencia } = usePersonalizacion();
+    const asideRef = useRef(null);
+
+    // En celular el menú es un cajón sobre el contenido: recibe el foco, Tab cicla dentro,
+    // Escape lo cierra y el foco vuelve al botón hamburguesa.
+    useAtraparFoco(Boolean(isMobile), asideRef);
+    useCerrarConEscape(Boolean(isMobile), onCloseDrawer);
 
     const [links,setLinks] = useState([
 
@@ -77,10 +85,11 @@ const Sidebar = ({ onCloseDrawer, selectedView, onSelectView }) =>{
 
     const handleChildClick = (childName) => {
         onSelectView?.(childName);
-        if(onCloseDrawer && window.innerWidth < 789) onCloseDrawer();
+        // Solo cierra en celular/tablet (el Dashboard lo ignora en escritorio).
+        onCloseDrawer?.();
     };
     return (
-        <aside className="print:hidden fixed left-0 top-0 h-screen bg-rail text-white overflow-hidden shadow-xl w-56 z-20 lg:mt-0 mt-14 flex flex-col">
+        <aside id="menu-lateral" ref={asideRef} tabIndex={-1} aria-label="Menú lateral" className="print:hidden fixed left-0 top-0 h-screen bg-rail text-white overflow-hidden shadow-xl w-56 z-20 lg:mt-0 mt-14 flex flex-col">
             <div className="h-16 flex items-center px-4 border-b border-white/10">
                 <div className="flex items-center gap-2.5">
                     <img className="h-10 w-10 shrink-0 object-contain" src={apariencia.logo_url || logoOriginal} alt="" width="40" height="40"/>

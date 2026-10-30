@@ -42,6 +42,10 @@
   --color-chart-1: #2a78d6;
   --color-chart-2: #eb6834;
   --color-chart-3: #1baf7a;
+  /* Texto sobre el tinte /15 de cada color (etiquetas de eventos del calendario): ≥ 4.8:1 */
+  --color-chart-1-texto: #225ba2;
+  --color-chart-2-texto: #934830;
+  --color-chart-3-texto: #166b56;
 
   /* Movimiento: solo opacity/transform, anulado con prefers-reduced-motion.
      Sin fill-mode: un transform que persiste convierte al panel en contenedor de los hijos
@@ -98,6 +102,9 @@
   --color-chart-1: #3987e5;
   --color-chart-2: #d95926;
   --color-chart-3: #199e70;
+  --color-chart-1-texto: #6ba5ec;
+  --color-chart-2-texto: #e3835c;
+  --color-chart-3-texto: #47b18d;
 }
 
 @layer base{

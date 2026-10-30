@@ -6,12 +6,13 @@ export default function FiltrosSolicitudesAprobadas({ filtros, onChange }) {
     return (
         <div className="bg-surface border border-border rounded-xl p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
             <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-faint" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-faint" aria-hidden="true" />
                 <input
-                    type="text"
+                    type="search"
                     value={filtros.agrupacion}
                     onChange={actualizar('agrupacion')}
                     placeholder="Nombre de agrupación..."
+                    aria-label="Buscar por nombre de agrupación"
                     className="w-full pl-9 pr-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
                 />
             </div>
@@ -21,6 +22,7 @@ export default function FiltrosSolicitudesAprobadas({ filtros, onChange }) {
                 value={filtros.cedula}
                 onChange={actualizar('cedula')}
                 placeholder="Cédula del encargado..."
+                aria-label="Buscar por cédula del encargado"
                 className="w-full px-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
             />
 

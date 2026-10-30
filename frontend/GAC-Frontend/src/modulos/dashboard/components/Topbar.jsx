@@ -8,7 +8,7 @@ import { useCerrarConEscape } from '../../../hooks/useCerrarConEscape'
 // El modal de perfil se descarga solo cuando se abre.
 const ModalPerfil = lazy(() => import('../../Usuarios/components/ModalPerfil'));
 
-const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
+const Topbar = ({ isDark, isDrawerOpen, onToggleDrawer, onToggleTheme }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [perfilAbierto, setPerfilAbierto] = useState(false);
     const menuRef = useRef(null);
@@ -51,7 +51,7 @@ const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
             <div className="h-16 flex items-center px-4 sm:px-6 lg:px-8">
                 <div className='flex items-center justify-between w-full'>
                     <div className="flex items-center gap-3">
-                        <button type="button" onClick= {onToggleDrawer} aria-label="Abrir o cerrar menú lateral" className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg hover:bg-surface-soft transition-colors">
+                        <button type="button" onClick= {onToggleDrawer} aria-label={isDrawerOpen ? 'Cerrar menú lateral' : 'Abrir menú lateral'} aria-expanded={isDrawerOpen} aria-controls="menu-lateral" className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg hover:bg-surface-soft transition-colors">
                             <Menu className="w-5 h-5 text-foreground" aria-hidden="true"/>
                         </button>
                     </div>

@@ -28,7 +28,7 @@ export default function ListaEventosMes({ mes, eventos, onSeleccionarDia }) {
                                 className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-border bg-background p-2.5 text-left transition-colors hover:border-primary/40"
                             >
                                 <span className={`flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg ${colores.bg} ${colores.text}`}>
-                                    <span className="text-[10px] font-semibold uppercase leading-none">
+                                    <span className="text-xs font-semibold uppercase leading-none">
                                         {format(dia, 'EEE', { locale: es }).replace('.', '')}
                                     </span>
                                     <span className="text-lg font-bold leading-tight">{format(dia, 'd')}</span>

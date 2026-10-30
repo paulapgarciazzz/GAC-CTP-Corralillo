@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import escudoOriginal from '../../../assets/escudo.webp';
+import { useCerrarConEscape } from '../../../hooks/useCerrarConEscape';
 import { usePersonalizacion } from '../../Personalizacion/publico/usePersonalizacion';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { useNavigate, Link } from '@tanstack/react-router';
@@ -22,6 +23,13 @@ const Navbar = ({isDark, onToggleTheme}) => {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const botonMenuRef = useRef(null);
+    // Escape cierra el menú móvil y devuelve el foco al botón que lo abrió.
+    const cerrarMenuConEscape = useCallback(() => {
+        setIsMenuOpen(false);
+        botonMenuRef.current?.focus();
+    }, []);
+    useCerrarConEscape(isMenuOpen, cerrarMenuConEscape);
     const handleLogout = async () => {
        await logout();
        navigate({ to: '/'});
@@ -88,6 +96,7 @@ const Navbar = ({isDark, onToggleTheme}) => {
                     </div>
                      <div className="lg:hidden">
                         <button
+                            ref={botonMenuRef}
                             type="button"
                             className={`inline-flex h-11 w-11 items-center justify-center rounded-lg transition-colors ${hoverIconoClass}`}
                             onClick={() => setIsMenuOpen((prev) => !prev)}

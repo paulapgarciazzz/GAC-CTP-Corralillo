@@ -14,7 +14,7 @@ const PERIODOS = [
 // Las tres partes van sin borde dentro de un solo contenedor, para que se vean como un único campo.
 const CONTENEDOR_CLASS = 'relative flex w-full min-h-11 items-center border border-border-input rounded-lg bg-surface transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30';
 
-const PARTE_CLASS = 'py-2 bg-transparent text-foreground cursor-pointer rounded-md focus:outline-none focus-visible:bg-primary/10 disabled:opacity-60 disabled:cursor-not-allowed';
+const PARTE_CLASS = 'py-2 bg-transparent text-foreground cursor-pointer rounded-md focus:outline-none focus-visible:bg-primary/10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary disabled:opacity-60 disabled:cursor-not-allowed';
 
 // Debe coincidir con `max-h-48` de la lista (12rem): unas 6 opciones visibles.
 const ALTO_LISTA = 192;

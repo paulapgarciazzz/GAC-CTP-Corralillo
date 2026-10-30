@@ -72,7 +72,7 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
                                         <EventChip key={event.id} event={event} variant="dot" />
                                     ))}
                                     {dayEvents.length > 4 && (
-                                        <span className="text-[9px] font-semibold text-foreground-faint">
+                                        <span className="text-xs font-semibold text-foreground-faint">
                                             +{dayEvents.length - 4}
                                         </span>
                                     )}

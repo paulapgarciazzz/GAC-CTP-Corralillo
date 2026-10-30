@@ -198,7 +198,7 @@ function FormularioEdicion({ solicitud, onClose, onActualizado }) {
                                 <div className="flex gap-2">
                                     {valores.codigo_pais_tel === 'OTRO' && (
                                         <input id="prefijo_custom_tel" name="prefijo_custom_tel" type="text" inputMode="numeric" value={valores.prefijo_custom_tel} onChange={handlePrefijoCustomChange} required
-                                            placeholder="Prefijo" maxLength={MAX_DIGITOS_PREFIJO_CUSTOM}
+                                            placeholder="Prefijo" aria-label="Prefijo telefónico del país" maxLength={MAX_DIGITOS_PREFIJO_CUSTOM}
                                             className="w-20 px-2 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
                                     )}
                                     <input id="numero_tel" name="numero_tel" type="tel" inputMode="numeric" value={valores.numero_tel} onChange={handleNumeroTelChange} required

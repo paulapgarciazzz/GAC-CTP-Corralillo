@@ -71,14 +71,14 @@ function TarjetaAsignacion({ asignacion }) {
             </div>
 
             <div className="pt-2 border-t border-border space-y-1">
-                <p className="text-[11px] uppercase tracking-wider text-foreground-faint">Solicitud de beneficios</p>
+                <p className="text-xs uppercase tracking-wider text-foreground-faint">Solicitud de beneficios</p>
                 <p className="text-sm text-foreground-soft italic line-clamp-3">
                     {solicitud?.comentarios ? `"${solicitud.comentarios}"` : 'Sin comentario'}
                 </p>
             </div>
 
             <div className="space-y-1">
-                <p className="text-[11px] uppercase tracking-wider text-foreground-faint">Observaciones de la asignación</p>
+                <p className="text-xs uppercase tracking-wider text-foreground-faint">Observaciones de la asignación</p>
                 <p className="text-sm text-foreground-soft whitespace-pre-wrap">
                     {asignacion.observaciones || 'Sin observaciones'}
                 </p>
@@ -203,6 +203,7 @@ export default function VerBeneficiosAsignados() {
                     value={filtros.cedula}
                     onChange={actualizarFiltro('cedula')}
                     placeholder="Cédula del encargado..."
+                    aria-label="Buscar por cédula del encargado"
                     className="w-full px-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
                 />
 
