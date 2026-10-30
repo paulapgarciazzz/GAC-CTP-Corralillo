@@ -56,14 +56,14 @@ export default function ReportesConteo() {
         <div className="space-y-5">
             <div>
                 <p className="text-sm text-foreground-faint">Conteo</p>
-                <h1 className="text-2xl font-bold text-primary">Reportes de conteo</h1>
+                <h1 className="text-2xl font-semibold text-foreground">Reportes de conteo</h1>
                 <p className="mt-1 text-sm text-foreground-soft">Estadísticas de entradas y salidas para una fecha específica.</p>
             </div>
 
             <div className="bg-surface border border-border rounded-xl p-4 sm:p-5 space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="space-y-1">
-                        <label htmlFor="reporte-conteo-fecha" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+                        <label htmlFor="reporte-conteo-fecha" className="block text-sm font-semibold text-foreground">
                             Fecha
                         </label>
                         <input
@@ -72,7 +72,7 @@ export default function ReportesConteo() {
                             value={fecha}
                             onChange={(event) => setFecha(event.target.value)}
                             disabled={generando}
-                            className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                            className="w-full px-3 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
                         />
                     </div>
                 </div>
@@ -85,7 +85,7 @@ export default function ReportesConteo() {
                     type="button"
                     onClick={handleGenerar}
                     disabled={generando}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-colors cursor-pointer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-on-primary rounded-lg font-semibold transition-colors cursor-pointer"
                 >
                     {generando && <Loader2 size={18} className="animate-spin" />}
                     {generando ? 'Generando reporte...' : 'Generar reporte'}
@@ -95,7 +95,7 @@ export default function ReportesConteo() {
             {reporte && (
                 <div className="space-y-6">
                     <div className="bg-surface border border-border rounded-xl p-4 sm:p-6">
-                        <h2 className="text-xl font-bold text-foreground">Reporte de conteo</h2>
+                        <h2 className="text-xl font-semibold text-foreground">Reporte de conteo</h2>
                         <p className="mt-1 text-sm text-foreground-soft">Fecha: {formatearFechaVisual(reporte.fecha)}</p>
                     </div>
 

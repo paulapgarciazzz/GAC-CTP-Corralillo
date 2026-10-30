@@ -33,7 +33,7 @@ export default function ReporteEvento({ evento, onVolver }) {
             </div>
 
             <div className="hidden print:block text-center">
-                <h2 className="text-xl font-bold">CTP de Corralillo</h2>
+                <h2 className="text-xl font-semibold">CTP de Corralillo</h2>
             </div>
 
             <div className="bg-surface border border-border rounded-xl p-4 sm:p-6 space-y-1 print:border-0 print:p-0 print:bg-transparent">
