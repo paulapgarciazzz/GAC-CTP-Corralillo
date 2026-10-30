@@ -77,7 +77,7 @@ function VistaPrevia({ tipo, textos, escudoUrl }) {
                             type="button"
                             onClick={() => setMovil(valor)}
                             aria-pressed={movil === valor}
-                            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${movil === valor ? 'bg-primary text-white' : 'text-foreground-soft hover:bg-background'}`}
+                            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${movil === valor ? 'bg-primary text-on-primary' : 'text-foreground-soft hover:bg-background'}`}
                         >
                             <Icono size={14} />{texto}
                         </button>
@@ -139,7 +139,7 @@ export default function CorreosTab() {
         <div className="space-y-8">
             <section className="space-y-3">
                 <div>
-                    <h2 className="text-lg font-bold text-foreground">Escudo de los correos</h2>
+                    <h2 className="text-lg font-semibold text-foreground">Escudo de los correos</h2>
                     <p className="mt-1 text-sm text-foreground-soft">
                         Aparece en el encabezado de los tres correos. Si no se elige uno propio se usa el de «Apariencia y galería» y, si tampoco hay, el original del colegio.
                     </p>

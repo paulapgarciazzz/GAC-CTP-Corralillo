@@ -51,7 +51,7 @@ export default function InformacionContactoTab() {
             {GRUPOS.map(({ titulo, descripcion, campos }) => (
                 <section key={titulo} className="space-y-3">
                     <div>
-                        <h2 className="text-lg font-bold text-foreground">{titulo}</h2>
+                        <h2 className="text-lg font-semibold text-foreground">{titulo}</h2>
                         <p className="mt-1 text-sm text-foreground-soft">{descripcion}</p>
                     </div>
                     <CamposSeccion

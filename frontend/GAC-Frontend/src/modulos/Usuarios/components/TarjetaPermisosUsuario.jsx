@@ -163,7 +163,7 @@ function TarjetaPermisosUsuario({ usuario, editable, onGuardado }) {
                             </button>
                         )}
                         <button type="button" onClick={guardar} disabled={!sucio || guardando}
-                            className="h-10 px-4 text-sm rounded-lg font-semibold bg-primary hover:bg-primary-hover text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer inline-flex items-center gap-2">
+                            className="h-10 px-4 text-sm rounded-lg font-semibold bg-primary hover:bg-primary-hover text-on-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer inline-flex items-center gap-2">
                             {guardando && <Loader2 size={16} className="animate-spin" />}
                             {guardando ? 'Guardando...' : 'Guardar cambios'}
                         </button>
