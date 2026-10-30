@@ -12,7 +12,7 @@ const PERIODOS = [
 ];
 
 // Las tres partes van sin borde dentro de un solo contenedor, para que se vean como un único campo.
-const CONTENEDOR_CLASS = 'relative flex w-full items-center border border-border rounded-lg bg-background focus-within:ring-2 focus-within:ring-primary';
+const CONTENEDOR_CLASS = 'relative flex w-full min-h-11 items-center border border-border-input rounded-lg bg-surface transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30';
 
 const PARTE_CLASS = 'py-2 bg-transparent text-foreground cursor-pointer rounded-md focus:outline-none focus-visible:bg-primary/10 disabled:opacity-60 disabled:cursor-not-allowed';
 
@@ -188,7 +188,7 @@ function ListaDesplegable({ id, etiqueta, value, opciones, disponibles, onChange
                                 onKeyDown={(e) => handleOpcionKeyDown(e, opcion)}
                                 className={`px-3 py-1 focus:outline-none ${
                                     seleccionada
-                                        ? 'cursor-pointer bg-primary text-white font-semibold'
+                                        ? 'cursor-pointer bg-primary text-on-primary font-semibold'
                                         : disponible
                                             ? 'cursor-pointer text-foreground hover:bg-primary/10 focus:bg-primary/10'
                                             : 'cursor-not-allowed text-foreground opacity-40 focus:bg-primary/10'
