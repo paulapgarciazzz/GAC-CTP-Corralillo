@@ -3,6 +3,9 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useAuth } from "../../../auth/hooks/useAuth";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import ModalRecuperarPassword from "./ModalRecuperarPassword";
+import escudoOriginal from '../../../assets/escudo.webp';
+import { usePersonalizacion } from '../../Personalizacion/publico/usePersonalizacion';
+import { BOTON_PRIMARIO_CLASS, INPUT_CLASS, LABEL_CLASS } from '../../../utils/formulario';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -12,6 +15,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [mostrarRecuperacion, setMostrarRecuperacion] = useState(false);
     const { login } = useAuth();
+    const { landing, apariencia } = usePersonalizacion();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -33,34 +37,37 @@ const Login = () => {
         }
     };
     return (
-        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-rail to-[#05070f] p-4">
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/10 space-y-6">
+        <main className="min-h-screen flex items-center justify-center bg-rail p-4">
+      <div className="w-full max-w-md space-y-6">
 
         {/* Volver a la landing */}
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors"
+          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg text-sm font-medium text-white/80 hover:text-white transition-colors"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} aria-hidden="true" />
           Volver al inicio
         </Link>
 
+        <div className="bg-surface rounded-2xl p-8 shadow-xl border border-border space-y-6 sm:p-10">
         {/* Encabezado */}
-        <div className="text-center space-y-2">
-          <h2 className="text-3xl font-extrabold text-white tracking-tight">
+        <div className="text-center space-y-3">
+          <img src={apariencia.escudo_url || escudoOriginal} alt="" width="64" height="64" className="mx-auto h-16 w-16 object-contain" />
+          <p className="text-sm font-semibold uppercase tracking-wider text-accent">{landing.nombre_institucion}</p>
+          <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
             ¡Bienvenido de nuevo!
-          </h2>
-          <p className="text-sm text-gray-400">
+          </h1>
+          <p className="text-sm text-foreground-soft">
             Ingresa tus credenciales para acceder a tu cuenta
           </p>
         </div>
- 
+
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
           {/* Campo Email */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label
               htmlFor="email"
-              className="text-xs font-medium text-gray-300 uppercase tracking-wider block"
+              className={LABEL_CLASS}
             >
               Correo Electrónico
             </label>
@@ -72,16 +79,18 @@ const Login = () => {
               placeholder="tu@ejemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7ecdda] focus:border-transparent transition-all duration-200"
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? 'login-error' : undefined}
+              className={INPUT_CLASS}
               required
             />
           </div>
 
           {/* Campo Contraseña */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label
               htmlFor="password"
-              className="text-xs font-medium text-gray-300 uppercase tracking-wider block"
+              className={LABEL_CLASS}
             >
               Contraseña
             </label>
@@ -94,58 +103,62 @@ const Login = () => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 pr-11 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7ecdda] focus:border-transparent transition-all duration-200"
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? 'login-error' : undefined}
+                className={`${INPUT_CLASS} pr-12`}
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer"
+                aria-pressed={showPassword}
+                className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-foreground-soft hover:text-foreground transition-colors cursor-pointer"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
               </button>
             </div>
           </div>
- 
+
           {/* Enlace "¿Olvidaste tu contraseña?" */}
           <div className="flex justify-end">
             <button
               type="button"
               onClick={() => setMostrarRecuperacion(true)}
-              className="text-xs font-medium text-[#7ecdda] hover:text-[#a8e2ea] transition-colors cursor-pointer"
+              className="rounded text-sm font-semibold text-primary hover:text-primary-hover hover:underline underline-offset-4 transition-colors cursor-pointer"
             >
               ¿Olvidaste tu contraseña?
             </button>
           </div>
- 
+
           {/* Alerta de Error */}
           {error && (
             <div
+              id="login-error"
               role="alert"
-              className="p-3 bg-[#e75c50]/10 border border-[#e75c50]/30 rounded-xl text-[#e75c50] text-sm text-center font-medium"
+              className="px-4 py-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm text-center font-medium"
             >
               {error}
             </div>
           )}
- 
+
           {/* Botón de Enviar */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-[#45ac75] hover:bg-[#6bc596] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+            className={`${BOTON_PRIMARIO_CLASS} min-h-11 text-base`}
           >
-            {loading && <Loader2 size={18} className="animate-spin" />}
+            {loading && <Loader2 size={18} className="animate-spin" aria-hidden="true" />}
             {loading ? "Ingresando..." : "Ingresar"}
           </button>
         </form>
+        </div>
       </div>
 
-      {/* Fuera de la tarjeta: su backdrop-blur encerraría al modal (position: fixed) */}
       {mostrarRecuperacion && (
         <ModalRecuperarPassword emailInicial={email} onClose={() => setMostrarRecuperacion(false)} />
       )}
-    </div>
+    </main>
     );
 };
 

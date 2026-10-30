@@ -9,7 +9,7 @@ export default function BotonImprimir({ texto = 'Imprimir' }) {
         <button
             type="button"
             onClick={() => window.print()}
-            className="print:hidden flex items-center gap-2 px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-hover transition-colors cursor-pointer"
+            className="print:hidden flex items-center gap-2 px-3 py-2 bg-primary text-on-primary text-sm font-medium rounded-lg hover:bg-primary-hover transition-colors cursor-pointer"
         >
             <Printer size={16} />
             {texto}

@@ -1,16 +1,23 @@
+import { cloneElement, isValidElement } from 'react';
 import { Loader2 } from 'lucide-react';
 import { BOTON_PRIMARIO_CLASS, BOTON_SECUNDARIO_CLASS, LABEL_CLASS } from '../utils/formulario';
 import Aviso from './Aviso';
 
 /**
  * Etiqueta + control + mensaje de error del backend (errors[campo][0]).
+ * Con error, el control queda marcado con aria-invalid y enlazado al mensaje.
  */
 export function CampoFormulario({ id, label, error, className = '', children }) {
+    const idError = `${id}-error`;
+    const control = error && isValidElement(children)
+        ? cloneElement(children, { 'aria-invalid': true, 'aria-describedby': idError })
+        : children;
+
     return (
-        <div className={`space-y-1 ${className}`}>
+        <div className={`space-y-1.5 ${className}`}>
             <label htmlFor={id} className={LABEL_CLASS}>{label}</label>
-            {children}
-            {error && <p className="text-xs text-danger">{error}</p>}
+            {control}
+            {error && <p id={idError} className="text-sm text-danger">{error}</p>}
         </div>
     );
 }
@@ -31,7 +38,7 @@ export function BotonesFormulario({ guardando, textoEnviar, textoGuardando = 'Gu
                 Cancelar
             </button>
             <button type="submit" disabled={guardando || deshabilitarEnviar} className={BOTON_PRIMARIO_CLASS}>
-                {guardando && <Loader2 size={16} className="animate-spin" />}
+                {guardando && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}
                 {guardando ? textoGuardando : textoEnviar}
             </button>
         </div>

@@ -51,7 +51,7 @@ export default function ReportesBeneficios() {
         <div className="space-y-5">
             <div className="print:hidden">
                 <p className="text-sm text-foreground-faint">Beneficios</p>
-                <h1 className="text-2xl font-bold text-primary">Reportes de beneficios</h1>
+                <h1 className="text-2xl font-semibold text-foreground">Reportes de beneficios</h1>
                 <p className="mt-1 text-sm text-foreground-soft">Genera reportes de beneficios asignados por periodo, categoría y tipo.</p>
             </div>
 
@@ -64,13 +64,13 @@ export default function ReportesBeneficios() {
             {reporte && filtrosAplicados && (
                 <div className="space-y-6">
                     <div className="hidden print:block text-center">
-                        <h2 className="text-xl font-bold">CTP de Corralillo</h2>
+                        <h2 className="text-xl font-semibold">CTP de Corralillo</h2>
                     </div>
 
                     <div className="bg-surface border border-border rounded-xl p-4 sm:p-6 print:border-0 print:p-0 print:bg-transparent">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                             <div>
-                                <h2 className="text-xl font-bold text-foreground">Reporte de beneficios</h2>
+                                <h2 className="text-xl font-semibold text-foreground">Reporte de beneficios</h2>
                                 <p className="mt-1 text-sm text-foreground-soft">
                                     Periodo: {formatearFecha(filtrosAplicados.fecha_desde)} - {formatearFecha(filtrosAplicados.fecha_hasta)}
                                 </p>

@@ -1,8 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import FormularioSolicitud from './FormularioSolicitud';
+import { useAtraparFoco } from '../../../hooks/useAtraparFoco';
+import { BOTON_CERRAR_MODAL_CLASS, MODAL_OVERLAY_CLASS, MODAL_PANEL_CLASS } from '../../../utils/modal';
 
 export default function ModalSolicitud({ open, onClose }) {
+    const panelRef = useRef(null);
+    useAtraparFoco(open, panelRef);
+
     useEffect(() => {
         if (!open) return;
         const handleKeyDown = (e) => {
@@ -16,25 +21,27 @@ export default function ModalSolicitud({ open, onClose }) {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            className={MODAL_OVERLAY_CLASS}
             onClick={onClose}
         >
             <div
+                ref={panelRef}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="titulo-modal-solicitud"
+                tabIndex={-1}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface rounded-2xl shadow-2xl p-8 relative"
+                className={`${MODAL_PANEL_CLASS} max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8`}
             >
                 <button
                     type="button"
                     onClick={onClose}
                     aria-label="Cerrar"
-                    className="absolute top-4 right-4 text-foreground-faint hover:text-foreground transition-colors cursor-pointer"
+                    className={BOTON_CERRAR_MODAL_CLASS}
                 >
-                    <X size={22} />
+                    <X size={20} aria-hidden="true" />
                 </button>
-                <h3 id="titulo-modal-solicitud" className="text-2xl text-center font-bold text-primary mb-6">
+                <h3 id="titulo-modal-solicitud" className="text-2xl text-center font-semibold text-foreground mb-6 px-8">
                     Solicitud de participación de agrupación
                 </h3>
                 <FormularioSolicitud onSuccess={onClose} />

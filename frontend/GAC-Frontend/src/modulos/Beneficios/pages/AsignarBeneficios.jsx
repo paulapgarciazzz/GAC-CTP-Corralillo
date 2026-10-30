@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Aviso from '../../../components/Aviso';
-import { EstadoCargando } from '../../../components/EstadoLista';
+import { EsqueletoLista } from '../../../components/EstadoLista';
 import FiltrosSolicitudesAprobadas from '../components/FiltrosSolicitudesAprobadas';
 import ListaSolicitudesAprobadas from '../components/ListaSolicitudesAprobadas';
 import ModalAsignacionBeneficios from '../components/ModalAsignacionBeneficios';
@@ -141,7 +141,7 @@ export default function AsignarBeneficios() {
         <div className="space-y-5">
             <div>
                 <p className="text-sm text-foreground-faint">Beneficios</p>
-                <h1 className="text-2xl font-bold text-primary">Asignar beneficios</h1>
+                <h1 className="text-2xl font-semibold text-foreground">Asignar beneficios</h1>
                 <p className="mt-1 text-sm text-foreground-soft">Selecciona una solicitud aprobada para asignarle beneficios.</p>
             </div>
 
@@ -151,7 +151,7 @@ export default function AsignarBeneficios() {
             <FiltrosSolicitudesAprobadas filtros={filtros} onChange={setFiltros} />
 
             {loading ? (
-                <EstadoCargando texto="Cargando solicitudes..." />
+                <EsqueletoLista texto="Cargando solicitudes..." />
             ) : (
                 <ListaSolicitudesAprobadas
                     solicitudes={solicitudesFiltradas}

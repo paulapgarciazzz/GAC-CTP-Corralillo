@@ -13,7 +13,7 @@ export default function SelectEventoReporte({ id = 'reporte-evento', eventos, ca
 
     return (
         <div className="print:hidden space-y-1 w-full sm:max-w-md">
-            <label htmlFor={id} className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+            <label htmlFor={id} className="block text-sm font-semibold text-foreground">
                 Evento
             </label>
             <select
@@ -21,7 +21,7 @@ export default function SelectEventoReporte({ id = 'reporte-evento', eventos, ca
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 disabled={cargando}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 border border-border-input rounded-lg bg-surface text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
             >
                 <option value="">{cargando ? 'Cargando eventos...' : 'Todos los eventos'}</option>
                 {ordenados.map((evento) => (

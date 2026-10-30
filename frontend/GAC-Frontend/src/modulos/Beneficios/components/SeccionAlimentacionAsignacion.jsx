@@ -26,7 +26,7 @@ export default function SeccionAlimentacionAsignacion({ opciones, seleccionadas,
                                         checked={marcado}
                                         disabled={disabled}
                                         onChange={() => onToggle(id)}
-                                        className="h-4 w-4 rounded border-border text-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                                        className="h-4 w-4 rounded border-border-input text-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
                                     />
                                     {opcion.tiempo_comida}
                                 </span>

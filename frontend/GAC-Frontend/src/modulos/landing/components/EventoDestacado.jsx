@@ -13,23 +13,28 @@ export default function EventoDestacado() {
     const [pasoModal, setPasoModal] = useState(null);
 
     return (
-        <section id="evento" className="scroll-mt-24 bg-surface py-20">
+        <section id="evento" aria-labelledby="titulo-evento" className="scroll-mt-24 bg-surface py-16 sm:py-20">
             <div className="container mx-auto px-4">
-                <div className="mx-auto flex max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-md md:grid md:grid-cols-2">
+                <div className="mx-auto flex max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-sm md:grid md:grid-cols-2">
                     <div className="h-64 md:h-full">
                         <img
                             src={festivalTortilla}
                             alt={EVENTO.nombre}
+                            width="800"
+                            height="533"
+                            loading="lazy"
+                            decoding="async"
                             className="h-full w-full object-cover"
                         />
                     </div>
                     <div className="flex flex-col justify-center p-8 text-center sm:p-10 md:text-left">
-                        <h2 className="mb-2 text-3xl font-bold text-foreground sm:text-4xl">{EVENTO.nombre}</h2>
-                        <p className="mb-6 text-foreground-soft">{EVENTO.descripcion}</p>
+                        <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-accent">Evento destacado</p>
+                        <h2 id="titulo-evento" className="mb-3 text-3xl font-semibold text-foreground sm:text-4xl">{EVENTO.nombre}</h2>
+                        <p className="mb-8 text-base text-foreground-soft sm:text-lg">{EVENTO.descripcion}</p>
                         <button
                             type="button"
                             onClick={() => setPasoModal('pregunta')}
-                            className="mx-auto w-fit rounded-lg bg-primary px-8 py-3 font-semibold text-white shadow-md transition-colors hover:bg-primary-hover hover:shadow-lg md:mx-0"
+                            className="mx-auto inline-flex min-h-12 w-fit items-center justify-center rounded-lg bg-primary px-8 py-3 text-base font-semibold text-on-primary shadow-sm transition-colors duration-150 hover:bg-primary-hover md:mx-0"
                         >
                             Inscríbete
                         </button>

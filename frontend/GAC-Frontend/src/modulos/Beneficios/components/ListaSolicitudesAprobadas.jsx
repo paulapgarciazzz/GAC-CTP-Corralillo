@@ -27,15 +27,28 @@ export default function ListaSolicitudesAprobadas({ solicitudes, onSeleccionar, 
                 return (
                     <article
                         key={solicitud.id}
-                        onClick={seleccionable ? () => onSeleccionar(solicitud) : undefined}
-                        className={`bg-surface border border-border rounded-xl shadow-sm p-4 flex flex-col gap-4 ${
-                            seleccionable ? 'hover:shadow-md transition-shadow cursor-pointer' : ''
+                        className={`relative bg-surface border border-border rounded-xl shadow-sm p-4 flex flex-col gap-4 ${
+                            seleccionable ? 'hover:shadow-md transition-shadow' : ''
                         }`}
                     >
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                                 <p className="text-xs font-medium text-primary uppercase tracking-wider">Solicitud #{solicitud.id}</p>
-                                <h3 className="mt-1 text-base font-semibold text-foreground truncate">{solicitud.agrupacion?.nombre}</h3>
+                                <h3 className="mt-1 text-base font-semibold text-foreground truncate">
+                                    {seleccionable ? (
+                                        // Toda la tarjeta abre la asignación: el botón se extiende sobre ella con after:absolute.
+                                        <button
+                                            type="button"
+                                            onClick={() => onSeleccionar(solicitud)}
+                                            aria-label={`${asignada ? 'Editar' : 'Asignar'} beneficios de ${solicitud.agrupacion?.nombre ?? `la solicitud #${solicitud.id}`}`}
+                                            className="max-w-full truncate text-left after:absolute after:inset-0 after:content-[''] cursor-pointer focus-visible:outline-none focus-visible:after:rounded-xl focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-primary"
+                                        >
+                                            {solicitud.agrupacion?.nombre}
+                                        </button>
+                                    ) : (
+                                        solicitud.agrupacion?.nombre
+                                    )}
+                                </h3>
                             </div>
                             <EstadoBadge estado={solicitud.estado} />
                         </div>

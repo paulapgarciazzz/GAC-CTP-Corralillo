@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { endOfMonth, startOfMonth } from 'date-fns';
-import { AlertCircle, CalendarDays, MousePointerClick, RotateCw } from 'lucide-react';
+import { AlertCircle, MousePointerClick, RotateCw } from 'lucide-react';
 import CabeceraMes from './CabeceraMes';
+import EncabezadoSeccion from '../EncabezadoSeccion';
 import GrillaMes, { GrillaMesCargando } from './GrillaMes';
 import ModalAgendaDia from './ModalAgendaDia';
 import ListaEventosMes from './ListaEventosMes';
@@ -14,15 +15,15 @@ function ErrorCarga({ mensaje, onReintentar }) {
     return (
         <div role="alert" className="flex flex-col items-center justify-center gap-4 px-6 py-20 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-danger-soft">
-                <AlertCircle className="h-6 w-6 text-danger" />
+                <AlertCircle className="h-6 w-6 text-danger" aria-hidden="true" />
             </div>
             <p className="max-w-sm text-sm text-foreground-soft">{mensaje}</p>
             <button
                 type="button"
                 onClick={onReintentar}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"
+                className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
             >
-                <RotateCw size={16} />
+                <RotateCw size={16} aria-hidden="true" />
                 Reintentar
             </button>
         </div>
@@ -58,28 +59,21 @@ export default function CalendarioEventos() {
     }
 
     return (
-        <section id="calendario" className="relative scroll-mt-24 overflow-hidden bg-background py-20">
-            <div className="pointer-events-none absolute -left-32 top-24 h-80 w-80 rounded-full bg-primary/10 blur-3xl" aria-hidden="true" />
-            <div className="pointer-events-none absolute -right-32 bottom-10 h-80 w-80 rounded-full bg-accent/10 blur-3xl" aria-hidden="true" />
+        <section id="calendario" aria-labelledby="titulo-calendario" className="scroll-mt-24 bg-background py-16 sm:py-20">
+            <div className="container mx-auto px-4">
+                <EncabezadoSeccion
+                    id="titulo-calendario"
+                    etiqueta="Agenda institucional"
+                    titulo="Calendario de eventos"
+                    descripcion="Consulta los eventos del CTP de Corralillo y descubre las actividades programadas para cada día."
+                />
 
-            <div className="container relative mx-auto px-4">
-                <div className="mx-auto mb-12 max-w-2xl text-center">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                        <CalendarDays className="h-6 w-6 text-primary" />
-                    </div>
-                    <h2 className="text-3xl font-bold text-foreground sm:text-4xl">Calendario de eventos</h2>
-                    <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-accent">Agenda institucional</p>
-                    <p className="mt-3 text-foreground-soft">
-                        Consulta los eventos del CTP de Corralillo y descubre las actividades programadas para cada día.
-                    </p>
-                </div>
-
-                <div className="mx-auto max-w-6xl rounded-3xl border border-border bg-surface shadow-lg">
+                <div className="mx-auto max-w-6xl rounded-2xl border border-border bg-surface shadow-sm">
                     <CabeceraMes mes={mes} cantidadEventos={eventosDelMes.length} onCambiarMes={setMes} />
                     <div className="overflow-hidden">{cuerpo}</div>
-                    <div className="flex flex-col items-center justify-between gap-2 rounded-b-3xl border-t border-border px-4 py-3 text-xs text-foreground-faint sm:flex-row sm:px-6 sm:text-sm">
+                    <div className="flex flex-col items-center justify-between gap-2 rounded-b-2xl border-t border-border px-4 py-3 text-xs text-foreground-soft sm:flex-row sm:px-6 sm:text-sm">
                         <span className="inline-flex items-center gap-2">
-                            <MousePointerClick size={16} className="text-primary" />
+                            <MousePointerClick size={16} className="text-primary" aria-hidden="true" />
                             Selecciona un día para ver sus actividades
                         </span>
                         {!cargando && !sinDatos && eventosDelMes.length === 0 && (

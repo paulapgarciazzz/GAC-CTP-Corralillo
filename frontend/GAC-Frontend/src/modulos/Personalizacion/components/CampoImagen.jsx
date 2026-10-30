@@ -61,7 +61,7 @@ export default function CampoImagen({ titulo, descripcion, url, urlPredeterminad
 
             {puedeEditar && (
                 <div className="flex flex-col gap-2 sm:items-end">
-                    <label htmlFor={id} className={`inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover ${procesando ? 'pointer-events-none opacity-60' : 'cursor-pointer'}`}>
+                    <label htmlFor={id} className={`inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover ${procesando ? 'pointer-events-none opacity-60' : 'cursor-pointer'}`}>
                         {procesando ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
                         Cambiar imagen
                     </label>

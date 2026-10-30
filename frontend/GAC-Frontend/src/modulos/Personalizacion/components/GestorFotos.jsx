@@ -144,7 +144,7 @@ export default function GestorFotos({ destino, textoVacio, puedeCrear, puedeEdit
                         aria-label="Título de la nueva foto"
                         className={INPUT_CLASS}
                     />
-                    <label htmlFor={idArchivo} className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover ${subiendo ? 'pointer-events-none opacity-60' : 'cursor-pointer'}`}>
+                    <label htmlFor={idArchivo} className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover ${subiendo ? 'pointer-events-none opacity-60' : 'cursor-pointer'}`}>
                         {subiendo ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
                         {subiendo ? 'Subiendo...' : 'Subir foto'}
                     </label>

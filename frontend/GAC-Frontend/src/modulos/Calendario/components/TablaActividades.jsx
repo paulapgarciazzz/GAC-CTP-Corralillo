@@ -13,7 +13,7 @@ export default function TablaActividades({ actividades, soloLectura = false, emb
         <div className={embebida ? 'overflow-x-auto bg-background/40' : 'overflow-x-auto rounded-lg border border-border bg-surface'}>
             <table className="w-full min-w-[720px] text-sm">
                 <thead className={embebida ? 'border-b border-border' : 'bg-background border-b border-border'}>
-                    <tr className="text-left text-[11px] uppercase tracking-wider text-foreground-faint">
+                    <tr className="text-left text-xs uppercase tracking-wider text-foreground-faint">
                         <th className={`${celda} py-2 font-semibold`}>Actividad</th>
                         <th className={`${celda} py-2 font-semibold`}>Fecha</th>
                         <th className={`${celda} py-2 font-semibold`}>Horario</th>
@@ -25,7 +25,7 @@ export default function TablaActividades({ actividades, soloLectura = false, emb
                 </thead>
                 <tbody className="divide-y divide-border">
                     {actividades.map((actividad) => (
-                        <tr key={actividad.id_actividad} className="hover:bg-background/60 transition-colors">
+                        <tr key={actividad.id_actividad} className="hover:bg-surface-soft transition-colors">
                             <td className={`${celda} py-2.5 font-medium text-foreground`}>{actividad.titulo}</td>
                             <td className={`${celda} py-2.5 text-foreground-soft whitespace-nowrap`}>{formatearFecha(actividad.fecha)}</td>
                             <td className={`${celda} py-2.5 text-foreground-soft whitespace-nowrap`}>

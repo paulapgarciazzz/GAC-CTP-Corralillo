@@ -20,12 +20,12 @@ export default function WeekView({ currentDate, events, onEventClick }) {
                         <div />
                         {days.map((day) => (
                             <div key={day.toISOString()} className="border-l border-border py-2 text-center">
-                                <div className="text-[11px] font-semibold uppercase tracking-wide text-foreground-faint">
+                                <div className="text-xs font-semibold uppercase tracking-wide text-foreground-faint">
                                     {format(day, 'EEE', { locale: es })}
                                 </div>
                                 <div
                                     className={`mx-auto mt-1 flex h-7 w-7 items-center justify-center rounded-full text-sm ${
-                                        isToday(day) ? 'bg-primary font-semibold text-white' : 'text-foreground'
+                                        isToday(day) ? 'bg-primary font-semibold text-on-primary' : 'text-foreground'
                                     }`}
                                 >
                                     {format(day, 'd')}
@@ -35,7 +35,7 @@ export default function WeekView({ currentDate, events, onEventClick }) {
                     </div>
 
                     <div className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] border-b border-border">
-                        <div className="flex items-start border-r border-border p-1 text-[10px] font-medium text-foreground-faint">
+                        <div className="flex items-start border-r border-border p-1 text-xs font-medium text-foreground-faint">
                             Todo el día
                         </div>
                         {days.map((day) => {
