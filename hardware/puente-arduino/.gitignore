@@ -1,4 +1,7 @@
 # Entorno virtual local y cola de eventos pendientes del puente.
 .venv/
 pendientes.jsonl
+pendientes.tmp
 __pycache__/
+# Por si alguien guarda un token aquí por error (el script los guarda en %USERPROFILE%\.gac-conteo).
+*.token

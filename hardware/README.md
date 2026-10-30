@@ -3,9 +3,9 @@
 | Carpeta | Qué es | Estado |
 |---|---|---|
 | `esp32-conteo/` | Firmware **definitivo**: ESP32 + sensores IR de entrada y salida, envío directo por WiFi | Hardware final |
-| `arduino-uno-esp8266/` | UNO + HC-SR04 + módulo ESP8266 (AT): envío directo por WiFi, sin PC intermedia | Demostración |
-| `arduino-uno-prototipo/` | Sketch del UNO + HC-SR04 que solo imprime por USB | Solo pruebas |
-| `puente-arduino/` | Puente Python serial → API para el sketch anterior | Solo pruebas |
+| `arduino-uno-esp8266/` | UNO + HC-SR04 + módulo ESP8266 (AT): envío directo por WiFi, solo hacia la API local por HTTP (el firmware AT 1.1 no puede conectarse a Render) | Demostración local |
+| `arduino-uno-prototipo/` | Sketch del UNO + HC-SR04 que imprime cada detección por USB | Desarrollo con Render |
+| `puente-arduino/` | Puente USB → API por HTTPS validado (Render), con cola persistente, reintentos y latido; se inicia con `iniciar_puente.cmd` | Desarrollo con Render |
 
 Ambos caminos usan la misma API autenticada:
 
