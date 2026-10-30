@@ -25,7 +25,7 @@ export default function TablaActividades({ actividades, soloLectura = false, emb
                 </thead>
                 <tbody className="divide-y divide-border">
                     {actividades.map((actividad) => (
-                        <tr key={actividad.id_actividad} className="hover:bg-background/60 transition-colors">
+                        <tr key={actividad.id_actividad} className="hover:bg-surface-soft transition-colors">
                             <td className={`${celda} py-2.5 font-medium text-foreground`}>{actividad.titulo}</td>
                             <td className={`${celda} py-2.5 text-foreground-soft whitespace-nowrap`}>{formatearFecha(actividad.fecha)}</td>
                             <td className={`${celda} py-2.5 text-foreground-soft whitespace-nowrap`}>

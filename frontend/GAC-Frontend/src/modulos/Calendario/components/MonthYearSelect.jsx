@@ -12,12 +12,12 @@ function inicioBloque(anio) {
 
 function Dropdown({ value, onChange, options, ariaLabel }) {
     return (
-        <div className="relative flex items-center rounded-lg border border-border bg-surface overflow-hidden">
+        <div className="relative flex items-center rounded-lg border border-border-input bg-surface overflow-hidden has-[select:focus-visible]:ring-2 has-[select:focus-visible]:ring-primary">
             <select
                 value={value}
                 onChange={(e) => onChange(Number(e.target.value))}
                 aria-label={ariaLabel}
-                className="min-w-[4.5rem] cursor-pointer appearance-none bg-transparent py-1.5 pl-2.5 pr-7 text-sm font-medium capitalize text-foreground-soft outline-none transition-colors hover:bg-primary/10 hover:text-primary"
+                className="min-h-9 min-w-[4.5rem] cursor-pointer appearance-none bg-transparent py-1.5 pl-2.5 pr-7 text-sm font-medium capitalize text-foreground outline-none transition-colors hover:bg-surface-soft"
             >
                 {options.map((opt) => (
                     <option key={opt.value} value={opt.value} className="bg-surface capitalize text-foreground">
@@ -66,7 +66,7 @@ function YearPicker({ value, onChange }) {
                 onClick={toggle}
                 aria-label="Seleccionar año"
                 aria-expanded={abierto}
-                className="flex min-w-[4.5rem] items-center justify-between gap-1 rounded-lg border border-border bg-surface py-1.5 pl-2.5 pr-2 text-sm font-medium text-foreground-soft transition-colors hover:bg-primary/10 hover:text-primary"
+                className="flex min-h-9 min-w-[4.5rem] items-center justify-between gap-1 rounded-lg border border-border-input bg-surface py-1.5 pl-2.5 pr-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-soft"
             >
                 {value}
                 <ChevronDown size={14} className={`transition-transform ${abierto ? 'rotate-180' : ''}`} />
@@ -106,7 +106,7 @@ function YearPicker({ value, onChange }) {
                                 }}
                                 className={`rounded-lg py-1.5 text-sm font-medium transition-colors ${
                                     anio === value
-                                        ? 'bg-primary text-white shadow-sm'
+                                        ? 'bg-primary text-on-primary shadow-sm'
                                         : anio === anioHoy
                                             ? 'border border-primary/40 text-primary hover:bg-primary/10'
                                             : 'text-foreground-soft hover:bg-primary/10 hover:text-primary'

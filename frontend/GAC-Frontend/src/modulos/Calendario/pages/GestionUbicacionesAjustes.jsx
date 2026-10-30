@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
 import Aviso from '../../../components/Aviso';
-import { EstadoCargando, EstadoVacio } from '../../../components/EstadoLista';
+import { EsqueletoLista, EstadoVacio } from '../../../components/EstadoLista';
 import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
 import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 import ModalUbicacion from '../components/ModalUbicacion';
@@ -87,11 +87,11 @@ export default function GestionUbicacionesAjustes() {
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div>
                     
-                    <h1 className="text-2xl font-bold text-primary">Gestión de ubicaciones</h1>
+                    <h1 className="text-2xl font-semibold text-foreground">Gestión de ubicaciones</h1>
                     <p className="mt-1 text-sm text-foreground-soft">Administra los lugares donde se realizan las actividades de los eventos.</p>
                 </div>
                 {puedeCrear && (
-                    <button type="button" onClick={abrirCrear} className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors cursor-pointer">
+                    <button type="button" onClick={abrirCrear} className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-on-primary rounded-lg font-semibold transition-colors cursor-pointer">
                         <Plus size={18} />Agregar ubicación
                     </button>
                 )}
@@ -101,7 +101,7 @@ export default function GestionUbicacionesAjustes() {
             <Aviso mensaje={error} onReintentar={cargarUbicaciones} />
 
             {loading ? (
-                <EstadoCargando texto="Cargando ubicaciones..." />
+                <EsqueletoLista texto="Cargando ubicaciones..." />
             ) : ubicaciones.length === 0 ? (
                 !error && <EstadoVacio mensaje="No hay ubicaciones registradas." />
             ) : (

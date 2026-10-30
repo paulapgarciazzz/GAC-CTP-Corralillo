@@ -45,7 +45,7 @@ export default function TablaEventos({
                     <button
                         type="button"
                         onClick={onCreateClick}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md transition duration-300 hover:bg-primary-hover hover:shadow-lg cursor-pointer"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-md transition duration-300 hover:bg-primary-hover hover:shadow-lg cursor-pointer"
                     >
                         <CalendarPlus size={16} />
                         Crear evento
@@ -64,8 +64,8 @@ export default function TablaEventos({
             ) : (
                 <div className="bg-surface border border-border rounded-xl overflow-x-auto">
                     <table className="w-full min-w-[860px] text-sm">
-                        <thead className="bg-background border-b border-border">
-                            <tr className="text-left text-xs uppercase tracking-wider text-foreground-faint">
+                        <thead className="bg-surface-soft border-b border-border">
+                            <tr className="text-left text-xs uppercase tracking-wide text-foreground-soft">
                                 <th className="px-4 py-3 font-semibold">Evento</th>
                                 <th className="px-4 py-3 font-semibold">Fecha inicio</th>
                                 <th className="px-4 py-3 font-semibold">Hora inicio</th>
@@ -82,7 +82,7 @@ export default function TablaEventos({
                                 const expandido = tieneActividades && expandidos.has(evento.id);
                                 return (
                                     <Fragment key={evento.id}>
-                                    <tr className="hover:bg-background/60 transition-colors">
+                                    <tr className="hover:bg-surface-soft transition-colors">
                                         <td className="px-4 py-4">
                                             <div className="flex items-center gap-1.5">
                                                 {tieneActividades ? (

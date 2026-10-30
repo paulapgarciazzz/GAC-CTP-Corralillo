@@ -25,7 +25,7 @@ export default function WeekView({ currentDate, events, onEventClick }) {
                                 </div>
                                 <div
                                     className={`mx-auto mt-1 flex h-7 w-7 items-center justify-center rounded-full text-sm ${
-                                        isToday(day) ? 'bg-primary font-semibold text-white' : 'text-foreground'
+                                        isToday(day) ? 'bg-primary font-semibold text-on-primary' : 'text-foreground'
                                     }`}
                                 >
                                     {format(day, 'd')}

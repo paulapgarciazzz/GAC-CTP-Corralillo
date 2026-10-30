@@ -46,7 +46,7 @@ export default function CalendarToolbar({ currentDate, viewMode, onViewModeChang
                             onClick={() => onViewModeChange(opt.key)}
                             className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                                 viewMode === opt.key
-                                    ? 'bg-primary text-white shadow-sm'
+                                    ? 'bg-primary text-on-primary shadow-sm'
                                     : 'text-foreground-soft hover:bg-primary/10 hover:text-primary'
                             }`}
                         >

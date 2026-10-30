@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { X } from 'lucide-react';
+import { useAtraparFoco } from '../../../hooks/useAtraparFoco';
+import { useCerrarConEscape } from '../../../hooks/useCerrarConEscape';
+import { BOTON_CERRAR_MODAL_CLASS, MODAL_PANEL_CLASS } from '../../../utils/modal';
 import { es } from 'date-fns/locale';
 import { isSameMonth, isSameDay, isToday, format } from 'date-fns';
 import EventChip from './EventChip';
@@ -13,6 +16,9 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
     const days = diasDeLaGrillaMes(currentDate);
 
     const [diaMovil, setDiaMovil] = useState(null);
+    const panelMovilRef = useRef(null);
+    useAtraparFoco(Boolean(diaMovil), panelMovilRef);
+    useCerrarConEscape(Boolean(diaMovil), () => setDiaMovil(null));
 
     const eventsForDay = (day) => events.filter((event) => ocurreEnDia(event, day));
 
@@ -22,7 +28,7 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
                 {DIAS_SEMANA.map((label) => (
                     <div
                         key={label}
-                        className="py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-foreground-faint"
+                        className="py-2 text-center text-xs font-semibold uppercase tracking-wide text-foreground-faint"
                     >
                         {label}
                     </div>
@@ -47,7 +53,7 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
                                 onClick={() => onDayClick?.(day)}
                                 className={`inline-flex h-7 w-7 shrink-0 items-center justify-center self-end rounded-full text-sm transition-colors ${
                                     isToday(day)
-                                        ? 'bg-primary font-semibold text-white'
+                                        ? 'bg-primary font-semibold text-on-primary'
                                         : inMonth
                                           ? 'text-foreground hover:bg-primary/10 hover:text-primary'
                                           : 'text-foreground-faint hover:bg-primary/10'
@@ -91,15 +97,17 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
                 })}
             </div>
             {diaMovil && (
-                <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4 sm:hidden" onClick={() => setDiaMovil(null)}>
+                <div className="fixed inset-0 z-40 flex animate-aparecer items-center justify-center bg-rail/60 p-4 sm:hidden" onClick={() => setDiaMovil(null)}>
                     <div
+                        ref={panelMovilRef}
                         role="dialog"
                         aria-modal="true"
                         aria-label={`Eventos del ${format(diaMovil, "d 'de' MMMM", { locale: es })}`}
+                        tabIndex={-1}
                         onClick={(e) => e.stopPropagation()}
-                        className="max-h-[70vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-surface p-4 shadow-2xl"
+                        className={`${MODAL_PANEL_CLASS} max-h-[70vh] max-w-sm overflow-y-auto p-4`}
                     >
-                        <div className="mb-3 flex items-center justify-between">
+                        <div className="mb-3 flex items-center justify-between pr-10">
                             <p className="text-sm font-semibold capitalize text-foreground">
                                 {format(diaMovil, "EEEE d 'de' MMMM", { locale: es })}
                             </p>
@@ -107,9 +115,9 @@ export default function MonthView({ currentDate, events, onDayClick, onEventClic
                                 type="button"
                                 onClick={() => setDiaMovil(null)}
                                 aria-label="Cerrar"
-                                className="text-foreground-faint transition-colors hover:text-foreground"
+                                className={BOTON_CERRAR_MODAL_CLASS}
                             >
-                                <X size={20} />
+                                <X size={20} aria-hidden="true" />
                             </button>
                         </div>
                         <div className="flex flex-col gap-2">
