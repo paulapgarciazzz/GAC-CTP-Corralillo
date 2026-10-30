@@ -5,7 +5,7 @@ import { lazy, Suspense, useState } from 'react'
 import { useEffect } from 'react';
 import { getRouteApi } from '@tanstack/react-router';
 import { Lock } from 'lucide-react';
-import { EstadoCargando } from '../../../components/EstadoLista';
+import { EsqueletoVista } from '../../../components/EstadoLista';
 import { useTheme } from '../../../hooks/useTheme';
 import { useAuth } from '../../../auth/hooks/useAuth';
 
@@ -38,8 +38,8 @@ const VISTAS = {
 function SinAcceso() {
     return (
         <section className="min-h-[calc(100vh-12rem)] flex flex-col items-center justify-center text-center gap-3">
-            <span className="h-14 w-14 inline-flex items-center justify-center rounded-full bg-background border border-border text-foreground-faint">
-                <Lock size={26} />
+            <span className="h-14 w-14 inline-flex items-center justify-center rounded-full bg-surface-soft border border-border text-foreground-soft">
+                <Lock size={26} aria-hidden="true" />
             </span>
             <h1 className="text-xl font-semibold text-foreground">Sin acceso a este módulo</h1>
             <p className="text-sm text-foreground-soft max-w-sm">Solicita a un administrador que te habilite el permiso en Roles y Permisos.</p>
@@ -87,13 +87,13 @@ const Dashboard =()=>{
     };
     return (
         <>
-            <div className="font-display min-h-screen bg-background">
+            <div className="min-h-screen bg-background">
+            <a href="#contenido" className="saltar-contenido">Saltar al contenido</a>
             {(isSidebarOpen || !isMobile) && (
                 <>
                     <Sidebar onCloseDrawer={closeSidebar} isMobile={isMobile} selectedView={selectedView} onSelectView={setSelectedView}/>
                     {isMobile && isSidebarOpen && (
-                        <div className="fixed inset-0 bg-black/50 z-10" onClick={() => setIsSidebarOpen(false)}/>
-                       
+                        <button type="button" aria-label="Cerrar menú lateral" className="fixed inset-0 bg-rail/60 z-10 animate-aparecer cursor-default" onClick={() => setIsSidebarOpen(false)}/>
                     )}
                 </>
             )}
@@ -104,15 +104,18 @@ const Dashboard =()=>{
                     onToggleTheme={toggleTheme}
                     isMobile={isMobile}
                 />
-                <main className="p-4 sm:p-6">
+                <main id="contenido" tabIndex={-1} className="p-4 sm:p-6 lg:p-8 focus:outline-none">
+                    {/* Se re-monta por vista: el fundido corto marca el cambio sin estorbar (sin transform persistente). */}
+                    <div key={selectedView ?? 'inicio'} className="animate-vista">
                     {selectedView === null && <Inicio onAbrir={setSelectedView} />}
                     {vista && (tieneModulo(vista.modulo) ? (
-                        <Suspense fallback={<EstadoCargando />}>
+                        <Suspense fallback={<EsqueletoVista texto={`Cargando ${selectedView}...`} />}>
                             <vista.Pagina key={selectedView} />
                         </Suspense>
                     ) : (
                         <SinAcceso />
                     ))}
+                    </div>
                 </main>
             </div>
 

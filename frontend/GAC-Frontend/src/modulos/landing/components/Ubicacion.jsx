@@ -1,5 +1,6 @@
-import { MapPin } from 'lucide-react';
+import { ExternalLink, MapPin } from 'lucide-react';
 import { usePersonalizacion } from '../../Personalizacion/publico/usePersonalizacion';
+import EncabezadoSeccion from './EncabezadoSeccion';
 
 export default function Ubicacion() {
     const { contacto } = usePersonalizacion();
@@ -9,17 +10,15 @@ export default function Ubicacion() {
     if (!DIRECCION) return null;
 
     return (
-        <section id="ubicacion" className="scroll-mt-24 bg-surface py-20">
+        <section id="ubicacion" aria-labelledby="titulo-ubicacion" className="scroll-mt-24 bg-surface py-16 sm:py-20">
             <div className="container mx-auto px-4">
-                <div className="mx-auto mb-10 max-w-2xl text-center">
-                    <h2 className="text-3xl font-bold text-foreground sm:text-4xl">Ubicación</h2>
-                    <p className="mt-3 flex items-center justify-center gap-2 text-foreground-soft">
-                        <MapPin className="h-5 w-5 shrink-0 text-primary" />
-                        {DIRECCION}
-                    </p>
-                </div>
+                <EncabezadoSeccion id="titulo-ubicacion" etiqueta="Cómo llegar" titulo="Ubicación" className="mb-8" />
+                <p className="mx-auto mb-10 flex max-w-2xl items-start justify-center gap-2 text-center text-foreground-soft">
+                    <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                    {DIRECCION}
+                </p>
 
-                <div className="mx-auto aspect-video max-w-4xl overflow-hidden rounded-2xl border border-border shadow-md">
+                <div className="mx-auto aspect-video max-w-4xl overflow-hidden rounded-2xl border border-border shadow-sm">
                     <iframe
                         src={`https://www.google.com/maps?q=${encodeURIComponent(DIRECCION)}&output=embed`}
                         title="Ubicación del CTP de Corralillo"
@@ -29,14 +28,16 @@ export default function Ubicacion() {
                     />
                 </div>
 
-                <div className="mt-4 text-center">
+                <div className="mt-6 text-center">
                     <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(DIRECCION)}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-sm font-semibold text-primary hover:underline"
+                        className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border-input px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-surface-soft"
                     >
                         Abrir en Google Maps
+                        <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                        <span className="sr-only">(se abre en una pestaña nueva)</span>
                     </a>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import escudoOriginal from '../../../assets/escudo.png';
+import escudoOriginal from '../../../assets/escudo.webp';
 import { usePersonalizacion } from '../../Personalizacion/publico/usePersonalizacion';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { useNavigate, Link } from '@tanstack/react-router';
@@ -8,12 +8,13 @@ import {Sun, Moon, Menu, X} from 'lucide-react'
 const ENLACES = [
     { href: '#inicio', texto: 'Inicio' },
     { href: '#calendario', texto: 'Calendario' },
-    { href: '#conocenos', texto: 'Conocenos' },
+    { href: '#conocenos', texto: 'Conócenos' },
     { href: '#ubicacion', texto: 'Ubicación' },
 ];
 
-const BOTON_PRIMARIO = 'px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition duration-300 font-medium shadow-md hover:shadow-lg';
-const BOTON_PELIGRO = 'px-6 py-2 bg-danger text-white rounded-lg hover:brightness-90 transition duration-300 font-medium shadow-md hover:shadow-lg';
+const BOTON_BASE = 'inline-flex min-h-10 items-center justify-center rounded-lg px-5 py-2 text-sm font-semibold shadow-sm transition-colors duration-150';
+const BOTON_PRIMARIO = `${BOTON_BASE} bg-primary text-on-primary hover:bg-primary-hover`;
+const BOTON_PELIGRO = `${BOTON_BASE} bg-danger text-on-danger hover:bg-danger/90`;
 
 const Navbar = ({isDark, onToggleTheme}) => {
     const {isAuthenticated, logout} = useAuth();
@@ -32,111 +33,107 @@ const Navbar = ({isDark, onToggleTheme}) => {
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 40);
         handleScroll();
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     const textColorClass = isScrolled ? 'text-foreground' : 'text-white';
-    const iconColorClass = isScrolled ? 'text-foreground-soft' : 'text-white';
+    const hoverIconoClass = isScrolled ? 'hover:bg-surface-soft' : 'hover:bg-white/10';
+    const etiquetaTema = isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
 
     return (
         <nav
-            className={`fixed inset-x-0 top-0 z-50 py-3 transition-colors duration-300 ${
+            aria-label="Principal"
+            className={`fixed inset-x-0 top-0 z-50 py-3 transition-colors duration-200 ${
                 isScrolled
-                    ? 'bg-background/95 backdrop-blur-lg border-b border-border shadow-md'
+                    ? 'bg-surface/95 border-b border-border shadow-sm'
                     : 'bg-transparent border-b border-transparent'
             } ${textColorClass}`}
         >
-            <div className="container px-4 mx-auto relative text-sm">
-                <div className="flex justify-center items-center">
-                    <div className= "flex items-center shrink-0">
-                        <img className="h-16 w-16 mr-2 object-contain" src={apariencia.escudo_url || escudoOriginal} alt="Escudo"/>
-                        <span className="text-xl tracking-tight">{landing.nombre_institucion}</span>
-                    </div>
-                    <ul className="hidden lg:flex ml-14 space-x-12">
+            <div className="container px-4 mx-auto relative">
+                <div className="flex justify-between items-center gap-6">
+                    <a href="#inicio" className="flex items-center gap-3 shrink-0 rounded-lg">
+                        <img className="h-12 w-12 object-contain sm:h-14 sm:w-14" src={apariencia.escudo_url || escudoOriginal} alt="" width="56" height="56"/>
+                        <span className="font-display text-lg font-semibold tracking-tight sm:text-xl">{landing.nombre_institucion}</span>
+                    </a>
+                    <ul className="hidden lg:flex items-center gap-8 text-sm font-medium">
                         {ENLACES.map(({ href, texto }) => (
-                            <li key={href}><a href={href} className="hover:text-accent transition-colors">{texto}</a></li>
+                            <li key={href}><a href={href} className="rounded-sm py-2 decoration-2 underline-offset-8 hover:underline">{texto}</a></li>
                         ))}
                     </ul>
-                    <div className="hidden lg:flex justify-center ml-14 space-x-4 items-center">
+                    <div className="hidden lg:flex gap-3 items-center">
                         {!isAuthenticated ? (
-                            <Link to="/login">
-                                <button className={BOTON_PRIMARIO}>
-                                    Iniciar sesión
-                                </button>
+                            <Link to="/login" className={BOTON_PRIMARIO}>
+                                Iniciar sesión
                             </Link>
                         ) : (
                             // Usuario autenticado
                             <>
-                                <Link to="/dashboard">
-                                    <button className={BOTON_PRIMARIO}>
-                                        Panel de Gestión
-                                    </button>
+                                <Link to="/dashboard" className={BOTON_PRIMARIO}>
+                                    Panel de Gestión
                                 </Link>
 
-                                <button onClick={handleLogout} className={BOTON_PELIGRO}>
+                                <button type="button" onClick={handleLogout} className={BOTON_PELIGRO}>
                                     Cerrar sesión
                                 </button>
                             </>
                         )}
-                        <button onClick={onToggleTheme} className="p-2 rounded-lg hover:bg-white/10 transition-colors" aria-label="Toggle Theme">
+                        <button type="button" onClick={onToggleTheme} className={`inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${hoverIconoClass}`} aria-label={etiquetaTema}>
                             {isDark ? (
-                                <Sun className="w-5 h-5 text-warning"/>
+                                <Sun className="w-5 h-5 text-warning" aria-hidden="true"/>
                             ):(
-                                <Moon className={`w-5 h-5 ${iconColorClass}`}/>
+                                <Moon className="w-5 h-5" aria-hidden="true"/>
                             )}
                         </button>
                     </div>
-                     <div className="lg:hidden ml-14">
+                     <div className="lg:hidden">
                         <button
-                            className={`focus:outline-none ${textColorClass}`}
+                            type="button"
+                            className={`inline-flex h-11 w-11 items-center justify-center rounded-lg transition-colors ${hoverIconoClass}`}
                             onClick={() => setIsMenuOpen((prev) => !prev)}
                             aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
                             aria-expanded={isMenuOpen}
+                            aria-controls="menu-movil"
                         >
-                            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            {isMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
                         </button>
                     </div>
                 </div>
                 {isMenuOpen && (
-                    <div className="lg:hidden mt-4 pb-2 -mx-4 px-4 rounded-b-2xl bg-surface text-foreground shadow-lg">
-                        <ul className="flex flex-col space-y-4 pt-4">
+                    <div id="menu-movil" className="lg:hidden mt-3 -mx-4 px-4 pb-4 rounded-b-2xl border-b border-border bg-surface text-foreground shadow-lg animate-aparecer">
+                        <ul className="flex flex-col pt-2 font-medium">
                             {ENLACES.map(({ href, texto }) => (
-                                <li key={href}><a href={href} onClick={() => setIsMenuOpen(false)} className="block hover:text-accent transition-colors">{texto}</a></li>
+                                <li key={href}><a href={href} onClick={() => setIsMenuOpen(false)} className="block rounded-lg px-3 py-3 transition-colors hover:bg-surface-soft">{texto}</a></li>
                             ))}
                         </ul>
-                        <div className="flex flex-col space-y-3 mt-6 pb-4">
+                        <div className="flex flex-col gap-3 mt-4">
                             {!isAuthenticated ? (
-                                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                                    <button className={`w-full ${BOTON_PRIMARIO}`}>
-                                        Iniciar sesión
-                                    </button>
+                                <Link to="/login" onClick={() => setIsMenuOpen(false)} className={`w-full ${BOTON_PRIMARIO}`}>
+                                    Iniciar sesión
                                 </Link>
                             ) : (
                                 <>
-                                    <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                                        <button className={`w-full ${BOTON_PRIMARIO}`}>
-                                            Panel de Gestión
-                                        </button>
+                                    <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className={`w-full ${BOTON_PRIMARIO}`}>
+                                        Panel de Gestión
                                     </Link>
-                                    <button onClick={handleLogout} className={`w-full ${BOTON_PELIGRO}`}>
+                                    <button type="button" onClick={handleLogout} className={`w-full ${BOTON_PELIGRO}`}>
                                         Cerrar sesión
                                     </button>
                                 </>
                             )}
                             <button
+                                type="button"
                                 onClick={onToggleTheme}
-                                className="flex items-center justify-center gap-2 p-2 rounded-lg hover:bg-primary/10 transition-colors border border-border"
-                                aria-label="Toggle Theme"
+                                className="flex min-h-10 items-center justify-center gap-2 px-3 py-2 rounded-lg border border-border-input text-sm font-semibold transition-colors hover:bg-surface-soft"
                             >
                                 {isDark ? (
                                     <>
-                                        <Sun className="w-5 h-5 text-warning"/>
+                                        <Sun className="w-5 h-5 text-warning" aria-hidden="true"/>
                                         <span>Modo claro</span>
                                     </>
                                 ):(
                                     <>
-                                        <Moon className="w-5 h-5 text-foreground-soft"/>
+                                        <Moon className="w-5 h-5 text-foreground-soft" aria-hidden="true"/>
                                         <span>Modo oscuro</span>
                                     </>
                                 )}

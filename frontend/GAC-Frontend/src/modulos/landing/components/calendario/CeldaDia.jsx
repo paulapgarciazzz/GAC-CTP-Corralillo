@@ -35,13 +35,13 @@ export default function CeldaDia({ dia, eventos, enMes, onSeleccionar }) {
             onClick={() => onSeleccionar(dia)}
             aria-label={`${format(dia, "EEEE d 'de' MMMM", { locale: es })}: ${tieneEventos ? cantidad : 'sin eventos'}`}
             className={`group flex min-h-[92px] min-w-0 cursor-pointer flex-col gap-1 p-1 text-left transition-colors focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-primary sm:min-h-[120px] sm:p-2 ${
-                enMes ? 'bg-surface hover:bg-background' : 'bg-background'
+                enMes ? 'bg-surface hover:bg-surface-soft' : 'bg-background'
             } ${tieneEventos && enMes ? 'bg-linear-to-b from-primary/5 to-transparent' : ''}`}
         >
             <span
                 className={`inline-flex h-6 w-6 shrink-0 items-center justify-center self-end rounded-full text-xs transition-colors sm:h-7 sm:w-7 sm:text-sm ${
                     hoy
-                        ? 'bg-primary font-bold text-white shadow-sm'
+                        ? 'bg-primary font-bold text-on-primary shadow-sm'
                         : enMes
                           ? 'font-medium text-foreground group-hover:bg-primary/10 group-hover:text-primary'
                           : 'text-foreground-faint'

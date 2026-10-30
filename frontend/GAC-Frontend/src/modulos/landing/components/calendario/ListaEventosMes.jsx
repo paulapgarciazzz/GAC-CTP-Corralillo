@@ -11,7 +11,7 @@ import { formatearHorarioEvento, formatearRangoEvento } from '../../../Calendari
 export default function ListaEventosMes({ mes, eventos, onSeleccionarDia }) {
     return (
         <div className="border-t border-border px-4 py-4 sm:hidden">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-foreground-faint">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-foreground-faint">
                 Eventos de {format(mes, 'MMMM', { locale: es })}
             </p>
             <ul className="space-y-2">

@@ -1,10 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>gac-frontend</title>
+    <meta name="description" content="CTP de Corralillo: calendario de actividades, festivales e inscripción de agrupaciones." />
+    <meta name="theme-color" content="#0f172a" />
+    <title>CTP de Corralillo</title>
+    <script>
+      // Aplica el tema guardado antes de pintar para evitar el destello claro (useTheme lo mantiene después).
+      try {
+        var tema = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', tema);
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

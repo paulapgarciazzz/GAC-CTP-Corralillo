@@ -96,12 +96,12 @@ export default function ListaUsuarios() {
         <div className="space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-primary">Lista de Usuarios</h1>
+                    <h1 className="text-2xl font-semibold text-foreground">Lista de Usuarios</h1>
                     <p className="mt-1 text-sm text-foreground-soft">Crea, edita y elimina las cuentas que acceden al sistema.</p>
                 </div>
                 {puedeCrear && (
                     <button type="button" onClick={() => setModal({ abierto: true, usuario: null })}
-                        className="inline-flex items-center justify-center gap-2 h-11 px-4 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors cursor-pointer">
+                        className="inline-flex items-center justify-center gap-2 h-11 px-4 bg-primary hover:bg-primary-hover text-on-primary rounded-lg font-semibold transition-colors cursor-pointer">
                         <Plus size={18} />Nuevo usuario
                     </button>
                 )}
@@ -147,7 +147,7 @@ export default function ListaUsuarios() {
                             </thead>
                             <tbody className="divide-y divide-border">
                                 {usuarios.map((usuario) => (
-                                    <tr key={usuario.id} className="hover:bg-background/60 transition-colors">
+                                    <tr key={usuario.id} className="hover:bg-surface-soft transition-colors">
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <Avatar nombre={usuario.name} foto={usuario.foto} />
