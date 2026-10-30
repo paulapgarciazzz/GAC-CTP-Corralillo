@@ -20,7 +20,7 @@ const uint8_t PIN_ECHO = 10;
 
 const char* LINEA_DETECCION = "ENTRADA_DETECTADA";
 
-const unsigned int UMBRAL_CM = 50;
+const unsigned int UMBRAL_CM = 20;
 const unsigned int HISTERESIS_CM = 5;
 const uint8_t LECTURAS_PARA_DETECTAR = 2;
 const uint8_t LECTURAS_PARA_LIBERAR = 4;
