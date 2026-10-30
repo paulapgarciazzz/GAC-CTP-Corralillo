@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Loader2, X } from 'lucide-react';
+import { useAtraparFoco } from '../../../hooks/useAtraparFoco';
+import { BOTON_CERRAR_MODAL_CLASS, MODAL_OVERLAY_CLASS, MODAL_PANEL_CLASS } from '../../../utils/modal';
 import Aviso from '../../../components/Aviso';
 import { EstadoCargando } from '../../../components/EstadoLista';
 import SeccionCategoriaAsignacion from './SeccionCategoriaAsignacion';
@@ -141,6 +143,9 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
         };
     }, [open]);
 
+    const panelRef = useRef(null);
+    useAtraparFoco(open, panelRef);
+
     useEffect(() => {
         if (!open) return undefined;
         const handleKeyDown = (event) => {
@@ -211,13 +216,13 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
         .map((aula) => ({ nombre: aula.nombre, capacidad: aula.capacidad, exceso: cantidadIntegrantes - aula.capacidad }));
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={loading ? undefined : onClose}>
-            <div role="dialog" aria-modal="true" aria-labelledby="titulo-modal-asignacion" onClick={(event) => event.stopPropagation()} className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-surface rounded-2xl shadow-2xl p-6 sm:p-8 relative">
-                <button type="button" onClick={onClose} disabled={loading} aria-label="Cerrar" className="absolute top-4 right-4 text-foreground-faint hover:text-foreground disabled:opacity-50 transition-colors cursor-pointer">
-                    <X size={22} />
+        <div className={MODAL_OVERLAY_CLASS} onClick={loading ? undefined : onClose}>
+            <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby="titulo-modal-asignacion" tabIndex={-1} onClick={(event) => event.stopPropagation()} className={`${MODAL_PANEL_CLASS} max-w-3xl max-h-[90vh] overflow-y-auto p-6 sm:p-8`}>
+                <button type="button" onClick={onClose} disabled={loading} aria-label="Cerrar" className={BOTON_CERRAR_MODAL_CLASS}>
+                    <X size={20} aria-hidden="true" />
                 </button>
 
-                <h2 id="titulo-modal-asignacion" className="text-xl sm:text-2xl text-center font-bold text-primary mb-1">
+                <h2 id="titulo-modal-asignacion" className="text-xl sm:text-2xl text-center font-semibold text-foreground mb-1 px-8">
                     {editando ? 'Editar asignación' : 'Crear asignación'}
                 </h2>
                 <p className="text-sm text-center text-foreground-soft mb-6">{solicitud?.agrupacion?.nombre}</p>
@@ -256,7 +261,7 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
                         ))}
 
                         <div className="space-y-1">
-                            <label htmlFor="observaciones-asignacion" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+                            <label htmlFor="observaciones-asignacion" className="block text-sm font-semibold text-foreground">
                                 Observaciones
                             </label>
                             <textarea
@@ -266,7 +271,7 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
                                 disabled={loading}
                                 maxLength={1000}
                                 rows={3}
-                                className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-surface-soft disabled:text-foreground-faint disabled:cursor-not-allowed"
+                                className="w-full px-4 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-surface-soft disabled:text-foreground-soft disabled:cursor-not-allowed"
                             />
                         </div>
 
@@ -278,7 +283,7 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
                             type="button"
                             onClick={() => setPaso('resumen')}
                             disabled={loading || hayFilasIncompletas}
-                            className="w-full py-2.5 px-4 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors cursor-pointer"
+                            className="w-full py-2.5 px-4 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-on-primary font-semibold rounded-lg transition-colors cursor-pointer"
                         >
                             Ver resumen
                         </button>
@@ -311,7 +316,7 @@ export default function ModalAsignacionBeneficios({ open, solicitud, asignacion,
                                 type="button"
                                 onClick={() => onSubmit(construirPayload())}
                                 disabled={loading}
-                                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors cursor-pointer"
+                                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-on-primary font-semibold rounded-lg transition-colors cursor-pointer"
                             >
                                 {loading && <Loader2 size={18} className="animate-spin" />}
                                 {loading ? 'Guardando...' : aulasSobrecapacidad.length > 0 ? 'Asignar de todas formas' : 'Confirmar y guardar'}

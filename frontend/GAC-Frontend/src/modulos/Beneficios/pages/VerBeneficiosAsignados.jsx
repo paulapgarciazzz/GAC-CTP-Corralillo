@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Aviso from '../../../components/Aviso';
 import BarraBusqueda from '../../../components/BarraBusqueda';
-import { EstadoCargando, EstadoVacio } from '../../../components/EstadoLista';
+import { EsqueletoLista, EstadoVacio } from '../../../components/EstadoLista';
 import EstadoBadge from '../../SolicitudesAgrupaciones/components/EstadoBadge';
 import { formatearFecha } from '../../../utils/fecha';
 import Dato from '../../../components/Dato';
@@ -183,7 +183,7 @@ export default function VerBeneficiosAsignados() {
         <div className="space-y-5">
             <div>
                 <p className="text-sm text-foreground-faint">Beneficios</p>
-                <h1 className="text-2xl font-bold text-primary">Beneficios asignados</h1>
+                <h1 className="text-2xl font-semibold text-foreground">Beneficios asignados</h1>
                 <p className="mt-1 text-sm text-foreground-soft">Consulta los beneficios ya asignados a solicitudes aprobadas.</p>
             </div>
 
@@ -203,7 +203,7 @@ export default function VerBeneficiosAsignados() {
                     value={filtros.cedula}
                     onChange={actualizarFiltro('cedula')}
                     placeholder="Cédula del encargado..."
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary"
                 />
 
                 <input
@@ -211,12 +211,12 @@ export default function VerBeneficiosAsignados() {
                     value={filtros.fecha}
                     onChange={actualizarFiltro('fecha')}
                     aria-label="Filtrar por fecha"
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
             </div>
 
             {loading ? (
-                <EstadoCargando texto="Cargando asignaciones..." />
+                <EsqueletoLista texto="Cargando asignaciones..." />
             ) : asignacionesFiltradas.length === 0 ? (
                 <EstadoVacio mensaje={hayFiltrosActivos ? 'Ninguna asignación coincide con los filtros.' : 'Todavía no hay beneficios asignados.'} />
             ) : (

@@ -89,7 +89,7 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
         <div className="bg-surface border border-border rounded-xl p-4 sm:p-5 space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="space-y-1">
-                    <label htmlFor="reporte-periodo" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+                    <label htmlFor="reporte-periodo" className="block text-sm font-semibold text-foreground">
                         Periodo
                     </label>
                     <select
@@ -97,7 +97,7 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
                         value={periodo}
                         onChange={(event) => setPeriodo(event.target.value)}
                         disabled={generando}
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                        className="w-full px-3 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
                     >
                         {PERIODOS.map((item) => (
                             <option key={item.value} value={item.value}>{item.label}</option>
@@ -107,7 +107,7 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
 
                 {periodo === 'dia' && (
                     <div className="space-y-1">
-                        <label htmlFor="reporte-fecha-dia" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+                        <label htmlFor="reporte-fecha-dia" className="block text-sm font-semibold text-foreground">
                             Fecha
                         </label>
                         <input
@@ -116,14 +116,14 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
                             value={fechaDia}
                             onChange={(event) => setFechaDia(event.target.value)}
                             disabled={generando}
-                            className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                            className="w-full px-3 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
                         />
                     </div>
                 )}
 
                 {periodo === 'semana' && (
                     <div className="space-y-1">
-                        <label htmlFor="reporte-fecha-semana" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+                        <label htmlFor="reporte-fecha-semana" className="block text-sm font-semibold text-foreground">
                             Cualquier día de la semana
                         </label>
                         <input
@@ -132,14 +132,14 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
                             value={fechaSemana}
                             onChange={(event) => setFechaSemana(event.target.value)}
                             disabled={generando}
-                            className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                            className="w-full px-3 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
                         />
                     </div>
                 )}
 
                 {periodo === 'mes' && (
                     <div className="space-y-1">
-                        <label htmlFor="reporte-mes" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+                        <label htmlFor="reporte-mes" className="block text-sm font-semibold text-foreground">
                             Mes
                         </label>
                         <input
@@ -148,7 +148,7 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
                             value={mesSeleccionado}
                             onChange={(event) => setMesSeleccionado(event.target.value)}
                             disabled={generando}
-                            className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                            className="w-full px-3 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
                         />
                     </div>
                 )}
@@ -156,7 +156,7 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
                 {periodo === 'rango' && (
                     <>
                         <div className="space-y-1">
-                            <label htmlFor="reporte-rango-desde" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+                            <label htmlFor="reporte-rango-desde" className="block text-sm font-semibold text-foreground">
                                 Desde
                             </label>
                             <input
@@ -165,11 +165,11 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
                                 value={rangoDesde}
                                 onChange={(event) => setRangoDesde(event.target.value)}
                                 disabled={generando}
-                                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
                             />
                         </div>
                         <div className="space-y-1">
-                            <label htmlFor="reporte-rango-hasta" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+                            <label htmlFor="reporte-rango-hasta" className="block text-sm font-semibold text-foreground">
                                 Hasta
                             </label>
                             <input
@@ -178,14 +178,14 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
                                 value={rangoHasta}
                                 onChange={(event) => setRangoHasta(event.target.value)}
                                 disabled={generando}
-                                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
                             />
                         </div>
                     </>
                 )}
 
                 <div className="space-y-1">
-                    <label htmlFor="reporte-categoria" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+                    <label htmlFor="reporte-categoria" className="block text-sm font-semibold text-foreground">
                         Beneficio
                     </label>
                     <select
@@ -196,7 +196,7 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
                             setTipoAlimentacion('');
                         }}
                         disabled={generando}
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                        className="w-full px-3 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
                     >
                         {CATEGORIAS.map((item) => (
                             <option key={item.value} value={item.value}>{item.label}</option>
@@ -206,7 +206,7 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
 
                 {categoria === 'alimentacion' && (
                     <div className="space-y-1">
-                        <label htmlFor="reporte-tipo-alimentacion" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+                        <label htmlFor="reporte-tipo-alimentacion" className="block text-sm font-semibold text-foreground">
                             Tipo de alimentación
                         </label>
                         <select
@@ -214,7 +214,7 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
                             value={tipoAlimentacion}
                             onChange={(event) => setTipoAlimentacion(event.target.value)}
                             disabled={generando || cargandoCatalogo}
-                            className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
+                            className="w-full px-3 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed"
                         >
                             <option value="">Todos los tipos</option>
                             {catalogoAlimentacion.map((item) => (
@@ -233,7 +233,7 @@ export default function FiltrosReporteBeneficios({ generando, onGenerar }) {
                 type="button"
                 onClick={handleGenerar}
                 disabled={generando}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-colors cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-on-primary rounded-lg font-semibold transition-colors cursor-pointer"
             >
                 {generando && <Loader2 size={18} className="animate-spin" />}
                 {generando ? 'Generando reporte...' : 'Generar reporte'}

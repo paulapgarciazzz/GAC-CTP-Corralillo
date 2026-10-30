@@ -13,7 +13,7 @@ export default function ReporteMobiliario({ seccion }) {
                 <>
                     <div className="overflow-x-auto border border-border rounded-xl">
                         <table className="w-full text-sm">
-                            <thead className="bg-surface text-foreground-soft">
+                            <thead className="bg-surface-soft text-foreground-soft">
                                 <tr>
                                     <th className="text-left px-4 py-2 font-semibold whitespace-nowrap">Agrupación</th>
                                     <th className="text-left px-4 py-2 font-semibold whitespace-nowrap">Mobiliario</th>

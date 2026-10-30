@@ -18,7 +18,7 @@ const obtenerValoresIniciales = (categoria, beneficio) => {
 function Campo({ label, name, value, onChange, error, type = 'text', disabled = false, required = true, min, maxLength }) {
     return (
         <div className="space-y-1">
-            <label htmlFor={`beneficio-${name}`} className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">
+            <label htmlFor={`beneficio-${name}`} className="block text-sm font-semibold text-foreground">
                 {label}
             </label>
             <input
@@ -31,7 +31,7 @@ function Campo({ label, name, value, onChange, error, type = 'text', disabled = 
                 required={required}
                 min={min}
                 maxLength={maxLength}
-                className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-surface-soft disabled:text-foreground-faint disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-border-input rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-surface-soft disabled:text-foreground-soft disabled:cursor-not-allowed"
             />
             {error && <p className="text-xs text-danger">{error}</p>}
         </div>
@@ -101,7 +101,7 @@ export default function FormularioBeneficio({ categoria, beneficio, loading, err
 
             {error && <div role="alert" className="p-3 bg-danger-soft border border-danger/30 rounded-lg text-danger text-sm">{error}</div>}
 
-            <button type="submit" disabled={loading} className="w-full py-2.5 px-4 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer">
+            <button type="submit" disabled={loading} className="w-full py-2.5 px-4 bg-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-on-primary font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer">
                 {loading && <Loader2 size={18} className="animate-spin" />}
                 {loading ? 'Guardando...' : editando ? 'Guardar cambios' : `Crear ${config.label.toLowerCase().replace(/s$/, '')}`}
             </button>

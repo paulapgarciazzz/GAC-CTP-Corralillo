@@ -3,7 +3,7 @@ import { getRouteApi } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
 import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
 import Aviso from '../../../components/Aviso';
-import { EstadoCargando, EstadoVacio } from '../../../components/EstadoLista';
+import { EsqueletoLista, EstadoVacio } from '../../../components/EstadoLista';
 import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
 import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 import ModalBeneficio from '../components/ModalBeneficio';
@@ -123,11 +123,11 @@ export default function GestionBeneficios() {
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div>
                     <p className="text-sm text-foreground-faint">Beneficios</p>
-                    <h1 className="text-2xl font-bold text-primary">Gestión de beneficios</h1>
+                    <h1 className="text-2xl font-semibold text-foreground">Gestión de beneficios</h1>
                     <p className="mt-1 text-sm text-foreground-soft">Administra los catálogos disponibles para las actividades.</p>
                 </div>
                 {puedeCrear && (
-                    <button type="button" onClick={abrirCrear} className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors cursor-pointer">
+                    <button type="button" onClick={abrirCrear} className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-on-primary rounded-lg font-semibold transition-colors cursor-pointer">
                         <Plus size={18} />Agregar beneficio
                     </button>
                 )}
@@ -149,7 +149,7 @@ export default function GestionBeneficios() {
             </div>
 
             {loading ? (
-                <EstadoCargando texto="Cargando beneficios..." />
+                <EsqueletoLista texto="Cargando beneficios..." />
             ) : beneficios.length === 0 ? (
                 <EstadoVacio mensaje={`No hay registros en ${config.label.toLowerCase()}.`} />
             ) : (

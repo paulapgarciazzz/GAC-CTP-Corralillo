@@ -31,7 +31,7 @@ export default function SeccionCategoriaAsignacion({ titulo, nota, filas, campos
                                     onChange={(event) => onCambiarFila(indice, campo.nombre, event.target.value)}
                                     disabled={disabled}
                                     aria-label={campo.etiqueta}
-                                    className="flex-1 min-w-[140px] px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-surface-soft disabled:cursor-not-allowed"
+                                    className="flex-1 min-w-[140px] px-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-surface-soft disabled:cursor-not-allowed"
                                 >
                                     <option value="">{campo.etiqueta}...</option>
                                     {campo.opciones.map((opcion) => (
@@ -49,7 +49,7 @@ export default function SeccionCategoriaAsignacion({ titulo, nota, filas, campos
                                     disabled={disabled}
                                     placeholder="Cantidad"
                                     aria-label="Cantidad"
-                                    className="w-24 px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-surface-soft disabled:cursor-not-allowed"
+                                    className="w-24 px-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-surface-soft disabled:cursor-not-allowed"
                                 />
                             )}
 
