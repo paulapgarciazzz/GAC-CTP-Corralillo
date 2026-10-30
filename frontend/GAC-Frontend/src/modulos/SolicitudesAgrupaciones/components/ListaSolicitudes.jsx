@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { MoreVertical, Pencil, Trash2, MailPlus, Loader2 } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
+import { useCerrarConEscape } from '../../../hooks/useCerrarConEscape';
 
 /**
  * Los handlers de acciones son opcionales: cada botón solo aparece si recibió
@@ -10,6 +11,22 @@ import EstadoBadge from './EstadoBadge';
 export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, onAceptar, onRechazar, onEditar, onEnviarDetalles, onEliminar, hayBusqueda }) {
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
     const [enviandoId, setEnviandoId] = useState(null);
+    const menuRef = useRef(null);
+
+    // Clic fuera cierra el menú; Escape lo cierra y devuelve el foco al botón que lo abrió.
+    useEffect(() => {
+        if (menuAbiertoId === null) return;
+        const handleClickFuera = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) setMenuAbiertoId(null);
+        };
+        document.addEventListener('mousedown', handleClickFuera);
+        return () => document.removeEventListener('mousedown', handleClickFuera);
+    }, [menuAbiertoId]);
+    const cerrarMenuConEscape = useCallback(() => {
+        menuRef.current?.querySelector('button')?.focus();
+        setMenuAbiertoId(null);
+    }, []);
+    useCerrarConEscape(menuAbiertoId !== null, cerrarMenuConEscape);
 
     if (solicitudes.length === 0) {
         return (
@@ -56,29 +73,35 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                 return (
                     <li key={solicitud.id}>
                         <div
-                            onClick={() => onSelect(solicitud.id)}
-                            className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${
+                            className={`relative w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-colors ${
                                 seleccionada
                                     ? 'bg-primary/15 border-l-2 border-primary'
                                     : 'hover:bg-primary/5 border-l-2 border-transparent'
                             }`}
                         >
-                            <div className="min-w-0">
+                            {/* Toda la fila abre el detalle: el botón se extiende sobre ella con after:absolute. */}
+                            <button
+                                type="button"
+                                onClick={() => onSelect(solicitud.id)}
+                                aria-current={seleccionada ? 'true' : undefined}
+                                className="min-w-0 text-left cursor-pointer after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:rounded-xl focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-primary"
+                            >
                                 <span className={`block truncate text-sm font-medium ${seleccionada ? 'text-primary' : 'text-foreground'}`}>
                                     {solicitud.agrupacion.nombre}
                                 </span>
                                 <span className="block text-xs text-foreground-faint">
                                     {solicitud.evento.nombre}
                                 </span>
-                            </div>
+                            </button>
 
-                            <div className="flex items-center gap-2 shrink-0">
+                            {/* Por encima del botón extendido; con el menú abierto, también por encima de las filas siguientes. */}
+                            <div className={`relative flex items-center gap-2 shrink-0 ${menuAbierto ? 'z-30' : 'z-10'}`}>
                                 {decidible ? (
                                     <>
                                         <button
                                             type="button"
                                             onClick={(e) => { e.stopPropagation(); onAceptar(solicitud.id); }}
-                                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-white hover:bg-primary-hover transition-colors cursor-pointer"
+                                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary hover:bg-primary-hover transition-colors cursor-pointer"
                                         >
                                             Aceptar
                                         </button>
@@ -95,21 +118,21 @@ export default function ListaSolicitudes({ solicitudes, selectedId, onSelect, on
                                 )}
 
                                 {hayMenu && (
-                                    <div className="relative">
+                                    <div className="relative" ref={menuAbierto ? menuRef : undefined}>
                                         <button
                                             type="button"
                                             onClick={(e) => { e.stopPropagation(); setMenuAbiertoId(menuAbierto ? null : solicitud.id); }}
-                                            aria-label="Más opciones"
+                                            aria-label={`Más opciones de ${solicitud.agrupacion.nombre}`}
+                                            aria-expanded={menuAbierto}
+                                            aria-haspopup="true"
                                             className="p-1.5 rounded-lg text-foreground-faint hover:bg-primary/10 hover:text-foreground transition-colors cursor-pointer"
                                         >
-                                            <MoreVertical size={16} />
+                                            <MoreVertical size={16} aria-hidden="true" />
                                         </button>
 
                                         {menuAbierto && (
                                             <>
-                                                <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setMenuAbiertoId(null); }} />
                                                 <div
-                                                    onClick={(e) => e.stopPropagation()}
                                                     className="absolute right-0 mt-1 w-40 bg-surface rounded-lg shadow-lg border border-border z-20 p-1"
                                                 >
                                                     {opcionesMenu.editar && (

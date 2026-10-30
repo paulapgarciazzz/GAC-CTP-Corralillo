@@ -20,8 +20,8 @@ export default function ListaEventosReporte({ filtro, onVer }) {
             ) : (
                 <div className="bg-surface border border-border rounded-xl overflow-x-auto">
                     <table className="w-full min-w-[640px] text-sm">
-                        <thead className="bg-background border-b border-border">
-                            <tr className="text-left text-xs uppercase tracking-wider text-foreground-faint">
+                        <thead className="bg-surface-soft border-b border-border">
+                            <tr className="text-left text-xs uppercase tracking-wide text-foreground-soft">
                                 <th className="px-4 py-3 font-semibold">Evento</th>
                                 <th className="px-4 py-3 font-semibold">Fechas</th>
                                 <th className="px-4 py-3 font-semibold">Horario</th>
@@ -32,7 +32,7 @@ export default function ListaEventosReporte({ filtro, onVer }) {
                             {eventosFiltrados.map((evento) => {
                                 const colors = CATEGORY_COLORS[evento.category] || CATEGORY_COLORS.info;
                                 return (
-                                    <tr key={evento.id} className="hover:bg-background/60 transition-colors">
+                                    <tr key={evento.id} className="hover:bg-surface-soft transition-colors">
                                         <td className="px-4 py-3">
                                             <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ${colors.bg} ${colors.text}`}>
                                                 {evento.title}

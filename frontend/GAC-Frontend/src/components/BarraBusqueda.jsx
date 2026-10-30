@@ -4,7 +4,7 @@ const TAMANOS = {
     // Barra principal de una página.
     md: { input: 'h-11 pl-10 pr-10 bg-surface', icono: 18, boton: 'h-9 w-9' },
     // Alineada con selects/inputs de filtros (py-2 text-sm).
-    sm: { input: 'py-2 pl-9 pr-9 text-sm bg-background', icono: 16, boton: 'h-8 w-8' },
+    sm: { input: 'min-h-10 py-2 pl-9 pr-9 text-sm bg-surface', icono: 16, boton: 'h-8 w-8' },
 };
 
 /**
@@ -32,16 +32,16 @@ export default function BarraBusqueda({
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 aria-label={ariaLabel ?? placeholder}
-                className={`w-full ${estilo.input} border border-border rounded-lg text-foreground placeholder:text-foreground-faint focus:outline-none focus:ring-2 focus:ring-primary [&::-webkit-search-cancel-button]:hidden`}
+                className={`w-full ${estilo.input} border border-border-input rounded-lg text-foreground placeholder:text-foreground-faint transition-colors focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 [&::-webkit-search-cancel-button]:hidden`}
             />
             {valor && (
                 <button
                     type="button"
                     onClick={limpiar}
                     aria-label="Limpiar búsqueda"
-                    className={`absolute right-1 top-1/2 -translate-y-1/2 ${estilo.boton} inline-flex items-center justify-center rounded-md text-foreground-faint hover:text-foreground hover:bg-primary/10 transition-colors cursor-pointer`}
+                    className={`absolute right-1 top-1/2 -translate-y-1/2 ${estilo.boton} inline-flex items-center justify-center rounded-md text-foreground-faint hover:text-foreground hover:bg-surface-soft transition-colors cursor-pointer`}
                 >
-                    <X size={16} />
+                    <X size={16} aria-hidden="true" />
                 </button>
             )}
         </div>

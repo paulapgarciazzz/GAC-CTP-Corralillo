@@ -70,10 +70,10 @@ final class Predeterminados
             ],
             'apariencia' => [
                 // Mismos valores que el tema claro de frontend/src/index.css.
-                'color_primario' => '#277a48',
-                'color_primario_hover' => '#1e5c37',
-                'color_acento' => '#2c8a9c',
-                'color_riel' => '#1a1e3c',
+                'color_primario' => '#0369a1',
+                'color_primario_hover' => '#075985',
+                'color_acento' => '#1e40af',
+                'color_riel' => '#0f172a',
                 'escudo' => null,
                 'logo' => null,
                 'mostrar_galeria' => false,

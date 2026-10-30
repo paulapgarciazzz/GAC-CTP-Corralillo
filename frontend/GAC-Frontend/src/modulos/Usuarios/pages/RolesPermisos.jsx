@@ -59,7 +59,7 @@ export default function RolesPermisos() {
     return (
         <div className="space-y-5">
             <div>
-                <h1 className="text-2xl font-bold text-primary">Roles y Permisos</h1>
+                <h1 className="text-2xl font-semibold text-foreground">Roles y Permisos</h1>
                 <p className="mt-1 text-sm text-foreground-soft">Define a qué módulos accede cada usuario y qué puede hacer en cada uno.</p>
             </div>
 

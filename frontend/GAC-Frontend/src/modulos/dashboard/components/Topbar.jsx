@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
-import { Menu, Search, Sun, Moon, UserCircle, LogOut,SquareArrowUpLeft} from 'lucide-react'
+import { Menu, Sun, Moon, UserCircle, LogOut,SquareArrowUpLeft} from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuth } from '../../../auth/hooks/useAuth'
 import Avatar from '../../../components/Avatar'
@@ -8,7 +8,7 @@ import { useCerrarConEscape } from '../../../hooks/useCerrarConEscape'
 // El modal de perfil se descarga solo cuando se abre.
 const ModalPerfil = lazy(() => import('../../Usuarios/components/ModalPerfil'));
 
-const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
+const Topbar = ({ isDark, isDrawerOpen, onToggleDrawer, onToggleTheme }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [perfilAbierto, setPerfilAbierto] = useState(false);
     const menuRef = useRef(null);
@@ -47,54 +47,50 @@ const Topbar = ({ isDark, onToggleDrawer, onToggleTheme }) => {
 
     return(
         <>
-        <nav className="print:hidden sticky top-0 z-20 bg-surface/80 backdrop-blur-lg border-b border-border">
-            <div className="h-16 flex items-center px-4 sm:px-6">
+        <nav aria-label="Barra superior" className="print:hidden sticky top-0 z-20 bg-surface/90 backdrop-blur-lg border-b border-border">
+            <div className="h-16 flex items-center px-4 sm:px-6 lg:px-8">
                 <div className='flex items-center justify-between w-full'>
                     <div className="flex items-center gap-3">
-                        <button onClick= {onToggleDrawer} className="lg:hidden p-2 rounded-lg hover:bg-primary/10 transition-colors">
-                            <Menu className="w-5 h-5 text-foreground"/>
+                        <button type="button" onClick= {onToggleDrawer} aria-label={isDrawerOpen ? 'Cerrar menú lateral' : 'Abrir menú lateral'} aria-expanded={isDrawerOpen} aria-controls="menu-lateral" className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg hover:bg-surface-soft transition-colors">
+                            <Menu className="w-5 h-5 text-foreground" aria-hidden="true"/>
                         </button>
                     </div>
                     <div className="flex items-center gap-2">
-
-                        <button className="md:hidden p-2 rounded-lg hover:bg-primary/10 transition-colors">
-                            <Search className="w-5 h-5 text-foreground-soft"/>
-                        </button>
-                        <button onClick={onToggleTheme} className="p-2 rounded-lg hover:bg-primary/10 transition-colors" aria-label="Toggle Theme">
+                        <button type="button" onClick={onToggleTheme} className="inline-flex h-10 w-10 items-center justify-center rounded-lg hover:bg-surface-soft transition-colors" aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}>
                             {isDark ? (
-                                <Sun className="w-5 h-5 text-warning"/>
+                                <Sun className="w-5 h-5 text-warning" aria-hidden="true"/>
                             ):(
-                                <Moon className="w-5 h-5 text-foreground-soft"/>
+                                <Moon className="w-5 h-5 text-foreground-soft" aria-hidden="true"/>
                             )}
                         </button>
 
                         {/* Perfil*/}
                         <div className="relative" ref={menuRef}>
-                            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} aria-label="Menú de usuario" aria-expanded={isDropdownOpen}
-                                className="flex items-center gap-2 p-2 rounded-lg hover:bg-primary/10 transition-colors">
+                            <button type="button" onClick={() => setIsDropdownOpen(!isDropdownOpen)} aria-label="Menú de usuario" aria-expanded={isDropdownOpen} aria-haspopup="true"
+                                className="flex items-center gap-2 p-1 rounded-full hover:bg-surface-soft transition-colors">
                                 <Avatar nombre={usuario?.name} foto={usuario?.foto} tamano="sm" className="border-2 border-border"/>
                             </button>
                             {isDropdownOpen && (
                                 <>
-                                    <div className='absolute right-0 mt-2 w-56 bg-surface rounded-lg shadow-lg border border-border z-20'>
+                                    <div className='absolute right-0 mt-2 w-60 bg-surface rounded-xl shadow-xl border border-border z-20 animate-aparecer'>
 
-                                        <div className='p-3 border-b border-border'>
+                                        <div className='px-4 py-3 border-b border-border'>
                                             <p className='text-sm font-semibold text-foreground truncate'>{usuario?.name ?? 'Usuario'}</p>
-                                            <p className='text-xs text-foreground-faint truncate'>{usuario?.email}</p>
+                                            <p className='text-sm text-foreground-soft truncate'>{usuario?.email}</p>
                                         </div>
                                     <div className='p-2'>
-                                        <button onClick={abrirPerfil} className='flex items-center gap-3 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors'>
-                                            <UserCircle className='w-4 h-4'/>
+                                        <button type="button" onClick={abrirPerfil} className='flex min-h-10 items-center gap-3 w-full px-3 py-2 text-sm rounded-lg transition-colors text-foreground hover:bg-surface-soft'>
+                                            <UserCircle className='w-4 h-4 text-foreground-soft' aria-hidden="true"/>
                                             Perfil
                                         </button>
                                         
-                                        <button onClick={salirAPaginaPrincipal} className='flex items-center gap-3 w-full px-3 py-2 text-sm text-foreground-soft hover:bg-primary/10 rounded-lg transition-colors'>
-                                            <SquareArrowUpLeft className='w-4 h-4'/>
-                                            Pagina principal
+                                        <button type="button" onClick={salirAPaginaPrincipal} className='flex min-h-10 items-center gap-3 w-full px-3 py-2 text-sm rounded-lg transition-colors text-foreground hover:bg-surface-soft'>
+                                            <SquareArrowUpLeft className='w-4 h-4 text-foreground-soft' aria-hidden="true"/>
+                                            Página principal
                                         </button>
-                                        <button className='flex items-center gap-3 w-full px-3 py-2 text-sm text-danger hover:bg-danger-soft rounded-lg transition-colors'  onClick={handleLogout}>
+                                        <button type="button" className='flex min-h-10 items-center gap-3 w-full px-3 py-2 text-sm rounded-lg transition-colors text-danger hover:bg-danger-soft' onClick={handleLogout}>
 
-                                            <LogOut  className='w-4 h-4'/>
+                                            <LogOut className='w-4 h-4' aria-hidden="true"/>
                                             Cerrar Sesión
                                         </button>
                                     </div>

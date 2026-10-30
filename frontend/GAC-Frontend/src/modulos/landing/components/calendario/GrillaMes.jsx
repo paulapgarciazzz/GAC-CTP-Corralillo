@@ -9,7 +9,7 @@ function EncabezadoSemana() {
             {DIAS_SEMANA.map((dia) => (
                 <div
                     key={dia}
-                    className="py-2.5 text-center text-[11px] font-semibold uppercase tracking-wide text-foreground-faint"
+                    className="py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-foreground-faint"
                 >
                     <span className="sm:hidden">{dia[0]}</span>
                     <span className="hidden sm:inline">{dia}</span>
@@ -19,11 +19,15 @@ function EncabezadoSemana() {
     );
 }
 
+// Líneas con bordes en cada celda (derecha e inferior), no con `gap-px` sobre un fondo:
+// con columnas de ancho fraccionario el hueco de 1px se redondea a 0 y desaparecen líneas.
+const GRILLA_CLASS = 'grid grid-cols-7 *:border-r *:border-b *:border-border [&>*:nth-child(7n)]:border-r-0 [&>*:nth-last-child(-n+7)]:border-b-0';
+
 export function GrillaMesCargando({ mes }) {
     return (
         <div aria-hidden="true">
             <EncabezadoSemana />
-            <div className="grid animate-pulse grid-cols-7 gap-px bg-border">
+            <div className={`${GRILLA_CLASS} animate-pulse`}>
                 {diasDeLaGrillaMes(mes).map((dia, i) => (
                     <div key={dia.toISOString()} className="flex min-h-[92px] flex-col gap-1.5 bg-surface p-1 sm:min-h-[120px] sm:p-2">
                         <span className="h-5 w-5 self-end rounded-full bg-background sm:h-6 sm:w-6" />
@@ -40,7 +44,7 @@ export default function GrillaMes({ mes, eventos, onSeleccionarDia }) {
     return (
         <div>
             <EncabezadoSemana />
-            <div className="grid grid-cols-7 gap-px bg-border">
+            <div className={GRILLA_CLASS}>
                 {diasDeLaGrillaMes(mes).map((dia) => (
                     <CeldaDia
                         key={dia.toISOString()}

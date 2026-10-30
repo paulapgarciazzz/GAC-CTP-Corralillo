@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Users } from 'lucide-react';
 import Aviso from '../../../components/Aviso';
+import { EstadoVacio } from '../../../components/EstadoLista';
 import BarraBusqueda from '../../../components/BarraBusqueda';
 import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
 import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
@@ -54,33 +55,55 @@ export default function GestionAgrupaciones() {
         : agrupaciones;
 
     return (
-        <div className="space-y-4">
-            <BarraBusqueda
-                valor={busqueda}
-                onChange={setBusqueda}
-                placeholder="Buscar por nombre o cédula del encargado"
-                ariaLabel="Buscar agrupación"
-                tamano="sm"
-                className="w-full sm:max-w-xs"
-            />
+        <div className="space-y-5">
+            <div>
+                <p className="text-sm text-foreground-faint">Solicitudes</p>
+                <h1 className="text-2xl font-semibold text-foreground">Gestión de agrupaciones</h1>
+                <p className="mt-1 text-sm text-foreground-soft">Consulta, edita o elimina las agrupaciones registradas. Selecciona una tarjeta para ver su detalle.</p>
+            </div>
+
+            <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
+                <BarraBusqueda
+                    valor={busqueda}
+                    onChange={setBusqueda}
+                    placeholder="Buscar por nombre o cédula del encargado"
+                    ariaLabel="Buscar agrupación"
+                    tamano="sm"
+                    className="w-full sm:max-w-sm"
+                />
+                {!loading && agrupaciones.length > 0 && (
+                    <p role="status" className="inline-flex items-center gap-2 text-sm text-foreground-soft">
+                        <Users size={16} className="text-primary" aria-hidden="true" />
+                        {terminoBusqueda
+                            ? `${agrupacionesFiltradas.length} de ${agrupaciones.length} agrupaciones`
+                            : `${agrupaciones.length} ${agrupaciones.length === 1 ? 'agrupación' : 'agrupaciones'}`}
+                    </p>
+                )}
+            </div>
 
             <Aviso tipo="exito" mensaje={mensajeExito} />
             <Aviso mensaje={error} />
 
             {loading ? (
-                <div className="flex items-center justify-center py-16">
-                    <Loader2 className="animate-spin text-primary" size={28} />
+                <div role="status" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <span className="sr-only">Cargando agrupaciones...</span>
+                    {Array.from({ length: 4 }, (_, i) => (
+                        <div key={i} aria-hidden="true" className="overflow-hidden rounded-xl border border-border bg-surface">
+                            <div className="esqueleto aspect-4/3 rounded-none" />
+                            <div className="space-y-2.5 p-4">
+                                <span className="esqueleto block h-4 w-2/3" />
+                                <span className="esqueleto block h-3 w-1/2" />
+                                <span className="esqueleto block h-3 w-1/3" />
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : agrupaciones.length === 0 ? (
-                <div className="flex items-center justify-center py-16">
-                    <p className="text-sm text-foreground-faint text-center">No hay agrupaciones registradas todavía.</p>
-                </div>
+                <EstadoVacio mensaje="No hay agrupaciones registradas todavía." />
             ) : agrupacionesFiltradas.length === 0 ? (
-                <div className="flex items-center justify-center py-16">
-                    <p className="text-sm text-foreground-faint text-center">No se encontraron agrupaciones que coincidan con la búsqueda.</p>
-                </div>
+                <EstadoVacio mensaje="No se encontraron agrupaciones que coincidan con la búsqueda." />
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {agrupacionesFiltradas.map((agrupacion) => (
                         <TarjetaAgrupacion
                             key={agrupacion.id}

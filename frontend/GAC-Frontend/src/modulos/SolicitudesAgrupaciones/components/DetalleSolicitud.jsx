@@ -36,7 +36,7 @@ export default function DetalleSolicitud({ solicitud, onBack }) {
             </button>
 
             <div className="flex items-center justify-between gap-4">
-                <h2 className="text-xl font-bold text-foreground">{agrupacion.nombre}</h2>
+                <h2 className="text-xl font-semibold text-foreground">{agrupacion.nombre}</h2>
                 <EstadoBadge estado={solicitud.estado} />
             </div>
 

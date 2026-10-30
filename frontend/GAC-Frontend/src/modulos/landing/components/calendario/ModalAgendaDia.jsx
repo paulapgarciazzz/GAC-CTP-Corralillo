@@ -61,7 +61,7 @@ function TarjetaEvento({ evento, dia, actividades, cargando }) {
                 </div>
             </div>
             <div className="px-4 py-3.5">
-                <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-foreground-faint">
+                <p className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-foreground-faint">
                     Actividades del {format(dia, "d 'de' MMMM", { locale: es })}
                 </p>
                 {contenido}

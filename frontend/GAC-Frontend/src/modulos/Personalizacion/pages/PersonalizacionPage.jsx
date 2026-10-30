@@ -22,7 +22,7 @@ export default function PersonalizacionPage() {
         <div className="space-y-5">
             <div>
                 <p className="text-sm text-foreground-faint">Ajustes</p>
-                <h1 className="text-2xl font-bold text-primary">Personalización del sistema</h1>
+                <h1 className="text-2xl font-semibold text-foreground">Personalización del sistema</h1>
                 <p className="mt-1 text-sm text-foreground-soft">
                     Administra el contenido público del sitio sin modificar código.
                 </p>

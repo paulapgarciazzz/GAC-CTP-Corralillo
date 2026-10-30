@@ -86,7 +86,7 @@ export default function GestionSolicitudes() {
                     value={filtroEvento}
                     onChange={(e) => setFiltroEvento(e.target.value)}
                     aria-label="Filtrar por evento"
-                    className="w-full sm:w-64 px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full sm:w-64 px-3 py-2 bg-surface border border-border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                     <option value="todos">Todos los eventos</option>
                     <option value="ninguno">Sin evento</option>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import ModalConfirmarEliminacion from '../../../components/ModalConfirmarEliminacion';
 import Aviso from '../../../components/Aviso';
-import { EstadoCargando, EstadoVacio } from '../../../components/EstadoLista';
+import { EsqueletoLista, EstadoVacio } from '../../../components/EstadoLista';
 import { useConfirmarEliminacion } from '../../../hooks/useConfirmarEliminacion';
 import { usePermisosModulo } from '../../../auth/hooks/usePermisosModulo';
 import { eliminarEncargado, obtenerEncargados } from '../services/encargadoService';
@@ -78,20 +78,20 @@ export default function GestionEncargadosAjustes() {
         <div className="space-y-5">
             <div>
                 <p className="text-sm text-foreground-faint">Solicitudes</p>
-                <h1 className="text-2xl font-bold text-primary">Gestión de Encargados</h1>
+                <h1 className="text-2xl font-semibold text-foreground">Gestión de Encargados</h1>
                 <p className="mt-1 text-sm text-foreground-soft">Administra los encargados registrados y sus datos asociados.</p>
             </div>
             <Aviso tipo="exito" mensaje={mensajeExito} />
             <Aviso mensaje={error} onReintentar={reintentar} />
             {loading ? (
-                <EstadoCargando texto="Cargando encargados..." />
+                <EsqueletoLista texto="Cargando encargados..." />
             ) : encargados.length === 0 ? (
                 <EstadoVacio mensaje="No hay encargados registrados." />
             ) : (
                 <div className="bg-surface border border-border rounded-xl overflow-x-auto">
                     <table className="w-full min-w-[980px] text-sm">
-                        <thead className="bg-background border-b border-border"><tr className="text-left text-xs uppercase tracking-wider text-foreground-faint"><th className="px-4 py-3 font-semibold">Encargado</th><th className="px-4 py-3 font-semibold">Identificación</th><th className="px-4 py-3 font-semibold">Contacto</th><th className="px-4 py-3 font-semibold">Agrupaciones</th><th className="px-4 py-3 font-semibold">Solicitudes</th>{puedeEliminar && <th className="px-4 py-3 font-semibold text-right">Acción</th>}</tr></thead>
-                        <tbody className="divide-y divide-border">{encargados.map((encargado) => <tr key={encargado.cedula} className="hover:bg-background/60 transition-colors"><td className="px-4 py-4 font-semibold text-foreground">{nombreEncargado(encargado)}</td><td className="px-4 py-4 text-foreground-soft"><span className="block">{obtenerConfigIdentificacion(encargado.tipo_identificacion).etiquetaCorta}</span><span className="text-xs text-foreground-faint">{encargado.cedula}</span></td><td className="px-4 py-4 text-foreground-soft"><span className="block">{encargado.email || '—'}</span><span className="text-xs text-foreground-faint">{encargado.numero_tel || '—'}</span></td><td className="px-4 py-4 text-foreground-soft">{textoCantidad(encargado.agrupaciones_count, 'agrupación', 'agrupaciones')}</td><td className="px-4 py-4 text-foreground-soft">{textoCantidad(encargado.solicitudes_count, 'solicitud', 'solicitudes')}</td>{puedeEliminar && <td className="px-4 py-4 text-right"><button type="button" onClick={() => eliminacion.abrir(encargado)} aria-label={`Eliminar a ${nombreEncargado(encargado)}`} className="inline-flex items-center gap-2 px-3 py-2 border border-danger text-danger hover:bg-danger-soft rounded-lg font-medium transition-colors cursor-pointer"><Trash2 size={15} />Eliminar</button></td>}</tr>)}</tbody>
+                        <thead className="bg-surface-soft border-b border-border"><tr className="text-left text-xs uppercase tracking-wide text-foreground-soft"><th className="px-4 py-3 font-semibold">Encargado</th><th className="px-4 py-3 font-semibold">Identificación</th><th className="px-4 py-3 font-semibold">Contacto</th><th className="px-4 py-3 font-semibold">Agrupaciones</th><th className="px-4 py-3 font-semibold">Solicitudes</th>{puedeEliminar && <th className="px-4 py-3 font-semibold text-right">Acción</th>}</tr></thead>
+                        <tbody className="divide-y divide-border">{encargados.map((encargado) => <tr key={encargado.cedula} className="hover:bg-surface-soft transition-colors"><td className="px-4 py-4 font-semibold text-foreground">{nombreEncargado(encargado)}</td><td className="px-4 py-4 text-foreground-soft"><span className="block">{obtenerConfigIdentificacion(encargado.tipo_identificacion).etiquetaCorta}</span><span className="text-xs text-foreground-faint">{encargado.cedula}</span></td><td className="px-4 py-4 text-foreground-soft"><span className="block">{encargado.email || '—'}</span><span className="text-xs text-foreground-faint">{encargado.numero_tel || '—'}</span></td><td className="px-4 py-4 text-foreground-soft">{textoCantidad(encargado.agrupaciones_count, 'agrupación', 'agrupaciones')}</td><td className="px-4 py-4 text-foreground-soft">{textoCantidad(encargado.solicitudes_count, 'solicitud', 'solicitudes')}</td>{puedeEliminar && <td className="px-4 py-4 text-right"><button type="button" onClick={() => eliminacion.abrir(encargado)} aria-label={`Eliminar a ${nombreEncargado(encargado)}`} className="inline-flex items-center gap-2 px-3 py-2 border border-danger text-danger hover:bg-danger-soft rounded-lg font-medium transition-colors cursor-pointer"><Trash2 size={15} />Eliminar</button></td>}</tr>)}</tbody>
                     </table>
                 </div>
             )}

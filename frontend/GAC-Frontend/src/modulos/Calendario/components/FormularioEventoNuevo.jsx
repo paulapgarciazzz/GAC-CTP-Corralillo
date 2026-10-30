@@ -133,7 +133,7 @@ export default function FormularioEventoNuevo({ evento, onSubmit, onCancel, onDe
             </div>
 
             <div className="space-y-2">
-                <span className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Color</span>
+                <span className="block text-sm font-semibold text-foreground">Color</span>
                 <div className="flex flex-wrap gap-2">
                     {COLOR_OPTIONS.map((opcion) => {
                         const colors = CATEGORY_COLORS[opcion.value];

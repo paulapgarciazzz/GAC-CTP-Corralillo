@@ -16,7 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 import ModalConfirmarEliminacion from '../../../../components/ModalConfirmarEliminacion';
 import Aviso from '../../../../components/Aviso';
-import { EstadoCargando, EstadoVacio } from '../../../../components/EstadoLista';
+import { EsqueletoLista, EstadoVacio } from '../../../../components/EstadoLista';
 import { useConfirmarEliminacion } from '../../../../hooks/useConfirmarEliminacion';
 import { usePermisosModulo } from '../../../../auth/hooks/usePermisosModulo';
 import ModalPatrocinador from '../components/ModalPatrocinador';
@@ -146,7 +146,7 @@ export default function PatrocinadoresTab() {
             <section className="space-y-5">
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
-                        <h2 className="text-lg font-bold text-foreground">Patrocinadores</h2>
+                        <h2 className="text-lg font-semibold text-foreground">Patrocinadores</h2>
                         {puedeEditar && (
                             <p className="mt-1 text-sm text-foreground-soft">
                                 Arrastra para cambiar el orden de aparición en la landing.
@@ -155,7 +155,7 @@ export default function PatrocinadoresTab() {
                         )}
                     </div>
                     {puedeCrear && (
-                        <button type="button" onClick={abrirCrear} className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors cursor-pointer">
+                        <button type="button" onClick={abrirCrear} className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-on-primary rounded-lg font-semibold transition-colors cursor-pointer">
                             <Plus size={18} />Agregar patrocinador
                         </button>
                     )}
@@ -165,7 +165,7 @@ export default function PatrocinadoresTab() {
                 <Aviso mensaje={error} onReintentar={cargarPatrocinadores} />
 
                 {loading ? (
-                    <EstadoCargando texto="Cargando patrocinadores..." />
+                    <EsqueletoLista texto="Cargando patrocinadores..." />
                 ) : patrocinadores.length === 0 ? (
                     !error && <EstadoVacio mensaje="No hay patrocinadores registrados." />
                 ) : (

@@ -53,7 +53,7 @@ export default function LandingTab() {
             <form onSubmit={enviar} className="space-y-8">
                 {GRUPOS.map(({ titulo, campos }) => (
                     <section key={titulo} className="space-y-3">
-                        <h2 className="text-lg font-bold text-foreground">{titulo}</h2>
+                        <h2 className="text-lg font-semibold text-foreground">{titulo}</h2>
                         <CamposSeccion
                             idPrefijo="landing"
                             campos={campos}
@@ -76,7 +76,7 @@ export default function LandingTab() {
 
             <section className="space-y-3">
                 <div>
-                    <h2 className="text-lg font-bold text-foreground">Imágenes de la portada</h2>
+                    <h2 className="text-lg font-semibold text-foreground">Imágenes de la portada</h2>
                     <p className="mt-1 text-sm text-foreground-soft">
                         Fotos del carrusel del Hero. Si no hay ninguna visible, se muestran las fotos originales del colegio.
                         Se recomiendan fotos horizontales de al menos 1600 px de ancho.

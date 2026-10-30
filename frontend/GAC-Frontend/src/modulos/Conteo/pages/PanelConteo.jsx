@@ -78,7 +78,7 @@ export default function PanelConteo() {
         <div className="space-y-5">
             <div>
                 <p className="text-sm text-foreground-faint">Conteo</p>
-                <h1 className="text-2xl font-bold text-primary">Panel de conteo</h1>
+                <h1 className="text-2xl font-semibold text-foreground">Panel de conteo</h1>
                 <p className="mt-1 text-sm text-foreground-soft">Ocupación estimada de la institución, actualizada automáticamente cada 5 segundos.</p>
             </div>
 

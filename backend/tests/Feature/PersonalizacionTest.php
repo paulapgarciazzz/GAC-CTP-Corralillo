@@ -84,7 +84,7 @@ class PersonalizacionTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.landing.hero_titulo', 'CTP de Corralillo')
             ->assertJsonPath('data.contacto.correo', 'ctp.decorralillo@mep.go.cr')
-            ->assertJsonPath('data.apariencia.color_primario', '#277a48')
+            ->assertJsonPath('data.apariencia.color_primario', '#0369a1')
             ->assertJsonPath('data.apariencia.escudo_url', null)
             ->assertJsonMissingPath('data.correos');
     }

@@ -1,71 +1,192 @@
 @import "tailwindcss";
 @custom-variant dark (&:where([data-theme=dark],[data-theme=dark] *));
 
+/* Sistema de diseño: design-system/ctp-corralillo/MASTER.md */
 @theme{
-  --font-display: 'Inter', sans-serif;
+  --font-sans: 'Source Sans 3 Variable', 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Lexend Variable', 'Lexend', ui-sans-serif, system-ui, sans-serif;
 
-  /* Verde Accesible — marca */
-  --color-primary: #277a48;
-  --color-primary-hover: #1e5c37;
-  --color-accent: #2c8a9c;
+  /* Azul institucional — marca (el admin puede sobrescribir primario, hover, acento y riel) */
+  --color-primary: #0369a1;
+  --color-primary-hover: #075985;
+  --color-on-primary: #ffffff;
+  --color-accent: #1e40af;
 
-  /* Riel de navegación (footer/login) — siempre oscuro, no cambia con el tema */
-  --color-rail: #1a1e3c;
+  /* Riel de navegación (hero/footer/login/sidebar) — siempre oscuro, no cambia con el tema */
+  --color-rail: #0f172a;
+  /* Indicador de ítem activo sobre el riel: el primario aclarado para que contraste con el fondo oscuro. */
+  --color-rail-activo: color-mix(in srgb, var(--color-primary) 55%, white);
 
   /* Superficies y texto (valores por defecto = tema claro) */
-  --color-background: #f4f8f6;
+  --color-background: #f8fafc;
   --color-surface: #ffffff;
-  --color-border: #d3e0d9;
-  --color-foreground: #14151f;
-  --color-foreground-soft: #4f546c;
-  --color-foreground-faint: #8b91a8;
+  --color-surface-soft: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-input: #7b8798;
+  --color-foreground: #0f172a;
+  --color-foreground-soft: #475569;
+  --color-foreground-faint: #64748b;
 
-  /* Estados semánticos (tablas, badges) */
-  --color-success: #1e5c37;
-  --color-success-soft: #cdedda;
-  --color-warning: #8a5a12;
-  --color-warning-soft: #fbe8c8;
-  --color-danger: #971911;
-  --color-danger-soft: #fadcda;
-  --color-info: #1c5c69;
-  --color-info-soft: #d3eef2;
+  /* Estados semánticos (tablas, badges) — todos ≥ 4.5:1 sobre su tinte */
+  --color-success: #166534;
+  --color-success-soft: #dcfce7;
+  --color-warning: #92400e;
+  --color-warning-soft: #fef3c7;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fee2e2;
+  --color-on-danger: #ffffff;
+  --color-info: #0e7490;
+  --color-info-soft: #cffafe;
 
   /* Paleta categórica para gráficos (validada CVD, máx. 3 usos simultáneos) */
   --color-chart-1: #2a78d6;
   --color-chart-2: #eb6834;
   --color-chart-3: #1baf7a;
+  /* Texto sobre el tinte /15 de cada color (etiquetas de eventos del calendario): ≥ 4.8:1 */
+  --color-chart-1-texto: #225ba2;
+  --color-chart-2-texto: #934830;
+  --color-chart-3-texto: #166b56;
+
+  /* Movimiento: solo opacity/transform, anulado con prefers-reduced-motion.
+     Sin fill-mode: un transform que persiste convierte al panel en contenedor de los hijos
+     `position: fixed` (p. ej. la lista de SelectorHora) y los desplaza o recorta. */
+  --animate-entrada: entrada 180ms ease-out;
+  --animate-aparecer: aparecer 150ms ease-out;
+  --animate-flotar: flotar 3s ease-in-out infinite;
+  --animate-check: check-aparece 2.4s ease-in-out infinite;
+  /* Entrada en cascada del hero (usar con animation-delay; backwards oculta el elemento durante el retraso). */
+  --animate-subir: subir 650ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  /* Cambio de vista del panel: corto para no estorbar. */
+  --animate-vista: vista 200ms ease-out;
+  --animate-girar-lento: girar 60s linear infinite;
+  --animate-brillo: brillo 1.4s ease-in-out infinite;
+
+  @keyframes entrada { from { opacity: 0; transform: translateY(4px) scale(0.98); } }
+  @keyframes aparecer { from { opacity: 0; } }
+  @keyframes subir { from { opacity: 0; transform: translateY(16px); } }
+  @keyframes vista { from { opacity: 0; transform: translateY(6px); } }
+  @keyframes girar { to { transform: rotate(360deg); } }
+  @keyframes brillo { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+  @keyframes flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes check-aparece { 0%, 15% { opacity: 0; transform: scale(0.4); } 30%, 85% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.4); } }
 }
 
 :root[data-theme="dark"]{
   /* Los controles nativos (listas de <select>, íconos de fecha, scrollbars) se dibujan en oscuro. */
   color-scheme: dark;
 
-  --color-primary: #45ac75;
-  --color-primary-hover: #6bc596;
-  --color-accent: #7ecdda;
+  --color-primary: #38bdf8;
+  --color-primary-hover: #7dd3fc;
+  --color-on-primary: #0f172a;
+  --color-accent: #93c5fd;
 
-  --color-background: #0a0c1a;
-  --color-surface: #12152b;
-  --color-border: #1c3327;
-  --color-foreground: #f4f5f8;
-  --color-foreground-soft: #a7abc4;
-  --color-foreground-faint: #6a708a;
+  --color-background: #0b1220;
+  --color-surface: #131c2e;
+  --color-surface-soft: #1a2438;
+  --color-border: #263248;
+  --color-border-input: #64748b;
+  --color-foreground: #f1f5f9;
+  --color-foreground-soft: #cbd5e1;
+  --color-foreground-faint: #94a3b8;
 
-  --color-success: #6bc596;
-  --color-success-soft: #143d25;
-  --color-warning: #f3c476;
-  --color-warning-soft: #3a2a0f;
-  --color-danger: #e75c50;
-  --color-danger-soft: #440c08;
-  --color-info: #7ecdda;
-  --color-info-soft: #132a2e;
+  --color-success: #4ade80;
+  --color-success-soft: #14301f;
+  --color-warning: #fbbf24;
+  --color-warning-soft: #33260a;
+  --color-danger: #f87171;
+  --color-danger-soft: #3b1212;
+  --color-on-danger: #0f172a;
+  --color-info: #67e8f9;
+  --color-info-soft: #0e2a33;
 
   --color-chart-1: #3987e5;
   --color-chart-2: #d95926;
   --color-chart-3: #199e70;
+  --color-chart-1-texto: #6ba5ec;
+  --color-chart-2-texto: #e3835c;
+  --color-chart-3-texto: #47b18d;
 }
 
-body{
-  background: var(--color-background);
-  color: var(--color-foreground);
+@layer base{
+  html{
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body{
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3{
+    font-family: var(--font-display);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection{
+    background: color-mix(in srgb, var(--color-primary) 25%, transparent);
+  }
+
+  /* Foco visible en todo control; los inputs que usan ring lo reemplazan con outline-none. */
+  :focus-visible{
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Contenedores que reciben foco por código (main, secciones al navegar con anclas, paneles de modal). */
+  [tabindex="-1"]:focus{
+    outline: none;
+  }
+
+  button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary, label[for]{
+    cursor: pointer;
+  }
+}
+
+@layer components{
+  /* Enlace "Saltar al contenido": oculto hasta recibir foco por teclado. */
+  .saltar-contenido{
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    z-index: 100;
+    transform: translateY(-200%);
+    border-radius: var(--radius-lg);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    padding: 0.625rem 1rem;
+    font-weight: 600;
+  }
+
+  .saltar-contenido:focus{
+    transform: none;
+  }
+
+  /* Patrón de puntos decorativo para fondos oscuros (riel). Solo CSS: no descarga imágenes. */
+  .patron-puntos{
+    background-image: radial-gradient(rgb(255 255 255 / 0.12) 1px, transparent 1.5px);
+    background-size: 22px 22px;
+    pointer-events: none;
+  }
+
+  /* Bloque de carga con brillo; con "reducir movimiento" queda estático. */
+  .esqueleto{
+    border-radius: var(--radius-md);
+    background-image: linear-gradient(90deg, var(--color-surface-soft) 25%, var(--color-border) 50%, var(--color-surface-soft) 75%);
+    background-size: 200% 100%;
+    animation: var(--animate-brillo);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, ::before, ::after{
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

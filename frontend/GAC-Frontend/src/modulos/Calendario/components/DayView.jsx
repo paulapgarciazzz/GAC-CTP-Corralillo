@@ -13,7 +13,7 @@ export default function DayView({ currentDate, events, onEventClick }) {
             <div className="overflow-x-auto">
                 <div className="min-w-[420px]">
                     <div className="flex flex-col gap-1 border-b border-border p-2">
-                        <span className="text-[10px] font-medium text-foreground-faint">Todo el día</span>
+                        <span className="text-xs font-medium text-foreground-faint">Todo el día</span>
                         {allDayEvents.length === 0 ? (
                             <span className="text-xs text-foreground-faint">Sin eventos de todo el día</span>
                         ) : (

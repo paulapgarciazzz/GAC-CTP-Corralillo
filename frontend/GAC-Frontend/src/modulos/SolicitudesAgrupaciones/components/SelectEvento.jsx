@@ -10,9 +10,9 @@ export default function SelectEvento({ eventos, cargando, value, onChange, idInc
 
     return (
         <div className="space-y-1 sm:col-span-2">
-            <label htmlFor="id_evento" className="text-xs font-medium text-foreground-soft uppercase tracking-wider block">Evento a participar</label>
+            <label htmlFor="id_evento" className="block text-sm font-semibold text-foreground">Evento a participar</label>
             <select id="id_evento" name="id_evento" value={value} onChange={onChange} disabled={cargando} required aria-invalid={Boolean(error)}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                className="w-full px-4 py-2 border border-border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                 <option value="" disabled className={OPCION_CLASS}>{cargando ? 'Cargando eventos...' : 'Selecciona un evento'}</option>
                 {opciones.map((evento) => (
                     <option key={evento.id} value={evento.id} className={OPCION_CLASS}>{evento.title} ({evento.fechaInicio.split('-').reverse().join('/')})</option>

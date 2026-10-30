@@ -29,7 +29,7 @@ export default function MoreEventsPopover({ date, events, onEventClick }) {
             <button
                 type="button"
                 onClick={() => setOpen((prev) => !prev)}
-                className="w-full truncate rounded-md px-1.5 py-0.5 text-left text-[11px] font-semibold text-foreground-faint hover:text-primary hover:bg-primary/10 transition-colors"
+                className="w-full truncate rounded-md px-1.5 py-0.5 text-left text-xs font-semibold text-foreground-faint hover:text-primary hover:bg-primary/10 transition-colors"
             >
                 +{events.length} más
             </button>

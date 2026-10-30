@@ -1,5 +1,5 @@
-import escudoOriginal from '../../../../assets/escudo.png';
-import logoOriginal from '../../../../assets/logo.png';
+import escudoOriginal from '../../../../assets/escudo.webp';
+import logoOriginal from '../../../../assets/logo.webp';
 import Aviso from '../../../../components/Aviso';
 import { EstadoCargando } from '../../../../components/EstadoLista';
 import { usePermisosModulo } from '../../../../auth/hooks/usePermisosModulo';
@@ -74,7 +74,7 @@ export default function AparienciaGaleriaTab() {
         <div className="space-y-10">
             <section className="space-y-3">
                 <div>
-                    <h2 className="text-lg font-bold text-foreground">Escudo y logotipo</h2>
+                    <h2 className="text-lg font-semibold text-foreground">Escudo y logotipo</h2>
                     <p className="mt-1 text-sm text-foreground-soft">Se guardan al elegir la imagen. PNG con fondo transparente, máximo 2 MB.</p>
                 </div>
                 <div className="grid gap-3 lg:grid-cols-2">
@@ -104,13 +104,13 @@ export default function AparienciaGaleriaTab() {
 
             <form onSubmit={enviar} className="space-y-8">
                 <section className="space-y-3">
-                    <h2 className="text-lg font-bold text-foreground">Colores institucionales</h2>
+                    <h2 className="text-lg font-semibold text-foreground">Colores institucionales</h2>
                     <CamposSeccion idPrefijo="apariencia" campos={COLORES} valores={seccion.valores} errores={seccion.errores} onChange={seccion.actualizarCampo} disabled={!puedeEditar} />
                     <MuestraColores valores={seccion.valores} />
                 </section>
 
                 <section className="space-y-3">
-                    <h2 className="text-lg font-bold text-foreground">Galería de la landing</h2>
+                    <h2 className="text-lg font-semibold text-foreground">Galería de la landing</h2>
                     <CamposSeccion idPrefijo="apariencia" campos={GALERIA} valores={seccion.valores} errores={seccion.errores} onChange={seccion.actualizarCampo} disabled={!puedeEditar} />
                 </section>
 
@@ -126,7 +126,7 @@ export default function AparienciaGaleriaTab() {
 
             <section className="space-y-3">
                 <div>
-                    <h2 className="text-lg font-bold text-foreground">Fotografías de la galería</h2>
+                    <h2 className="text-lg font-semibold text-foreground">Fotografías de la galería</h2>
                     <p className="mt-1 text-sm text-foreground-soft">PNG, JPG o WEBP, máximo 4 MB. Las fotos ocultas no se muestran en la landing.</p>
                 </div>
                 <GestorFotos

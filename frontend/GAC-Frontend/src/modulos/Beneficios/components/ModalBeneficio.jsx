@@ -1,11 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
+import { useAtraparFoco } from '../../../hooks/useAtraparFoco';
+import { BOTON_CERRAR_MODAL_CLASS, MODAL_OVERLAY_CLASS, MODAL_PANEL_CLASS } from '../../../utils/modal';
 import SelectorCategoriaBeneficio from './SelectorCategoriaBeneficio';
 import FormularioBeneficio from './FormularioBeneficio';
 import { BENEFICIO_CONFIG } from '../services/beneficioService';
 
 export default function ModalBeneficio({ open, modo, categoriaInicial, beneficio, loading, error, errors, onClose, onSubmit, ocultarSelectorCategoria = false }) {
     const [categoria, setCategoria] = useState(categoriaInicial);
+
+    const panelRef = useRef(null);
+    useAtraparFoco(open, panelRef);
 
     useEffect(() => {
         if (!open) return undefined;
@@ -21,12 +26,12 @@ export default function ModalBeneficio({ open, modo, categoriaInicial, beneficio
     const editando = modo === 'editar';
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={loading ? undefined : onClose}>
-            <div role="dialog" aria-modal="true" aria-labelledby="titulo-modal-beneficio" onClick={(event) => event.stopPropagation()} className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface rounded-2xl shadow-2xl p-6 sm:p-8 relative">
-                <button type="button" onClick={onClose} disabled={loading} aria-label="Cerrar" className="absolute top-4 right-4 text-foreground-faint hover:text-foreground disabled:opacity-50 transition-colors cursor-pointer">
-                    <X size={22} />
+        <div className={MODAL_OVERLAY_CLASS} onClick={loading ? undefined : onClose}>
+            <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby="titulo-modal-beneficio" tabIndex={-1} onClick={(event) => event.stopPropagation()} className={`${MODAL_PANEL_CLASS} max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8`}>
+                <button type="button" onClick={onClose} disabled={loading} aria-label="Cerrar" className={BOTON_CERRAR_MODAL_CLASS}>
+                    <X size={20} aria-hidden="true" />
                 </button>
-                <h2 id="titulo-modal-beneficio" className="text-xl sm:text-2xl text-center font-bold text-primary mb-6">
+                <h2 id="titulo-modal-beneficio" className="text-xl sm:text-2xl text-center font-semibold text-foreground mb-6 px-8">
                     {editando ? 'Editar beneficio' : 'Agregar beneficio'}
                 </h2>
 
