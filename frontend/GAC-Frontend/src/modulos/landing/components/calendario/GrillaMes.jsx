@@ -30,9 +30,9 @@ export function GrillaMesCargando({ mes }) {
             <div className={`${GRILLA_CLASS} animate-pulse`}>
                 {diasDeLaGrillaMes(mes).map((dia, i) => (
                     <div key={dia.toISOString()} className="flex min-h-[92px] flex-col gap-1.5 bg-surface p-1 sm:min-h-[120px] sm:p-2">
-                        <span className="h-5 w-5 self-end rounded-full bg-background sm:h-6 sm:w-6" />
-                        {i % 3 === 1 && <span className="h-3 rounded bg-background sm:h-4" />}
-                        {i % 5 === 2 && <span className="h-3 w-2/3 rounded bg-background sm:h-4" />}
+                        <span className="h-5 w-5 self-end rounded-full bg-border sm:h-6 sm:w-6" />
+                        {i % 3 === 1 && <span className="h-3 rounded bg-border sm:h-4" />}
+                        {i % 5 === 2 && <span className="h-3 w-2/3 rounded bg-border sm:h-4" />}
                     </div>
                 ))}
             </div>

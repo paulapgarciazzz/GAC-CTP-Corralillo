@@ -5,17 +5,33 @@ const prefiereMenosMovimiento = () => window.matchMedia?.('(prefers-reduced-moti
 // Acelera al salir y frena al llegar (ease-in-out cúbica).
 const suavizar = (t) => (t < 0.5 ? 4 * t * t * t : 1 - ((-2 * t + 2) ** 3) / 2);
 
+// Tiempo tras llegar en el que se corrige la posición si el contenido que aún carga cambia el alto de la página.
+const SEGUIMIENTO_MS = 5000;
+
 /**
  * Desplazamiento lento hacia las secciones de la landing al tocar enlaces internos (#inicio, #calendario...).
  * Respeta el scroll-margin-top de la sección, le pasa el foco al llegar (como el ancla nativa) y se
- * cancela si la persona desplaza por su cuenta. Con "reducir movimiento" el salto es inmediato.
+ * cancela si la persona interactúa por su cuenta. Con "reducir movimiento" el salto es inmediato.
  */
 export function useDesplazamientoSuave() {
     useEffect(() => {
         let animacion = null;
+        let dejarDeSeguir = null;
         const cancelar = () => {
             if (animacion) cancelAnimationFrame(animacion);
             animacion = null;
+            dejarDeSeguir?.();
+        };
+
+        const seguirDestino = (calcularFin) => {
+            const observador = new ResizeObserver(() => window.scrollTo(0, calcularFin()));
+            const temporizador = setTimeout(() => dejarDeSeguir?.(), SEGUIMIENTO_MS);
+            dejarDeSeguir = () => {
+                observador.disconnect();
+                clearTimeout(temporizador);
+                dejarDeSeguir = null;
+            };
+            observador.observe(document.body);
         };
 
         const handleClick = (e) => {
@@ -31,7 +47,8 @@ export function useDesplazamientoSuave() {
 
             const margen = parseFloat(getComputedStyle(destino).scrollMarginTop) || 0;
             const inicio = window.scrollY;
-            const fin = Math.max(0, destino.getBoundingClientRect().top + inicio - margen);
+            const calcularFin = () => Math.max(0, destino.getBoundingClientRect().top + window.scrollY - margen);
+            const fin = calcularFin();
             const distancia = fin - inicio;
 
             const llegar = () => {
@@ -39,6 +56,7 @@ export function useDesplazamientoSuave() {
                 destino.focus({ preventScroll: true });
                 // Conserva el estado del router y deja el ancla en la URL, como el enlace nativo.
                 history.replaceState(history.state, '', hash);
+                seguirDestino(calcularFin);
             };
 
             if (prefiereMenosMovimiento() || Math.abs(distancia) < 2) {
@@ -52,7 +70,8 @@ export function useDesplazamientoSuave() {
             const paso = (ahora) => {
                 comienzo ??= ahora;
                 const progreso = Math.min(1, (ahora - comienzo) / duracion);
-                window.scrollTo(0, inicio + distancia * suavizar(progreso));
+                // El destino se recalcula en cada frame: puede moverse si aparece contenido durante el recorrido.
+                window.scrollTo(0, inicio + (calcularFin() - inicio) * suavizar(progreso));
                 if (progreso < 1) {
                     animacion = requestAnimationFrame(paso);
                 } else {
@@ -66,6 +85,7 @@ export function useDesplazamientoSuave() {
         document.addEventListener('click', handleClick);
         window.addEventListener('wheel', cancelar, { passive: true });
         window.addEventListener('touchstart', cancelar, { passive: true });
+        window.addEventListener('pointerdown', cancelar, { passive: true });
         window.addEventListener('keydown', cancelar);
 
         return () => {
@@ -73,6 +93,7 @@ export function useDesplazamientoSuave() {
             document.removeEventListener('click', handleClick);
             window.removeEventListener('wheel', cancelar);
             window.removeEventListener('touchstart', cancelar);
+            window.removeEventListener('pointerdown', cancelar);
             window.removeEventListener('keydown', cancelar);
         };
     }, []);
