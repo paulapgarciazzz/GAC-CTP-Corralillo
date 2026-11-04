@@ -53,7 +53,8 @@
   --animate-entrada: entrada 180ms ease-out;
   --animate-aparecer: aparecer 150ms ease-out;
   --animate-flotar: flotar 3s ease-in-out infinite;
-  --animate-check: check-aparece 2.4s ease-in-out infinite;
+  /* backwards: con animation-delay, cada check espera oculto su turno en vez de verse y desaparecer. */
+  --animate-check: check-aparece 2.4s ease-in-out infinite backwards;
   /* Entrada en cascada del hero (usar con animation-delay; backwards oculta el elemento durante el retraso). */
   --animate-subir: subir 650ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
   /* Cambio de vista del panel: corto para no estorbar. */
@@ -182,10 +183,17 @@
   }
 }
 
+/* Durante el cambio de tema (useTheme) todo cambia a la vez, sin fundidos parciales. */
+:root[data-cambiando-tema] *, :root[data-cambiando-tema] ::before, :root[data-cambiando-tema] ::after{
+  transition: none !important;
+}
+
 @media (prefers-reduced-motion: reduce){
   *, ::before, ::after{
+    animation-delay: 0s !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    transition-delay: 0s !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
